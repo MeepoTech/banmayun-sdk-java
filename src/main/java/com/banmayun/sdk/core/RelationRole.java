@@ -10,29 +10,29 @@ import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
-public class Size extends Dumpable {
+public class RelationRole extends Dumpable {
 
-    public long bytes;
+    public String name;
     public String displayValue;
 
-    public Size(long bytes, String displayValue) {
-        this.bytes = bytes;
+    public RelationRole(String name, String displayValue) {
+        this.name = name;
         this.displayValue = displayValue;
     }
 
     @Override
     protected void dumpFields(DumpWriter out) {
         // TODO Auto-generated method stub
-        out.field("bytes", bytes);
+        out.field("name", name);
         out.field("display_value", displayValue);
     }
 
-    public static JsonReader<Size> Reader = new JsonReader<Size>() {
+    public static JsonReader<RelationRole> Reader = new JsonReader<RelationRole>() {
 
         @Override
-        public Size read(JsonParser parser) throws IOException, JsonReadException {
+        public RelationRole read(JsonParser parser) throws IOException, JsonReadException {
             
-            long bytes = -1;
+            String name = null;
             String displayValue = null;
             
             JsonLocation top = JsonReader.expectObjectStart(parser);
@@ -45,8 +45,8 @@ public class Size extends Dumpable {
                     case -1:
                         JsonReader.skipValue(parser);
                         break;
-                    case FM_bytes:
-                        bytes = JsonReader.readUnsignedLongField(parser, fieldName, bytes);
+                    case FM_name:
+                        name = JsonReader.StringReader.readField(parser, fieldName, name);
                         break;
                     case FM_display_value:
                         displayValue = JsonReader.StringReader.readField(parser, fieldName, displayValue);
@@ -61,18 +61,18 @@ public class Size extends Dumpable {
             JsonReader.expectObjectEnd(parser);
             
             // TODO: add some checks?
-            return new Size(bytes, displayValue);
+            return new RelationRole(name, displayValue);
         }
     };
 
-    private static final int FM_bytes = 0;
+    private static final int FM_name = 0;
     private static final int FM_display_value = 1;
 
     private static final JsonReader.FieldMapping FM;
 
     static {
         JsonReader.FieldMapping.Builder b = new JsonReader.FieldMapping.Builder();
-        b.add("bytes", FM_bytes);
+        b.add("name", FM_name);
         b.add("display_value", FM_display_value);
 
         FM = b.build();
