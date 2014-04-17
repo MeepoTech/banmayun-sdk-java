@@ -23,7 +23,7 @@ public class Share extends Dumpable {
     public User createdBy;
     public Meta[] meta;
 
-    Share(String id, String rootId, String metaId, Time expiresAt, Time createdAt, User createdBy, Meta[] meta) {
+    public Share(String id, String rootId, String metaId, Time expiresAt, Time createdAt, User createdBy, Meta[] meta) {
         this.id = id;
         this.rootId = rootId;
         this.metaId = metaId;
@@ -35,7 +35,6 @@ public class Share extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
         out.field("id", id);
         out.field("root_id", rootId);
         out.field("meta_id", metaId);
@@ -140,5 +139,9 @@ public class Share extends Dumpable {
         b.add("meta", FM_meta);
 
         FM = b.build();
+    }
+
+    public void print() {
+        System.out.println(this.id + " " + this.metaId + " " + this.rootId);
     }
 }

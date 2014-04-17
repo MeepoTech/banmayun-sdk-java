@@ -21,8 +21,20 @@ public class Permission extends Dumpable {
     public boolean writableToOthers;
     public boolean deletableToOthers;
 
-    Permission(boolean insertableToOwner, boolean readableToOwner, boolean writableToOwner, boolean deletableToOwner,
-            boolean insertableToOthers, boolean readableToOthers, boolean writableToOthers, boolean deletableToOthers) {
+    public Permission() {
+        this.insertableToOwner = true;
+        this.readableToOwner = true;
+        this.writableToOwner = true;
+        this.deletableToOwner = true;
+        this.insertableToOthers = true;
+        this.readableToOthers = true;
+        this.writableToOthers = true;
+        this.deletableToOthers = true;
+    }
+
+    public Permission(boolean insertableToOwner, boolean readableToOwner, boolean writableToOwner,
+            boolean deletableToOwner, boolean insertableToOthers, boolean readableToOthers, boolean writableToOthers,
+            boolean deletableToOthers) {
         this.insertableToOwner = insertableToOwner;
         this.readableToOwner = readableToOwner;
         this.writableToOwner = writableToOwner;
@@ -51,14 +63,14 @@ public class Permission extends Dumpable {
         @Override
         public Permission read(JsonParser parser) throws IOException, JsonReadException {
 
-            boolean insertableToOwner = false;
-            boolean readableToOwner = false;
-            boolean writableToOwner = false;
-            boolean deletableToOwner = false;
-            boolean insertableToOthers = false;
-            boolean readableToOthers = false;
-            boolean writableToOthers = false;
-            boolean deletableToOthers = false;
+            boolean insertableToOwner = true;
+            boolean readableToOwner = true;
+            boolean writableToOwner = true;
+            boolean deletableToOwner = true;
+            boolean insertableToOthers = true;
+            boolean readableToOthers = true;
+            boolean writableToOthers = true;
+            boolean deletableToOthers = true;
 
             JsonLocation top = JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
@@ -133,4 +145,5 @@ public class Permission extends Dumpable {
 
         FM = b.build();
     }
+
 }

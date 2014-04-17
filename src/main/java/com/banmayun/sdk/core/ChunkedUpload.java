@@ -58,7 +58,7 @@ public class ChunkedUpload extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_id:
-                        id = JsonReader.StringReader.readField(parser, fieldName, id); 
+                        id = JsonReader.StringReader.readField(parser, fieldName, id);
                         break;
                     case FM_offset:
                         offset = JsonReader.readUnsignedLongField(parser, fieldName, offset);

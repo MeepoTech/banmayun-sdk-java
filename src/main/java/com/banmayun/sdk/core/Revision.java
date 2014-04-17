@@ -116,4 +116,9 @@ public class Revision extends Dumpable {
 
         FM = b.build();
     }
+
+    public void print() {
+        System.out.println(this.md5 + " " + this.version + " " + this.size.bytes);
+
+    }
 }

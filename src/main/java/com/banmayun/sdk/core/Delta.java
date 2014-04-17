@@ -105,8 +105,8 @@ public class Delta extends Dumpable {
         // TODO Auto-generated method stub
         out.field("cursor_id", cursorId);
         out.field("reset", reset);
-        //not ok
-        //out.field("entried", entries);
+        // not ok
+        // out.field("entried", entries);
     }
 
     public static JsonReader<Delta> Reader = new JsonReader<Delta>() {
@@ -144,7 +144,7 @@ public class Delta extends Dumpable {
                         parser.nextToken();
                         if (entryList.size() > 0) {
                             entries = new Entry[entryList.size()];
-                            for (int i = 0; i < entryList.size(); i ++) {
+                            for (int i = 0; i < entryList.size(); i++) {
                                 entries[i] = entryList.get(i);
                             }
                         } else {
@@ -176,8 +176,17 @@ public class Delta extends Dumpable {
         b.add("cursor_id", FM_cursor_id);
         b.add("reset", FM_reset);
         b.add("entries", FM_entries);
-        
+
         FM = b.build();
+    }
+
+    public void print() {
+        System.out.println(this.cursorId + " " + this.reset);
+        if (this.entries == null) {
+            System.out.println("entries is null");
+        } else {
+            System.out.println("entries: " + entries.length);
+        }
     }
 }
 

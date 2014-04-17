@@ -7,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 
-
 public class StandardHttpRequestor extends HttpRequestor {
 
     private final Proxy proxy;
@@ -26,12 +25,14 @@ public class StandardHttpRequestor extends HttpRequestor {
 
     private static Response toResponse(HttpURLConnection conn) throws IOException {
         int responseCode = conn.getResponseCode();
+        System.out.println("responseCode: " + responseCode);
         InputStream bodyStream;
 
         if (responseCode >= 400) {
             bodyStream = conn.getErrorStream();
         } else {
             bodyStream = conn.getInputStream();
+
         }
         return new Response(conn.getResponseCode(), bodyStream, conn.getHeaderFields());
     }
@@ -58,14 +59,14 @@ public class StandardHttpRequestor extends HttpRequestor {
         conn.setRequestMethod("POST");
         return new Uploader(conn);
     }
-  //TODO: http instead of https
-    /*@Override
-    public Uploader startPut(String url, Iterable<Header> headers) throws IOException {
-        HttpURLConnection conn = prepRequest(url, headers);
-        conn.setRequestMethod("PUT");
-        return new Uploader(conn);
-    }*/
-    
+
+    // TODO: http instead of https
+    /*
+     * @Override public Uploader startPut(String url, Iterable<Header> headers)
+     * throws IOException { HttpURLConnection conn = prepRequest(url, headers);
+     * conn.setRequestMethod("PUT"); return new Uploader(conn); }
+     */
+
     @Override
     public Uploader startPut(String url, Iterable<Header> headers) throws IOException {
         HttpURLConnection conn = prepRequest(url, headers);
@@ -76,9 +77,11 @@ public class StandardHttpRequestor extends HttpRequestor {
     /*
      * This for the sub-classes to overload.
      */
-    //TODO: http instead of https
-    /*protected void configureConnection(HttpURLConnection conn) throws IOException {
-    }*/
+    // TODO: http instead of https
+    /*
+     * protected void configureConnection(HttpURLConnection conn) throws
+     * IOException { }
+     */
     protected void configureConnection(HttpURLConnection conn) throws IOException {
     }
 
@@ -118,10 +121,11 @@ public class StandardHttpRequestor extends HttpRequestor {
                 throw new IllegalStateException("Can't finish().  Uploader already closed.");
             }
             this.conn = null;
-            return toResponse(conn);
+            Response response = toResponse(conn);
+            return response;
         }
     }
-    
+
     private HttpURLConnection prepRequest(String url, Iterable<Header> headers) throws IOException {
         URL urlObject = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) urlObject.openConnection(this.proxy);
@@ -137,20 +141,19 @@ public class StandardHttpRequestor extends HttpRequestor {
         }
         return conn;
     }
-    //TODO: http instead of https
-    /*private HttpURLConnection prepRequest(String url, Iterable<Header> headers) throws IOException {
-        URL urlObject = new URL(url);
-        HttpURLConnection conn = (HttpURLConnection) urlObject.openConnection(this.proxy);
-        conn.setConnectTimeout(DefaultConnectTimeoutMillis);
-        conn.setReadTimeout(DefaultReadTimeoutMillis);
-        conn.setUseCaches(false);
-        conn.setAllowUserInteraction(false);
-
-        configureConnection(conn);
-
-        for (Header header : headers) {
-            conn.addRequestProperty(header.key, header.value);
-        }
-        return conn;
-    }*/
+    // TODO: http instead of https
+    /*
+     * private HttpURLConnection prepRequest(String url, Iterable<Header>
+     * headers) throws IOException { URL urlObject = new URL(url);
+     * HttpURLConnection conn = (HttpURLConnection)
+     * urlObject.openConnection(this.proxy);
+     * conn.setConnectTimeout(DefaultConnectTimeoutMillis);
+     * conn.setReadTimeout(DefaultReadTimeoutMillis); conn.setUseCaches(false);
+     * conn.setAllowUserInteraction(false);
+     * 
+     * configureConnection(conn);
+     * 
+     * for (Header header : headers) { conn.addRequestProperty(header.key,
+     * header.value); } return conn; }
+     */
 }

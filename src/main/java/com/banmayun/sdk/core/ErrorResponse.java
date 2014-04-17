@@ -75,7 +75,7 @@ public class ErrorResponse extends Dumpable {
     private static final int FM_status = 0;
     private static final int FM_code = 1;
     private static final int FM_message = 2;
-    
+
     private static final JsonReader.FieldMapping FM;
 
     static {
@@ -83,7 +83,7 @@ public class ErrorResponse extends Dumpable {
         b.add("status", FM_status);
         b.add("code", FM_code);
         b.add("message", FM_message);
-        
+
         FM = b.build();
     }
 }

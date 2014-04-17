@@ -113,4 +113,13 @@ public class ResultList<T extends Dumpable> extends Dumpable {
             FM = b.build();
         }
     }
+
+    public void print() {
+        System.out.println("" + this.offset + this.total);
+        if (this.entries == null) {
+            System.out.println("entries is null");
+        } else {
+            System.out.println("entries: " + entries.size());
+        }
+    }
 }

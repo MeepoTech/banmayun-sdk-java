@@ -94,6 +94,7 @@ public class Meta extends Dumpable {
         // out.field("contents", contents);
         // TODO: not ok
     }
+
     public static JsonReader<Meta> Reader = new JsonReader<Meta>() {
 
         @Override
@@ -286,5 +287,16 @@ public class Meta extends Dumpable {
         b.add("contents", FM_contents);
 
         FM = b.build();
+    }
+
+    public void print() {
+        System.out.println("" + this.commentCount + " " + this.icon + " " + this.id + " " + this.md5 + " " + this.name
+                + " " + this.path + " " + this.rootId + " " + this.shareCount + " " + this.version);
+        if (contents == null) {
+            System.out.println("contents is null");
+        } else {
+            System.out.println("contents: " + contents.length);
+        }
+
     }
 }

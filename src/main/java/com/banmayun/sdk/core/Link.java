@@ -2,6 +2,8 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
+import javax.jws.soap.SOAPBinding.Use;
+
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -15,12 +17,12 @@ public class Link extends Dumpable {
     public enum LinkDevice {
         PC_WINDOWS, PC_MACOSX, PC_LINUX, PHONE_IOS, PHONE_ANDROID, PAD_IOS, PAD_ANDROID, WEB, UNKNOWN
     }
-    
+
     public static String getLinkDeviceStr(LinkDevice linkDevice) {
         String device = null;
         switch (linkDevice) {
         case PC_WINDOWS:
-            device = "pc_windows"; 
+            device = "pc_windows";
             break;
         case PC_MACOSX:
             device = "pc_macosx";
@@ -53,6 +55,7 @@ public class Link extends Dumpable {
     }
 
     public String id;
+    public String userId;
     public String name;
     public String device;
     public String token;
@@ -60,8 +63,10 @@ public class Link extends Dumpable {
     public Time createdAt;
     public boolean isCurrent;
 
-    public Link(String id, String name, String device, String token, Time expiresAt, Time createdAt, boolean isCurrent) {
+    public Link(String id, String userId, String name, String device, String token, Time expiresAt, Time createdAt,
+            boolean isCurrent) {
         this.id = id;
+        this.userId = userId;
         this.name = name;
         this.device = device;
         this.token = token;
@@ -74,6 +79,7 @@ public class Link extends Dumpable {
     protected void dumpFields(DumpWriter out) {
         // TODO Auto-generated method stub
         out.field("id", id);
+        out.field("user_id", userId);
         out.field("name", name);
         out.field("device", device);
         out.field("token", token);
@@ -88,6 +94,7 @@ public class Link extends Dumpable {
         public Link read(JsonParser parser) throws IOException, JsonReadException {
 
             String id = null;
+            String userId = null;
             String name = null;
             String device = null;
             String token = null;
@@ -107,6 +114,9 @@ public class Link extends Dumpable {
                         break;
                     case FM_id:
                         id = JsonReader.StringReader.readField(parser, fieldName, id);
+                        break;
+                    case FM_user_id:
+                        userId = JsonReader.StringReader.readField(parser, fieldName, userId);
                         break;
                     case FM_name:
                         name = JsonReader.StringReader.readField(parser, fieldName, name);
@@ -136,23 +146,25 @@ public class Link extends Dumpable {
             JsonReader.expectObjectEnd(parser);
 
             // TODO: add some checks?
-            return new Link(id, name, device, token, expiresAt, createdAt, isCurrent);
+            return new Link(id, userId, name, device, token, expiresAt, createdAt, isCurrent);
         }
     };
 
     private static final int FM_id = 0;
-    private static final int FM_name = 1;
-    private static final int FM_device = 2;
-    private static final int FM_token = 3;
-    private static final int FM_expires_at = 4;
-    private static final int FM_created_at = 5;
-    private static final int FM_is_current = 6;
+    private static final int FM_user_id = 1;
+    private static final int FM_name = 2;
+    private static final int FM_device = 3;
+    private static final int FM_token = 4;
+    private static final int FM_expires_at = 5;
+    private static final int FM_created_at = 6;
+    private static final int FM_is_current = 7;
 
     private static final JsonReader.FieldMapping FM;
 
     static {
         JsonReader.FieldMapping.Builder b = new JsonReader.FieldMapping.Builder();
         b.add("id", FM_id);
+        b.add("user_id", FM_user_id);
         b.add("name", FM_name);
         b.add("device", FM_device);
         b.add("token", FM_token);
@@ -161,5 +173,9 @@ public class Link extends Dumpable {
         b.add("is_current", FM_is_current);
 
         FM = b.build();
+    }
+
+    public void print() {
+        System.out.println(this.device + " " + this.id + " " + this.name + " " + this.token + " " + this.userId);
     }
 }

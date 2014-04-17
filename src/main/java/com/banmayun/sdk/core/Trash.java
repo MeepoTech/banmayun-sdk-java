@@ -34,7 +34,6 @@ public class Trash extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
         out.field("id", id);
         out.field("root_id", rootId);
         out.field("meta_id", metaId);
@@ -92,7 +91,7 @@ public class Trash extends Dumpable {
                         parser.nextToken();
                         if (metaList.size() > 0) {
                             meta = new Meta[metaList.size()];
-                            for (int i = 0; i < metaList.size(); i ++) {
+                            for (int i = 0; i < metaList.size(); i++) {
                                 meta[i] = metaList.get(i);
                             }
                         } else {
@@ -132,5 +131,9 @@ public class Trash extends Dumpable {
         b.add("meta", FM_meta);
 
         FM = b.build();
+    }
+
+    public void print() {
+        System.out.println(this.id + " " + this.metaId + " " + this.rootId);
     }
 }

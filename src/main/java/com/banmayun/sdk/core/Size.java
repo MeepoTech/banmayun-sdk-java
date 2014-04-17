@@ -22,7 +22,6 @@ public class Size extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
         out.field("bytes", bytes);
         out.field("display_value", displayValue);
     }
@@ -31,10 +30,10 @@ public class Size extends Dumpable {
 
         @Override
         public Size read(JsonParser parser) throws IOException, JsonReadException {
-            
+
             long bytes = -1;
             String displayValue = null;
-            
+
             JsonLocation top = JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
@@ -59,7 +58,7 @@ public class Size extends Dumpable {
                 }
             }
             JsonReader.expectObjectEnd(parser);
-            
+
             // TODO: add some checks?
             return new Size(bytes, displayValue);
         }

@@ -31,10 +31,10 @@ public class RelationRole extends Dumpable {
 
         @Override
         public RelationRole read(JsonParser parser) throws IOException, JsonReadException {
-            
+
             String name = null;
             String displayValue = null;
-            
+
             JsonLocation top = JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
@@ -59,7 +59,7 @@ public class RelationRole extends Dumpable {
                 }
             }
             JsonReader.expectObjectEnd(parser);
-            
+
             // TODO: add some checks?
             return new RelationRole(name, displayValue);
         }

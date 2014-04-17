@@ -12,18 +12,17 @@ import com.fasterxml.jackson.core.JsonToken;
 
 public class Time extends Dumpable {
 
-    public String rfc1123;
+    public long millis;
     public String displayValue;
 
-    public Time(String rfc1123, String displayValue) {
-        this.rfc1123 = rfc1123;
+    public Time(long millis, String displayValue) {
+        this.millis = millis;
         this.displayValue = displayValue;
     }
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("rfc1123", rfc1123);
+        out.field("millis", millis);
         out.field("display_value", displayValue);
     }
 
@@ -31,10 +30,10 @@ public class Time extends Dumpable {
 
         @Override
         public Time read(JsonParser parser) throws IOException, JsonReadException {
-            
-            String rfc1123 = null;
+
+            long millis = -1;
             String displayValue = null;
-            
+
             JsonLocation top = JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
@@ -45,8 +44,8 @@ public class Time extends Dumpable {
                     case -1:
                         JsonReader.skipValue(parser);
                         break;
-                    case FM_rfc1123:
-                        rfc1123 = JsonReader.StringReader.readField(parser, fieldName, rfc1123);
+                    case FM_millis:
+                        millis = JsonReader.readUnsignedLongField(parser, fieldName, millis);
                         break;
                     case FM_display_value:
                         displayValue = JsonReader.StringReader.readField(parser, fieldName, displayValue);
@@ -59,22 +58,26 @@ public class Time extends Dumpable {
                 }
             }
             JsonReader.expectObjectEnd(parser);
-            
+
             // TODO: add some checks?
-            return new Time(rfc1123, displayValue);
+            return new Time(millis, displayValue);
         }
     };
 
-    private static final int FM_rfc1123 = 0;
+    private static final int FM_millis = 0;
     private static final int FM_display_value = 1;
 
     private static final JsonReader.FieldMapping FM;
 
     static {
         JsonReader.FieldMapping.Builder b = new JsonReader.FieldMapping.Builder();
-        b.add("rfc1123", FM_rfc1123);
+        b.add("rfc1123", FM_millis);
         b.add("display_value", FM_display_value);
 
         FM = b.build();
+    }
+
+    public void print() {
+        System.out.println(this.millis + " " + this.displayValue);
     }
 }

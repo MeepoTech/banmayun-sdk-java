@@ -194,4 +194,9 @@ public class User extends Dumpable {
 
         FM = b.build();
     }
+
+    public void print() {
+        System.out.println(this.displayName + " " + this.email + " " + this.groupCount + " " + this.groupsCanOwn + " "
+                + this.id + " " + this.name + " " + this.rootId + " " + this.source);
+    }
 }

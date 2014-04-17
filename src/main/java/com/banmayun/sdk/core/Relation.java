@@ -18,7 +18,15 @@ public class Relation extends Dumpable {
     public String remark;
     public Time createdAt;
 
-    Relation(RelationRole role, boolean isActivated, boolean isBlocked, String remark, Time createdAt) {
+    public Relation() {
+        this.role = null;
+        this.isActivated = false;
+        this.isBlocked = false;
+        this.remark = null;
+        this.createdAt = null;
+    }
+
+    public Relation(RelationRole role, boolean isActivated, boolean isBlocked, String remark, Time createdAt) {
         this.role = role;
         this.isActivated = isActivated;
         this.isBlocked = isBlocked;

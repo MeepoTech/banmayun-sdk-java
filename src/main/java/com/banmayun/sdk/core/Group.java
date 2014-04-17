@@ -29,11 +29,15 @@ public class Group extends Dumpable {
     public Relation relation;
     public Root root;
 
+    public Group() {
+    }
+
     public Group(String id, String rootId, String name, String source, GroupType type, String intro, String tags,
             String annouce, boolean isVisible, boolean isActivated, boolean isBlocked, int userCount, Time createdAt,
             User createdBy, Relation relation, Root root) {
         this.id = id;
         this.rootId = rootId;
+        this.name = name;
         this.source = source;
         this.type = type;
         this.intro = intro;
@@ -203,5 +207,10 @@ public class Group extends Dumpable {
         b.add("root", FM_root);
 
         FM = b.build();
+    }
+
+    public void print() {
+        System.out.println(this.annouce + " " + this.id + " " + this.intro + " " + this.name + " " + this.rootId + " "
+                + this.source + " " + this.tags);
     }
 }

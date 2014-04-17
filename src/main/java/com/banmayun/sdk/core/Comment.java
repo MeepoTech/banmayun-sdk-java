@@ -19,7 +19,11 @@ public class Comment extends Dumpable {
     public Time createdAt;
     public User createdBy;
 
-    Comment(String id, String rootId, String metaId, String contents, Time createdAt, User createdBy) {
+    public Comment() {
+
+    }
+
+    public Comment(String id, String rootId, String metaId, String contents, Time createdAt, User createdBy) {
         this.id = id;
         this.rootId = rootId;
         this.metaId = metaId;
@@ -112,5 +116,10 @@ public class Comment extends Dumpable {
         b.add("created_by", FM_created_by);
 
         FM = b.build();
+    }
+
+    public void print() {
+        System.out.println(this.contents + " " + this.id + " " + this.metaId + " " + this.rootId + " "
+                + this.createdAt.displayValue);
     }
 }

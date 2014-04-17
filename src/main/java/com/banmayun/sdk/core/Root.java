@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Root extends Dumpable {
-    
+
     public String id;
     public String type;
     public Size used;
@@ -33,7 +33,6 @@ public class Root extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
         out.field("id", id);
         out.field("type", type);
         out.field("used", used);
@@ -44,7 +43,7 @@ public class Root extends Dumpable {
     }
 
     public static JsonReader<Root> Reader = new JsonReader<Root>() {
-        
+
         @Override
         public Root read(JsonParser parser) throws IOException, JsonReadException {
 
@@ -120,7 +119,11 @@ public class Root extends Dumpable {
         b.add("default_permission", FM_default_permission);
         b.add("file_count", FM_file_count);
         b.add("byte_count", FM_byte_count);
-        
+
         FM = b.build();
+    }
+
+    public void print() {
+        System.out.println(this.byteCount + " " + this.fileCount + " " + this.id + " " + this.type);
     }
 }

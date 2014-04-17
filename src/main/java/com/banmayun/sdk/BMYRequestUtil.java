@@ -2,6 +2,7 @@ package com.banmayun.sdk;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-
-import org.apache.commons.logging.Log;
 
 import com.banmayun.sdk.core.ErrorResponse;
 import com.banmayun.sdk.http.HttpRequestor;
@@ -65,37 +64,29 @@ public class BMYRequestUtil {
 
         return buf.toString();
     }
+
     public static String buildUri(String host, String path) {
         return "http://" + host + "/" + path;
-        /*try {
-            //return "http://" + host + "/" + path;
-            return new URI("http", host, "/" + path, null).toURL().toExternalForm();
-        } catch (MalformedURLException ex) {
-            AssertionError ae = new AssertionError();
-            ae.initCause(ex);
-            throw ae;
-        } catch (URISyntaxException ex) {
-            AssertionError ae = new AssertionError();
-            ae.initCause(ex);
-            throw ae;
-        }*/
+        /*
+         * try { //return "http://" + host + "/" + path; return new URI("http",
+         * host, "/" + path, null).toURL().toExternalForm(); } catch
+         * (MalformedURLException ex) { AssertionError ae = new
+         * AssertionError(); ae.initCause(ex); throw ae; } catch
+         * (URISyntaxException ex) { AssertionError ae = new AssertionError();
+         * ae.initCause(ex); throw ae; }
+         */
     }
-    //TODO: http instead of https
-    /*public static String buildUri(String host, String path) {
-        try {
-            return new URI("https", host, "/" + path, null).toURL().toExternalForm();
-            // return new URI("https", host, "/" + path,
-            // null).toURL().toExternalForm();
-        } catch (MalformedURLException ex) {
-            AssertionError ae = new AssertionError();
-            ae.initCause(ex);
-            throw ae;
-        } catch (URISyntaxException ex) {
-            AssertionError ae = new AssertionError();
-            ae.initCause(ex);
-            throw ae;
-        }
-    }*/
+
+    // TODO: http instead of https
+    /*
+     * public static String buildUri(String host, String path) { try { return
+     * new URI("https", host, "/" + path, null).toURL().toExternalForm(); //
+     * return new URI("https", host, "/" + path, //
+     * null).toURL().toExternalForm(); } catch (MalformedURLException ex) {
+     * AssertionError ae = new AssertionError(); ae.initCause(ex); throw ae; }
+     * catch (URISyntaxException ex) { AssertionError ae = new AssertionError();
+     * ae.initCause(ex); throw ae; } }
+     */
 
     public static String buildUrlWithParams(String userLocale, String host, String path, String[] params) {
         return buildUri(host, path) + "?" + encodeUrlParams(userLocale, params);
@@ -127,6 +118,7 @@ public class BMYRequestUtil {
         headers = addUserAgentHeader(headers, requestConfig);
 
         String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+        System.out.println(url);
         try {
             return requestConfig.httpRequestor.doGet(url, headers);
         } catch (IOException ex) {
@@ -139,6 +131,7 @@ public class BMYRequestUtil {
         headers = addUserAgentHeader(headers, requestConfig);
 
         String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+        System.out.println(url);
         try {
             return requestConfig.httpRequestor.doDelete(url, headers);
         } catch (IOException ex) {
@@ -152,6 +145,7 @@ public class BMYRequestUtil {
         headers = addAuthHeader(headers, accessToken);
 
         String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+        System.out.println(url);
         try {
             return requestConfig.httpRequestor.startPut(url, headers);
         } catch (IOException ex) {
@@ -282,6 +276,7 @@ public class BMYRequestUtil {
     public static <T> T doGet(BMYRequestConfig requestConfig, String host, String path, String[] params,
             ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
         HttpRequestor.Response response = startGet(requestConfig, host, path, params, headers);
+        System.out.println(response.statusCode);
         try {
             return handler.handle(response);
         } finally {
@@ -308,9 +303,25 @@ public class BMYRequestUtil {
         }
     }
 
+    public static HttpRequestor.Uploader getUploaderWithPut(BMYRequestConfig requestConfig, String host, String path,
+            String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
+        String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+        System.out.println(url);
+        headers = addUserAgentHeader(headers, requestConfig);
+        headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
+
+        try {
+            HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPut(url, headers);
+            return uploader;
+        } catch (IOException e) {
+            throw new BMYException.NetworkIO(e);
+        }
+    }
+
     public static HttpRequestor.Uploader getUploaderWithPost(BMYRequestConfig requestConfig, String host, String path,
             String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
         String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+        System.out.println(url);
         headers = addUserAgentHeader(headers, requestConfig);
         headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
 
@@ -329,14 +340,13 @@ public class BMYRequestUtil {
         headers = addUserAgentHeader(headers, requestConfig);
         headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
 
-        if (body != null)
-            headers.add(new HttpRequestor.Header("Content-Length", Integer.toString(body.length())));
-
         try {
             HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPost(url, headers);
             try {
-                if (body != null)
+                if (body != null) {
+                    System.out.println("body length: " + body.length());
                     uploader.body.write(body.getBytes());
+                }
                 return uploader.finish();
             } finally {
                 uploader.close();
@@ -360,6 +370,7 @@ public class BMYRequestUtil {
     public static <T> T doPost(BMYRequestConfig requestConfig, String host, String path, String[] params, String body,
             ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
         HttpRequestor.Response response = startPost(requestConfig, host, path, params, body, headers);
+        System.out.println(response.statusCode);
         return finishResponse(response, handler);
     }
 

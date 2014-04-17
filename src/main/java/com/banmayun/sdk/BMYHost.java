@@ -6,7 +6,9 @@ public class BMYHost {
     public final String web;
 
     public static final BMYHost Default = new BMYHost("192.168.200.195:5000", "www.banmayun.com");
-    //public static final BMYHost Default = new BMYHost("api.banmayun.com", "www.banmayun.com");
+
+    // public static final BMYHost Default = new BMYHost("api.banmayun.com",
+    // "www.banmayun.com");
 
     public BMYHost(String api, String web) {
         this.api = api;
