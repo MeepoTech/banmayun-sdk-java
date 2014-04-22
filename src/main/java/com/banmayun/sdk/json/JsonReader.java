@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 public abstract class JsonReader<T> {
+
     public abstract T read(JsonParser parser) throws IOException, JsonReadException;
 
     public final T readField(JsonParser parser, String fieldName, T v) throws IOException, JsonReadException {
@@ -98,7 +99,8 @@ public abstract class JsonReader<T> {
         return JsonReader.readUnsignedLong(parser);
     }
 
-    public static final JsonReader<String> StringReader = new JsonReader<String>() {
+    public static final JsonReader<String> STRING_READER = new JsonReader<String>() {
+        @Override
         public String read(JsonParser parser) throws IOException, JsonReadException {
             try {
                 String v = parser.getText();
@@ -110,7 +112,8 @@ public abstract class JsonReader<T> {
         }
     };
 
-    public static final JsonReader<Boolean> BooleanReader = new JsonReader<Boolean>() {
+    public static final JsonReader<Boolean> BOOLEAN_READER = new JsonReader<Boolean>() {
+        @Override
         public Boolean read(JsonParser parser) throws IOException, JsonReadException {
             return readBoolean(parser);
         }
@@ -126,8 +129,8 @@ public abstract class JsonReader<T> {
         }
     }
 
-    public static final class FieldMapping {
-        public final HashMap<String, Integer> fields;
+    public static class FieldMapping {
+        private HashMap<String, Integer> fields = null;
 
         private FieldMapping(HashMap<String, Integer> fields) {
             assert fields != null;
@@ -136,18 +139,20 @@ public abstract class JsonReader<T> {
 
         public int get(String fieldName) {
             Integer i = fields.get(fieldName);
-            if (i == null)
+            if (i == null) {
                 return -1;
+            }
             return i;
         }
 
-        public static final class Builder {
+        public static class Builder {
             private HashMap<String, Integer> fields = new HashMap<String, Integer>();
 
             public void add(String fieldName, int expectedIndex) {
-                if (fields == null)
+                if (this.fields == null) {
                     throw new IllegalStateException("already called build(); can't call add() anymore");
-                int i = fields.size();
+                }
+                int i = this.fields.size();
                 if (expectedIndex != i) {
                     throw new IllegalStateException("expectedIndex = " + expectedIndex + ", actual = " + i);
                 }
@@ -158,8 +163,9 @@ public abstract class JsonReader<T> {
             }
 
             public FieldMapping build() {
-                if (fields == null)
+                if (this.fields == null) {
                     throw new IllegalStateException("already called build(); can't call build() again");
+                }
                 HashMap<String, Integer> f = fields;
                 this.fields = null;
                 return new FieldMapping(f);
@@ -167,11 +173,11 @@ public abstract class JsonReader<T> {
         }
     }
 
-    static final JsonFactory jsonFactory = new JsonFactory();
+    public static final JsonFactory JSON_FACTORY = new JsonFactory();
 
     public T readFully(InputStream utf8Body) throws IOException, JsonReadException {
         try {
-            JsonParser parser = jsonFactory.createParser(utf8Body);
+            JsonParser parser = JSON_FACTORY.createParser(utf8Body);
             return readFully(parser);
         } catch (JsonParseException ex) {
             throw JsonReadException.fromJackson(ex);
@@ -180,7 +186,7 @@ public abstract class JsonReader<T> {
 
     public T readFully(String body) throws JsonReadException {
         try {
-            JsonParser parser = jsonFactory.createParser(body);
+            JsonParser parser = JSON_FACTORY.createParser(body);
             try {
                 return readFully(parser);
             } finally {
@@ -197,7 +203,7 @@ public abstract class JsonReader<T> {
 
     public T readFully(byte[] utf8Body) throws JsonReadException {
         try {
-            JsonParser parser = jsonFactory.createParser(utf8Body);
+            JsonParser parser = JSON_FACTORY.createParser(utf8Body);
             try {
                 return readFully(parser);
             } finally {
@@ -240,21 +246,31 @@ public abstract class JsonReader<T> {
 
         public static final class IOError extends FileLoadException {
             private static final long serialVersionUID = 1L;
-            public final IOException reason;
+
+            private IOException reason = null;
 
             public IOError(File file, IOException reason) {
                 super("unable to read file \"" + file.getPath() + "\": " + reason.getMessage());
                 this.reason = reason;
             }
+
+            public IOException getReason() {
+                return this.reason;
+            }
         }
 
         public static final class JsonError extends FileLoadException {
             private static final long serialVersionUID = 1L;
-            public final JsonReadException reason;
+
+            private JsonReadException reason = null;
 
             public JsonError(File file, JsonReadException reason) {
                 super(file.getPath() + ": " + reason.getMessage());
                 this.reason = reason;
+            }
+
+            public JsonReadException getReason() {
+                return this.reason;
             }
         }
     }

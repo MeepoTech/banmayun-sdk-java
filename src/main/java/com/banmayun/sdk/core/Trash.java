@@ -1,29 +1,27 @@
 package com.banmayun.sdk.core;
 
 import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.jws.soap.SOAPBinding.Use;
-import javax.swing.text.AbstractDocument.BranchElement;
 
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Trash extends Dumpable {
 
-    public String id;
-    public String rootId;
-    public String metaId;
-    public Time createdAt;
-    public User createdBy;
-    public Meta[] meta;
+    public String id = null;
+    public String rootId = null;
+    public String metaId = null;
+    public Time createdAt = null;
+    public User createdBy = null;
+    public Meta meta = null;
 
-    public Trash(String id, String rootId, String metaId, Time createdAt, User createdBy, Meta[] meta) {
+    public Trash() {
+    }
+
+    public Trash(String id, String rootId, String metaId, Time createdAt, User createdBy, Meta meta) {
         this.id = id;
         this.rootId = rootId;
         this.metaId = metaId;
@@ -34,16 +32,14 @@ public class Trash extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        out.field("id", id);
-        out.field("root_id", rootId);
-        out.field("meta_id", metaId);
-        out.field("created_at", createdAt);
-        out.field("created_by", createdBy);
-        // TODO: not ok
-        // out.field("meta", meta);
+        out.field("id", this.id);
+        out.field("root_id", this.rootId);
+        out.field("meta_id", this.metaId);
+        out.field("created_at", this.createdAt);
+        out.field("created_by", this.createdBy);
     }
 
-    public static JsonReader<Trash> Reader = new JsonReader<Trash>() {
+    public static JsonReader<Trash> reader = new JsonReader<Trash>() {
 
         @Override
         public Trash read(JsonParser parser) throws IOException, JsonReadException {
@@ -53,9 +49,9 @@ public class Trash extends Dumpable {
             String metaId = null;
             Time createdAt = null;
             User createdBy = null;
-            Meta[] meta = null;
+            Meta meta = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -66,37 +62,38 @@ public class Trash extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_id:
-                        id = JsonReader.StringReader.readField(parser, fieldName, id);
+                        id = JsonReader.STRING_READER.readField(parser, fieldName, id);
                         break;
                     case FM_root_id:
-                        rootId = JsonReader.StringReader.readField(parser, fieldName, rootId);
+                        rootId = JsonReader.STRING_READER.readField(parser, fieldName, rootId);
                         break;
                     case FM_meta_id:
-                        metaId = JsonReader.StringReader.readField(parser, fieldName, metaId);
+                        metaId = JsonReader.STRING_READER.readField(parser, fieldName, metaId);
                         break;
                     case FM_created_at:
-                        createdAt = Time.Reader.readField(parser, fieldName, createdAt);
+                        createdAt = Time.reader.readField(parser, fieldName, createdAt);
                         break;
                     case FM_created_by:
-                        createdBy = User.Reader.readField(parser, fieldName, createdBy);
+                        createdBy = User.reader.readField(parser, fieldName, createdBy);
                         break;
                     case FM_meta:
                         JsonReader.expectArrayStart(parser);
-                        ArrayList<Meta> metaList = new ArrayList<>();
-                        while (!JsonReader.isArrayEnd(parser)) {
-                            Meta temp;
-                            temp = Meta.Reader.read(parser);
-                            metaList.add(temp);
-                        }
-                        parser.nextToken();
-                        if (metaList.size() > 0) {
-                            meta = new Meta[metaList.size()];
-                            for (int i = 0; i < metaList.size(); i++) {
-                                meta[i] = metaList.get(i);
-                            }
-                        } else {
-                            meta = null;
-                        }
+                        // TODO:
+                        // ArrayList<Meta> metaList = new ArrayList<>();
+                        // while (!JsonReader.isArrayEnd(parser)) {
+                        // Meta temp;
+                        // temp = Meta.reader.read(parser);
+                        // metaList.add(temp);
+                        // }
+                        // parser.nextToken();
+                        // if (metaList.size() > 0) {
+                        // meta = new Meta[metaList.size()];
+                        // for (int i = 0; i < metaList.size(); i++) {
+                        // meta[i] = metaList.get(i);
+                        // }
+                        // } else {
+                        // meta = null;
+                        // }
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -131,9 +128,5 @@ public class Trash extends Dumpable {
         b.add("meta", FM_meta);
 
         FM = b.build();
-    }
-
-    public void print() {
-        System.out.println(this.id + " " + this.metaId + " " + this.rootId);
     }
 }

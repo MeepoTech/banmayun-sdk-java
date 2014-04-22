@@ -7,15 +7,17 @@ public class BMYRequestConfig {
 
     public static String defaultLocale = "zh_CN";
 
-    public String clientIdentifier;
-    public String userLocale;
-    public HttpRequestor httpRequestor;
+    public String clientIdentifier = null;
+    public String userLocale = null;
+    public HttpRequestor httpRequestor = null;
 
     public BMYRequestConfig(String clientIdentifier, String userLocale, HttpRequestor httpRequestor) {
-        if (clientIdentifier == null)
+        if (clientIdentifier == null) {
             throw new IllegalArgumentException("'clientIdentifier' should not be null");
-        if (httpRequestor == null)
+        }
+        if (httpRequestor == null) {
             throw new IllegalArgumentException("'httpRequestor' should not be null");
+        }
 
         this.clientIdentifier = clientIdentifier;
         this.userLocale = userLocale;
@@ -23,7 +25,7 @@ public class BMYRequestConfig {
     }
 
     public BMYRequestConfig(String clientIdentifier, String userLocale) {
-        this(clientIdentifier, userLocale, StandardHttpRequestor.Instance);
+        this(clientIdentifier, userLocale, StandardHttpRequestor.getInstance());
     }
 
     public BMYRequestConfig(String clientIdentifier) {

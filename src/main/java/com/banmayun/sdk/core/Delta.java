@@ -1,30 +1,23 @@
 package com.banmayun.sdk.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import java.io.IOException;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.RestoreAction;
+import java.util.ArrayList;
 
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Delta extends Dumpable {
 
     public static class Entry extends Dumpable {
+        public String path = null;
+        public Meta meta = null;
 
-        public String path;
-        public Meta meta;
+        public Entry() {
+        }
 
         public Entry(String path, Meta meta) {
             this.path = path;
@@ -33,20 +26,17 @@ public class Delta extends Dumpable {
 
         @Override
         protected void dumpFields(DumpWriter out) {
-            // TODO Auto-generated method stub
-            out.field("path", path);
-            out.field("meta", meta);
+            out.field("path", this.path);
+            out.field("meta", this.meta);
         }
 
-        public static JsonReader<Entry> Reader = new JsonReader<Entry>() {
-
+        public static JsonReader<Entry> reader = new JsonReader<Entry>() {
             @Override
             public Entry read(JsonParser parser) throws IOException, JsonReadException {
-
                 String path = null;
                 Meta meta = null;
 
-                JsonLocation top = JsonReader.expectObjectStart(parser);
+                JsonReader.expectObjectStart(parser);
                 while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                     String fieldName = parser.getCurrentName();
                     parser.nextToken();
@@ -57,10 +47,10 @@ public class Delta extends Dumpable {
                             JsonReader.skipValue(parser);
                             break;
                         case FM_path:
-                            path = JsonReader.StringReader.readField(parser, fieldName, path);
+                            path = JsonReader.STRING_READER.readField(parser, fieldName, path);
                             break;
                         case FM_meta:
-                            meta = Meta.Reader.readField(parser, fieldName, meta);
+                            meta = Meta.reader.readField(parser, fieldName, meta);
                             break;
                         default:
                             throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -71,7 +61,6 @@ public class Delta extends Dumpable {
                 }
                 JsonReader.expectObjectEnd(parser);
 
-                // TODO: add some checks?
                 return new Entry(path, meta);
             }
         };
@@ -90,9 +79,12 @@ public class Delta extends Dumpable {
         }
     }
 
-    public String cursorId;
-    public boolean reset;
-    public Entry[] entries;
+    public String cursorId = null;
+    public Boolean reset = null;
+    public Entry[] entries = null;
+
+    public Delta() {
+    }
 
     public Delta(String cursorId, boolean reset, Entry[] entries) {
         this.cursorId = cursorId;
@@ -102,23 +94,18 @@ public class Delta extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("cursor_id", cursorId);
-        out.field("reset", reset);
-        // not ok
-        // out.field("entried", entries);
+        out.field("cursor_id", this.cursorId);
+        out.field("reset", this.reset);
     }
 
     public static JsonReader<Delta> Reader = new JsonReader<Delta>() {
-
         @Override
         public Delta read(JsonParser parser) throws IOException, JsonReadException {
-
             String cursorId = null;
             boolean reset = false;
             Entry[] entries = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -129,7 +116,7 @@ public class Delta extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_cursor_id:
-                        cursorId = JsonReader.StringReader.readField(parser, fieldName, cursorId);
+                        cursorId = JsonReader.STRING_READER.readField(parser, fieldName, cursorId);
                         break;
                     case FM_reset:
                         reset = JsonReader.readBoolean(parser);
@@ -138,7 +125,7 @@ public class Delta extends Dumpable {
                         ArrayList<Entry> entryList = new ArrayList<>();
                         while (!JsonReader.isArrayEnd(parser)) {
                             Entry entry;
-                            entry = Entry.Reader.read(parser);
+                            entry = Entry.reader.read(parser);
                             entryList.add(entry);
                         }
                         parser.nextToken();
@@ -160,7 +147,6 @@ public class Delta extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Delta(cursorId, reset, entries);
         }
     };
@@ -179,29 +165,4 @@ public class Delta extends Dumpable {
 
         FM = b.build();
     }
-
-    public void print() {
-        System.out.println(this.cursorId + " " + this.reset);
-        if (this.entries == null) {
-            System.out.println("entries is null");
-        } else {
-            System.out.println("entries: " + entries.length);
-        }
-    }
 }
-
-/*
- * @JsonInclude(Include.NON_NULL) public class Delta {
- * 
- * @JsonProperty("cursor_id") public String cursorId = null;
- * 
- * @JsonProperty("reset") public Boolean reset = null;
- * 
- * @JsonProperty("entries") public List<Entry> entries = null;
- * 
- * @JsonInclude(Include.NON_NULL) public static class Entry {
- * 
- * @JsonProperty("path") public String path = null;
- * 
- * @JsonProperty("meta") public Meta meta = null; } }
- */

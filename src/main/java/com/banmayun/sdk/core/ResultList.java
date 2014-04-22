@@ -8,19 +8,17 @@ import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.banmayun.sdk.util.StringUtil;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class ResultList<T extends Dumpable> extends Dumpable {
 
-    public int total;
-    public int offset;
-    public List<T> entries;
+    public Integer total = null;
+    public Integer offset = null;
+    public List<T> entries = null;
+
+    public ResultList() {
+    }
 
     public ResultList(int total, int offset, List<T> entries) {
         this.total = total;
@@ -30,31 +28,29 @@ public class ResultList<T extends Dumpable> extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        out.field("total", total);
-        out.field("offset", offset);
-        // not ok
-        // out.field("entries", entries);
+        out.field("total", this.total);
+        out.field("offset", this.offset);
     }
 
     public static class Reader<T extends Dumpable> extends JsonReader<ResultList<T>> {
-        public JsonReader<T> metadataReader;
+        private JsonReader<T> metadataReader = null;
 
         public Reader(JsonReader<T> metadataReader) {
             this.metadataReader = metadataReader;
         }
 
+        @Override
         public ResultList<T> read(JsonParser parser) throws IOException, JsonReadException {
             return read(parser, metadataReader);
         }
 
         public static <T extends Dumpable> ResultList<T> read(JsonParser parser, JsonReader<T> metadataReader)
                 throws IOException, JsonReadException {
-
             int total = -1;
             int offset = -1;
             List<T> entries = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -111,15 +107,6 @@ public class ResultList<T extends Dumpable> extends Dumpable {
             b.add("entries", FM_entries);
 
             FM = b.build();
-        }
-    }
-
-    public void print() {
-        System.out.println("" + this.offset + this.total);
-        if (this.entries == null) {
-            System.out.println("entries is null");
-        } else {
-            System.out.println("entries: " + entries.size());
         }
     }
 }

@@ -3,6 +3,7 @@ package com.banmayun.sdk.util;
 import java.util.ArrayList;
 
 public abstract class Collector<E, L> {
+
     public abstract void add(E element);
 
     public abstract L finish();
@@ -10,10 +11,12 @@ public abstract class Collector<E, L> {
     public static final class ArrayListCollector<E> extends Collector<E, ArrayList<E>> {
         private ArrayList<E> list = new ArrayList<E>();
 
+        @Override
         public void add(E element) {
             this.list.add(element);
         }
 
+        @Override
         public ArrayList<E> finish() {
             ArrayList<E> list = this.list;
             this.list = null;
@@ -22,7 +25,7 @@ public abstract class Collector<E, L> {
     }
 
     public static final class NullSkipper<E, L> extends Collector<E, L> {
-        private final Collector<E, L> underlying;
+        private Collector<E, L> underlying = null;
 
         public NullSkipper(Collector<E, L> underlying) {
             this.underlying = underlying;
@@ -32,15 +35,16 @@ public abstract class Collector<E, L> {
             return new NullSkipper<E, L>(underlying);
         }
 
+        @Override
         public void add(E element) {
             if (element != null) {
-                underlying.add(element);
+                this.underlying.add(element);
             }
         }
 
+        @Override
         public L finish() {
-            return underlying.finish();
+            return this.underlying.finish();
         }
     }
-
 }

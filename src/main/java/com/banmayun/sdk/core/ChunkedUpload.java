@@ -6,17 +6,19 @@ import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class ChunkedUpload extends Dumpable {
 
-    public String id;
-    public long offset;
-    public Size size;
-    public Time expiresAt;
-    public Time createdAt;
+    public String id = null;
+    public Long offset = null;
+    public Size size = null;
+    public Time expiresAt = null;
+    public Time createdAt = null;
+
+    public ChunkedUpload() {
+    }
 
     public ChunkedUpload(String id, long offset, Size size, Time expiresAt, Time createdAt) {
         this.id = id;
@@ -28,26 +30,23 @@ public class ChunkedUpload extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("id", id);
-        out.field("offset", offset);
-        out.field("size", size);
-        out.field("expires_at", expiresAt);
-        out.field("created_at", createdAt);
+        out.field("id", this.id);
+        out.field("offset", this.offset);
+        out.field("size", this.size);
+        out.field("expires_at", this.expiresAt);
+        out.field("created_at", this.createdAt);
     }
 
-    public static JsonReader<ChunkedUpload> Reader = new JsonReader<ChunkedUpload>() {
-
+    public static JsonReader<ChunkedUpload> reader = new JsonReader<ChunkedUpload>() {
         @Override
         public ChunkedUpload read(JsonParser parser) throws IOException, JsonReadException {
-
             String id = null;
             long offset = -1;
             Size size = null;
             Time expiresAt = null;
             Time createdAt = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -58,19 +57,19 @@ public class ChunkedUpload extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_id:
-                        id = JsonReader.StringReader.readField(parser, fieldName, id);
+                        id = JsonReader.STRING_READER.readField(parser, fieldName, id);
                         break;
                     case FM_offset:
                         offset = JsonReader.readUnsignedLongField(parser, fieldName, offset);
                         break;
                     case FM_size:
-                        size = Size.Reader.readField(parser, fieldName, size);
+                        size = Size.reader.readField(parser, fieldName, size);
                         break;
                     case FM_expires_at:
-                        expiresAt = Time.Reader.readField(parser, fieldName, expiresAt);
+                        expiresAt = Time.reader.readField(parser, fieldName, expiresAt);
                         break;
                     case FM_created_at:
-                        createdAt = Time.Reader.readField(parser, fieldName, createdAt);
+                        createdAt = Time.reader.readField(parser, fieldName, createdAt);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -81,7 +80,6 @@ public class ChunkedUpload extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new ChunkedUpload(id, offset, size, expiresAt, createdAt);
         }
     };

@@ -8,10 +8,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public abstract class JsonWriter<T> {
+
     public abstract void write(T value, JsonGenerator g) throws IOException;
 
     public final void writeToStream(T value, OutputStream out, boolean indent) throws IOException {
-        JsonGenerator g = JsonReader.jsonFactory.createGenerator(out);
+        JsonGenerator g = JsonReader.JSON_FACTORY.createGenerator(out);
         if (indent) {
             g = g.useDefaultPrettyPrinter();
         }

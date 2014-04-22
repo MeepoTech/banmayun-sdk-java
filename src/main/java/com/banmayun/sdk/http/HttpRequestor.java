@@ -17,8 +17,8 @@ public abstract class HttpRequestor {
     public abstract Uploader startPut(String url, Iterable<Header> headers) throws IOException;
 
     public static final class Header {
-        public final String key;
-        public final String value;
+        protected String key = null;
+        protected String value = null;
 
         public Header(String key, String value) {
             this.key = key;
@@ -27,10 +27,14 @@ public abstract class HttpRequestor {
     }
 
     public static abstract class Uploader {
-        public final OutputStream body;
+        protected OutputStream body = null;
 
         protected Uploader(OutputStream body) {
             this.body = body;
+        }
+
+        public OutputStream getBody() {
+            return this.body;
         }
 
         public abstract void close();
@@ -40,7 +44,7 @@ public abstract class HttpRequestor {
         public abstract Response finish() throws IOException;
     }
 
-    public static final class Response {
+    public static class Response {
         public final int statusCode;
         public final InputStream body;
         public final Map<String, ? extends List<String>> headers;

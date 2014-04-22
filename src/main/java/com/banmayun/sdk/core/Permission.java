@@ -6,30 +6,21 @@ import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Permission extends Dumpable {
 
-    public boolean insertableToOwner;
-    public boolean readableToOwner;
-    public boolean writableToOwner;
-    public boolean deletableToOwner;
-    public boolean insertableToOthers;
-    public boolean readableToOthers;
-    public boolean writableToOthers;
-    public boolean deletableToOthers;
+    public Boolean insertableToOwner = null;
+    public Boolean readableToOwner = null;
+    public Boolean writableToOwner = null;
+    public Boolean deletableToOwner = null;
+    public Boolean insertableToOthers = null;
+    public Boolean readableToOthers = null;
+    public Boolean writableToOthers = null;
+    public Boolean deletableToOthers = null;
 
     public Permission() {
-        this.insertableToOwner = true;
-        this.readableToOwner = true;
-        this.writableToOwner = true;
-        this.deletableToOwner = true;
-        this.insertableToOthers = true;
-        this.readableToOthers = true;
-        this.writableToOthers = true;
-        this.deletableToOthers = true;
     }
 
     public Permission(boolean insertableToOwner, boolean readableToOwner, boolean writableToOwner,
@@ -47,22 +38,19 @@ public class Permission extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("insertable_to_owner", insertableToOwner);
-        out.field("readable_to_owner", readableToOwner);
-        out.field("writable_to_owner", writableToOwner);
-        out.field("deletable_to_owner", deletableToOwner);
-        out.field("insertable_to_others", insertableToOthers);
-        out.field("readable_to_others", readableToOthers);
-        out.field("writable_to_others", writableToOthers);
-        out.field("deletable_to_others", deletableToOthers);
+        out.field("insertable_to_owner", this.insertableToOwner);
+        out.field("readable_to_owner", this.readableToOwner);
+        out.field("writable_to_owner", this.writableToOwner);
+        out.field("deletable_to_owner", this.deletableToOwner);
+        out.field("insertable_to_others", this.insertableToOthers);
+        out.field("readable_to_others", this.readableToOthers);
+        out.field("writable_to_others", this.writableToOthers);
+        out.field("deletable_to_others", this.deletableToOthers);
     }
 
-    public static JsonReader<Permission> Reader = new JsonReader<Permission>() {
-
+    public static JsonReader<Permission> reader = new JsonReader<Permission>() {
         @Override
         public Permission read(JsonParser parser) throws IOException, JsonReadException {
-
             boolean insertableToOwner = true;
             boolean readableToOwner = true;
             boolean writableToOwner = true;
@@ -72,7 +60,7 @@ public class Permission extends Dumpable {
             boolean writableToOthers = true;
             boolean deletableToOthers = true;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -115,7 +103,6 @@ public class Permission extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Permission(insertableToOwner, readableToOwner, writableToOwner, deletableToOwner,
                     insertableToOthers, readableToOthers, writableToOthers, deletableToOthers);
         }
@@ -145,5 +132,4 @@ public class Permission extends Dumpable {
 
         FM = b.build();
     }
-
 }

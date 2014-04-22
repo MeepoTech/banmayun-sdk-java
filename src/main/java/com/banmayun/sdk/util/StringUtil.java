@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 public class StringUtil {
+
     public static final Charset UTF8 = Charset.forName("UTF-8");
     public static final char[] HexDigits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
             'f', };
@@ -108,28 +109,31 @@ public class StringUtil {
         return result == 0;
     }
 
-    public static final String Base64Digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    public static final String UrlSafeBase64Digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    public static final String BASE64_DIGITS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    public static final String URL_SAFE_BASE64_DIGITS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     static {
-        assert Base64Digits.length() == 64 : Base64Digits.length();
-        assert UrlSafeBase64Digits.length() == 64 : UrlSafeBase64Digits.length();
+        assert BASE64_DIGITS.length() == 64 : BASE64_DIGITS.length();
+        assert URL_SAFE_BASE64_DIGITS.length() == 64 : URL_SAFE_BASE64_DIGITS.length();
     }
 
     public static String base64Encode(byte[] data) {
-        return base64EncodeGeneric(Base64Digits, data);
+        return base64EncodeGeneric(BASE64_DIGITS, data);
     }
 
     public static String urlSafeBase64Encode(byte[] data) {
-        return base64EncodeGeneric(UrlSafeBase64Digits, data);
+        return base64EncodeGeneric(URL_SAFE_BASE64_DIGITS, data);
     }
 
     public static String base64EncodeGeneric(String digits, byte[] data) {
-        if (data == null)
+        if (data == null) {
             throw new IllegalArgumentException("'data' can't be null");
-        if (digits == null)
+        }
+        if (digits == null) {
             throw new IllegalArgumentException("'digits' can't be null");
-        if (digits.length() != 64)
+        }
+        if (digits.length() != 64) {
             throw new IllegalArgumentException("'digits' must be 64 characters long: " + jq(digits));
+        }
 
         int numGroupsOfThreeInputBytes = (data.length + 2) / 3;
         int numOutputChars = numGroupsOfThreeInputBytes * 4;

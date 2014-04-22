@@ -1,14 +1,15 @@
 package com.banmayun.sdk.json;
 
 import com.banmayun.sdk.util.Collector;
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class JsonArrayReader<T, L> extends JsonReader<L> {
-    public final JsonReader<? extends T> elementReader;
-    public final Collector<T, ? extends L> collector;
+
+    private JsonReader<? extends T> elementReader = null;
+    private Collector<T, ? extends L> collector = null;
 
     public JsonArrayReader(JsonReader<? extends T> elementReader, Collector<T, ? extends L> collector) {
         this.elementReader = elementReader;
@@ -24,8 +25,9 @@ public class JsonArrayReader<T, L> extends JsonReader<L> {
         return new JsonArrayReader<T, L>(elementReader, collector);
     }
 
+    @Override
     public L read(JsonParser parser) throws JsonReadException, IOException {
-        return read(elementReader, collector, parser);
+        return read(this.elementReader, this.collector, parser);
     }
 
     public static <T, L> L read(JsonReader<? extends T> elementReader, Collector<T, ? extends L> collector,

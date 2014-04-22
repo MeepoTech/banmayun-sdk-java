@@ -1,6 +1,8 @@
 package com.banmayun.sdk.util;
 
 public abstract class Dumpable {
+
+    @Override
     public final String toString() {
         StringBuilder buf = new StringBuilder();
         toString(buf);

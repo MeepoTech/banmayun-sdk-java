@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class CountingOutputStream extends OutputStream {
-    private final OutputStream out;
-    private long bytesWritten = 0;
+
+    private OutputStream out = null;
+    private long bytesWritten = 0L;
 
     public CountingOutputStream(OutputStream out) {
         this.out = out;
@@ -17,25 +18,25 @@ public class CountingOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        bytesWritten++;
-        out.write(b);
+        this.bytesWritten++;
+        this.out.write(b);
     }
 
     @Override
     public void write(byte[] b) throws IOException {
-        bytesWritten += b.length;
-        out.write(b);
+        this.bytesWritten += b.length;
+        this.out.write(b);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        bytesWritten += len;
-        out.write(b, off, len);
+        this.bytesWritten += len;
+        this.out.write(b, off, len);
     }
 
     @Override
     public void flush() throws IOException {
-        out.flush();
+        this.out.flush();
     }
 
     @Override

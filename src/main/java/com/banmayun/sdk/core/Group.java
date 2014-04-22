@@ -6,33 +6,32 @@ import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Group extends Dumpable {
 
-    public String id;
-    public String rootId;
-    public String name;
-    public String source;
-    public GroupType type;
-    public String intro;
-    public String tags;
-    public String annouce;
-    public boolean isVisible;
-    public boolean isActivated;
-    public boolean isBlocked;
-    public int userCount;
-    public Time createdAt;
-    public User createdBy;
-    public Relation relation;
-    public Root root;
+    public String id = null;
+    public String rootId = null;
+    public String name = null;
+    public String source = null;
+    public EnumElement type = null;
+    public String intro = null;
+    public String tags = null;
+    public String annouce = null;
+    public Boolean isVisible = null;
+    public Boolean isActivated = null;
+    public Boolean isBlocked = null;
+    public Integer userCount = null;
+    public Time createdAt = null;
+    public User createdBy = null;
+    public Relation relation = null;
+    public Root root = null;
 
     public Group() {
     }
 
-    public Group(String id, String rootId, String name, String source, GroupType type, String intro, String tags,
+    public Group(String id, String rootId, String name, String source, EnumElement type, String intro, String tags,
             String annouce, boolean isVisible, boolean isActivated, boolean isBlocked, int userCount, Time createdAt,
             User createdBy, Relation relation, Root root) {
         this.id = id;
@@ -55,35 +54,32 @@ public class Group extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("id", id);
-        out.field("root_id", rootId);
-        out.field("name", name);
-        out.field("source", source);
-        out.field("type", type);
-        out.field("intro", intro);
-        out.field("tags", tags);
-        out.field("announce", annouce);
-        out.field("is_visible", isVisible);
-        out.field("is_activated", isActivated);
-        out.field("is_blocked", isBlocked);
-        out.field("user_count", userCount);
-        out.field("created_at", createdAt);
-        out.field("created_by", createdBy);
-        out.field("relation", relation);
-        out.field("root", root);
+        out.field("id", this.id);
+        out.field("root_id", this.rootId);
+        out.field("name", this.name);
+        out.field("source", this.source);
+        out.field("type", this.type);
+        out.field("intro", this.intro);
+        out.field("tags", this.tags);
+        out.field("announce", this.annouce);
+        out.field("is_visible", this.isVisible);
+        out.field("is_activated", this.isActivated);
+        out.field("is_blocked", this.isBlocked);
+        out.field("user_count", this.userCount);
+        out.field("created_at", this.createdAt);
+        out.field("created_by", this.createdBy);
+        out.field("relation", this.relation);
+        out.field("root", this.root);
     }
 
-    public static JsonReader<Group> Reader = new JsonReader<Group>() {
-
+    public static JsonReader<Group> reader = new JsonReader<Group>() {
         @Override
         public Group read(JsonParser parser) throws IOException, JsonReadException {
-
             String id = null;
             String rootId = null;
             String name = null;
             String source = null;
-            GroupType type = null;
+            EnumElement type = null;
             String intro = null;
             String tags = null;
             String annouce = null;
@@ -96,7 +92,7 @@ public class Group extends Dumpable {
             Relation relation = null;
             Root root = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -107,28 +103,28 @@ public class Group extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_id:
-                        id = JsonReader.StringReader.readField(parser, fieldName, id);
+                        id = JsonReader.STRING_READER.readField(parser, fieldName, id);
                         break;
                     case FM_root_id:
-                        rootId = JsonReader.StringReader.readField(parser, fieldName, rootId);
+                        rootId = JsonReader.STRING_READER.readField(parser, fieldName, rootId);
                         break;
                     case FM_name:
-                        name = JsonReader.StringReader.readField(parser, fieldName, name);
+                        name = JsonReader.STRING_READER.readField(parser, fieldName, name);
                         break;
                     case FM_source:
-                        source = JsonReader.StringReader.readField(parser, fieldName, source);
+                        source = JsonReader.STRING_READER.readField(parser, fieldName, source);
                         break;
                     case FM_type:
-                        type = GroupType.Reader.readField(parser, fieldName, type);
+                        type = EnumElement.reader.readField(parser, fieldName, type);
                         break;
                     case FM_intro:
-                        intro = JsonReader.StringReader.readField(parser, fieldName, intro);
+                        intro = JsonReader.STRING_READER.readField(parser, fieldName, intro);
                         break;
                     case FM_tags:
-                        tags = JsonReader.StringReader.readField(parser, fieldName, tags);
+                        tags = JsonReader.STRING_READER.readField(parser, fieldName, tags);
                         break;
                     case FM_announce:
-                        annouce = JsonReader.StringReader.readField(parser, fieldName, annouce);
+                        annouce = JsonReader.STRING_READER.readField(parser, fieldName, annouce);
                         break;
                     case FM_is_visible:
                         isVisible = JsonReader.readBoolean(parser);
@@ -143,16 +139,16 @@ public class Group extends Dumpable {
                         userCount = (int) JsonReader.readUnsignedLongField(parser, fieldName, userCount);
                         break;
                     case FM_created_at:
-                        createdAt = Time.Reader.readField(parser, fieldName, createdAt);
+                        createdAt = Time.reader.readField(parser, fieldName, createdAt);
                         break;
                     case FM_created_by:
-                        createdBy = User.Reader.readField(parser, fieldName, createdBy);
+                        createdBy = User.reader.readField(parser, fieldName, createdBy);
                         break;
                     case FM_relation:
-                        relation = Relation.Reader.readField(parser, fieldName, relation);
+                        relation = Relation.reader.readField(parser, fieldName, relation);
                         break;
                     case FM_root:
-                        root = Root.Reader.readField(parser, fieldName, root);
+                        root = Root.reader.readField(parser, fieldName, root);
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
                     }
@@ -162,7 +158,6 @@ public class Group extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Group(id, rootId, name, source, type, intro, tags, annouce, isVisible, isActivated, isBlocked,
                     userCount, createdAt, createdBy, relation, root);
         }
@@ -207,10 +202,5 @@ public class Group extends Dumpable {
         b.add("root", FM_root);
 
         FM = b.build();
-    }
-
-    public void print() {
-        System.out.println(this.annouce + " " + this.id + " " + this.intro + " " + this.name + " " + this.rootId + " "
-                + this.source + " " + this.tags);
     }
 }

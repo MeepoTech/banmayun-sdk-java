@@ -6,10 +6,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.File;
 
 public final class JsonReadException extends java.lang.Exception {
-    public static final long serialVersionUID = 0;
-    public final String error;
-    public final JsonLocation location;
-    private PathPart path;
+
+    public static final long serialVersionUID = 1L;
+
+    private String error = null;
+    private JsonLocation location = null;
+    private PathPart path = null;
 
     public JsonReadException(String error, JsonLocation location) {
         this.error = error;
@@ -27,13 +29,14 @@ public final class JsonReadException extends java.lang.Exception {
         return this;
     }
 
+    @Override
     public String getMessage() {
         StringBuilder buf = new StringBuilder();
-        toStringLocation(buf, location);
+        toStringLocation(buf, this.location);
         buf.append(": ");
 
-        if (path != null) {
-            PathPart p = path;
+        if (this.path != null) {
+            PathPart p = this.path;
             buf.append(p.description);
             while (p.next != null) {
                 p = p.next;
@@ -42,7 +45,7 @@ public final class JsonReadException extends java.lang.Exception {
             }
             buf.append(": ");
         }
-        buf.append(error);
+        buf.append(this.error);
         return buf.toString();
     }
 
@@ -59,13 +62,21 @@ public final class JsonReadException extends java.lang.Exception {
         buf.append(location.getColumnNr());
     }
 
-    public static final class PathPart {
-        public final String description;
-        public final PathPart next;
+    public static class PathPart {
+        private String description = null;
+        private PathPart next = null;
 
         public PathPart(String description, PathPart next) {
             this.description = description;
             this.next = next;
+        }
+
+        public String getDescription() {
+            return this.description;
+        }
+
+        public PathPart getNext() {
+            return this.next;
         }
     }
 

@@ -6,14 +6,16 @@ import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Size extends Dumpable {
 
-    public long bytes;
-    public String displayValue;
+    public Long bytes = null;
+    public String displayValue = null;
+
+    public Size() {
+    }
 
     public Size(long bytes, String displayValue) {
         this.bytes = bytes;
@@ -22,19 +24,17 @@ public class Size extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        out.field("bytes", bytes);
-        out.field("display_value", displayValue);
+        out.field("bytes", this.bytes);
+        out.field("display_value", this.displayValue);
     }
 
-    public static JsonReader<Size> Reader = new JsonReader<Size>() {
-
+    public static JsonReader<Size> reader = new JsonReader<Size>() {
         @Override
         public Size read(JsonParser parser) throws IOException, JsonReadException {
-
             long bytes = -1;
             String displayValue = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -48,7 +48,7 @@ public class Size extends Dumpable {
                         bytes = JsonReader.readUnsignedLongField(parser, fieldName, bytes);
                         break;
                     case FM_display_value:
-                        displayValue = JsonReader.StringReader.readField(parser, fieldName, displayValue);
+                        displayValue = JsonReader.STRING_READER.readField(parser, fieldName, displayValue);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -59,7 +59,6 @@ public class Size extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Size(bytes, displayValue);
         }
     };

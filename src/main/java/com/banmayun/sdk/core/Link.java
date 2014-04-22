@@ -2,66 +2,26 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
-import javax.jws.soap.SOAPBinding.Use;
-
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Link extends Dumpable {
 
-    public enum LinkDevice {
-        PC_WINDOWS, PC_MACOSX, PC_LINUX, PHONE_IOS, PHONE_ANDROID, PAD_IOS, PAD_ANDROID, WEB, UNKNOWN
-    }
+    public String id = null;
+    public String userId = null;
+    public String name = null;
+    public String device = null;
+    public String token = null;
+    public Time expiresAt = null;
+    public Time createdAt = null;
+    public Boolean isCurrent = null;
 
-    public static String getLinkDeviceStr(LinkDevice linkDevice) {
-        String device = null;
-        switch (linkDevice) {
-        case PC_WINDOWS:
-            device = "pc_windows";
-            break;
-        case PC_MACOSX:
-            device = "pc_macosx";
-            break;
-        case PC_LINUX:
-            device = "pc_linux";
-            break;
-        case PHONE_IOS:
-            device = "phone_ios";
-            break;
-        case PHONE_ANDROID:
-            device = "phone_android";
-            break;
-        case PAD_IOS:
-            device = "pad_ios";
-            break;
-        case PAD_ANDROID:
-            device = "pad_android";
-        case WEB:
-            device = "web";
-            break;
-        case UNKNOWN:
-            device = "unknown";
-            break;
-        default:
-            device = "unknown";
-            break;
-        }
-        return device;
+    public Link() {
     }
-
-    public String id;
-    public String userId;
-    public String name;
-    public String device;
-    public String token;
-    public Time expiresAt;
-    public Time createdAt;
-    public boolean isCurrent;
 
     public Link(String id, String userId, String name, String device, String token, Time expiresAt, Time createdAt,
             boolean isCurrent) {
@@ -77,22 +37,19 @@ public class Link extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("id", id);
-        out.field("user_id", userId);
-        out.field("name", name);
-        out.field("device", device);
-        out.field("token", token);
-        out.field("expires_at", expiresAt);
-        out.field("created_at", createdAt);
-        out.field("is_current", isCurrent);
+        out.field("id", this.id);
+        out.field("user_id", this.userId);
+        out.field("name", this.name);
+        out.field("device", this.device);
+        out.field("token", this.token);
+        out.field("expires_at", this.expiresAt);
+        out.field("created_at", this.createdAt);
+        out.field("is_current", this.isCurrent);
     }
 
-    public static JsonReader<Link> Reader = new JsonReader<Link>() {
-
+    public static JsonReader<Link> reader = new JsonReader<Link>() {
         @Override
         public Link read(JsonParser parser) throws IOException, JsonReadException {
-
             String id = null;
             String userId = null;
             String name = null;
@@ -102,7 +59,7 @@ public class Link extends Dumpable {
             Time createdAt = null;
             boolean isCurrent = false;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -113,25 +70,25 @@ public class Link extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_id:
-                        id = JsonReader.StringReader.readField(parser, fieldName, id);
+                        id = JsonReader.STRING_READER.readField(parser, fieldName, id);
                         break;
                     case FM_user_id:
-                        userId = JsonReader.StringReader.readField(parser, fieldName, userId);
+                        userId = JsonReader.STRING_READER.readField(parser, fieldName, userId);
                         break;
                     case FM_name:
-                        name = JsonReader.StringReader.readField(parser, fieldName, name);
+                        name = JsonReader.STRING_READER.readField(parser, fieldName, name);
                         break;
                     case FM_device:
-                        device = JsonReader.StringReader.readField(parser, fieldName, device);
+                        device = JsonReader.STRING_READER.readField(parser, fieldName, device);
                         break;
                     case FM_token:
-                        token = JsonReader.StringReader.readField(parser, fieldName, token);
+                        token = JsonReader.STRING_READER.readField(parser, fieldName, token);
                         break;
                     case FM_expires_at:
-                        expiresAt = Time.Reader.readField(parser, fieldName, expiresAt);
+                        expiresAt = Time.reader.readField(parser, fieldName, expiresAt);
                         break;
                     case FM_created_at:
-                        createdAt = Time.Reader.readField(parser, fieldName, createdAt);
+                        createdAt = Time.reader.readField(parser, fieldName, createdAt);
                         break;
                     case FM_is_current:
                         isCurrent = JsonReader.readBoolean(parser);
@@ -145,7 +102,6 @@ public class Link extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Link(id, userId, name, device, token, expiresAt, createdAt, isCurrent);
         }
     };
@@ -173,9 +129,5 @@ public class Link extends Dumpable {
         b.add("is_current", FM_is_current);
 
         FM = b.build();
-    }
-
-    public void print() {
-        System.out.println(this.device + " " + this.id + " " + this.name + " " + this.token + " " + this.userId);
     }
 }

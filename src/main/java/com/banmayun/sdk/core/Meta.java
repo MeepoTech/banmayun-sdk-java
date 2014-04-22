@@ -2,41 +2,42 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Meta extends Dumpable {
 
-    public String id;
-    public String rootId;
-    public String name;
-    public String path;
-    public String md5;
-    public Size size;
-    public long version;
-    public String icon;
-    public boolean isDir;
-    public boolean thumbExists;
-    public boolean insertable;
-    public boolean readable;
-    public boolean writable;
-    public boolean deletable;
-    public int commentCount;
-    public int shareCount;
-    public Time createdAt;
-    public User createdBy;
-    public Time modifiedAt;
-    public User modifiedBy;
-    public Time clientModifiedAt;
-    public Permission permission;
-    public Meta[] contents;
+    public String id = null;
+    public String rootId = null;
+    public String name = null;
+    public String path = null;
+    public String md5 = null;
+    public Size size = null;
+    public Long version = null;
+    public String icon = null;
+    public Boolean isDir = null;
+    public Boolean thumbExists = null;
+    public Boolean insertable = null;
+    public Boolean readable = null;
+    public Boolean writable = null;
+    public Boolean deletable = null;
+    public Integer commentCount = null;
+    public Integer shareCount = null;
+    public Time createdAt = null;
+    public User createdBy = null;
+    public Time modifiedAt = null;
+    public User modifiedBy = null;
+    public Time clientModifiedAt = null;
+    public Permission permission = null;
+    public Meta[] contents = null;
+
+    public Meta() {
+    }
 
     public Meta(String id, String rootId, String name, String path, String md5, Size size, long version, String icon,
             boolean isDir, boolean thumbExists, boolean insertable, boolean readable, boolean writable,
@@ -69,37 +70,33 @@ public class Meta extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        out.field("id", id);
-        out.field("root_id", rootId);
-        out.field("name", name);
-        out.field("path", path);
-        out.field("md5", md5);
-        out.field("size", size);
-        out.field("version", version);
-        out.field("icon", icon);
-        out.field("is_dir", isDir);
-        out.field("thumb_exists", thumbExists);
-        out.field("insertable", insertable);
-        out.field("readable", readable);
-        out.field("writable", writable);
-        out.field("deletable", deletable);
-        out.field("comment_count", commentCount);
-        out.field("share_count", shareCount);
-        out.field("created_at", createdAt);
-        out.field("created_by", createdBy);
-        out.field("modified_at", modifiedAt);
-        out.field("modified_by", modifiedBy);
-        out.field("client_modified_at", clientModifiedAt);
-        out.field("permission", permission);
-        // out.field("contents", contents);
-        // TODO: not ok
+        out.field("id", this.id);
+        out.field("root_id", this.rootId);
+        out.field("name", this.name);
+        out.field("path", this.path);
+        out.field("md5", this.md5);
+        out.field("size", this.size);
+        out.field("version", this.version);
+        out.field("icon", this.icon);
+        out.field("is_dir", this.isDir);
+        out.field("thumb_exists", this.thumbExists);
+        out.field("insertable", this.insertable);
+        out.field("readable", this.readable);
+        out.field("writable", this.writable);
+        out.field("deletable", this.deletable);
+        out.field("comment_count", this.commentCount);
+        out.field("share_count", this.shareCount);
+        out.field("created_at", this.createdAt);
+        out.field("created_by", this.createdBy);
+        out.field("modified_at", this.modifiedAt);
+        out.field("modified_by", this.modifiedBy);
+        out.field("client_modified_at", this.clientModifiedAt);
+        out.field("permission", this.permission);
     }
 
-    public static JsonReader<Meta> Reader = new JsonReader<Meta>() {
-
+    public static JsonReader<Meta> reader = new JsonReader<Meta>() {
         @Override
         public Meta read(JsonParser parser) throws IOException, JsonReadException {
-
             String id = null;
             String rootId = null;
             String name = null;
@@ -124,7 +121,7 @@ public class Meta extends Dumpable {
             Permission permission = null;
             Meta[] contents = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -135,28 +132,28 @@ public class Meta extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_id:
-                        id = JsonReader.StringReader.readField(parser, fieldName, id);
+                        id = JsonReader.STRING_READER.readField(parser, fieldName, id);
                         break;
                     case FM_root_id:
-                        rootId = JsonReader.StringReader.readField(parser, fieldName, rootId);
+                        rootId = JsonReader.STRING_READER.readField(parser, fieldName, rootId);
                         break;
                     case FM_name:
-                        name = JsonReader.StringReader.readField(parser, fieldName, name);
+                        name = JsonReader.STRING_READER.readField(parser, fieldName, name);
                         break;
                     case FM_path:
-                        path = JsonReader.StringReader.readField(parser, fieldName, path);
+                        path = JsonReader.STRING_READER.readField(parser, fieldName, path);
                         break;
                     case FM_md5:
-                        md5 = JsonReader.StringReader.readField(parser, fieldName, md5);
+                        md5 = JsonReader.STRING_READER.readField(parser, fieldName, md5);
                         break;
                     case FM_size:
-                        size = Size.Reader.readField(parser, fieldName, size);
+                        size = Size.reader.readField(parser, fieldName, size);
                         break;
                     case FM_version:
                         version = JsonReader.readUnsignedLongField(parser, fieldName, version);
                         break;
                     case FM_icon:
-                        icon = JsonReader.StringReader.readField(parser, fieldName, icon);
+                        icon = JsonReader.STRING_READER.readField(parser, fieldName, icon);
                         break;
                     case FM_is_dir:
                         isDir = JsonReader.readBoolean(parser);
@@ -183,29 +180,29 @@ public class Meta extends Dumpable {
                         shareCount = (int) JsonReader.readUnsignedLongField(parser, fieldName, shareCount);
                         break;
                     case FM_created_at:
-                        createdAt = Time.Reader.readField(parser, fieldName, createdAt);
+                        createdAt = Time.reader.readField(parser, fieldName, createdAt);
                         break;
                     case FM_created_by:
-                        createdBy = User.Reader.readField(parser, fieldName, createdBy);
+                        createdBy = User.reader.readField(parser, fieldName, createdBy);
                         break;
                     case FM_modified_at:
-                        modifiedAt = Time.Reader.readField(parser, fieldName, modifiedAt);
+                        modifiedAt = Time.reader.readField(parser, fieldName, modifiedAt);
                         break;
                     case FM_modified_by:
-                        modifiedBy = User.Reader.readField(parser, fieldName, modifiedBy);
+                        modifiedBy = User.reader.readField(parser, fieldName, modifiedBy);
                         break;
                     case FM_client_modified_at:
-                        clientModifiedAt = Time.Reader.readField(parser, fieldName, clientModifiedAt);
+                        clientModifiedAt = Time.reader.readField(parser, fieldName, clientModifiedAt);
                         break;
                     case FM_permission:
-                        permission = Permission.Reader.readField(parser, fieldName, permission);
+                        permission = Permission.reader.readField(parser, fieldName, permission);
                         break;
                     case FM_contents:
                         JsonReader.expectArrayStart(parser);
                         ArrayList<Meta> metaList = new ArrayList<>();
                         while (!JsonReader.isArrayEnd(parser)) {
                             Meta meta;
-                            meta = Meta.Reader.read(parser);
+                            meta = Meta.reader.read(parser);
                             metaList.add(meta);
                         }
                         parser.nextToken();
@@ -227,7 +224,6 @@ public class Meta extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Meta(id, rootId, name, path, md5, size, version, icon, isDir, thumbExists, insertable, readable,
                     writable, deletable, commentCount, shareCount, createdAt, createdBy, modifiedAt, modifiedBy,
                     clientModifiedAt, permission, contents);
@@ -287,16 +283,5 @@ public class Meta extends Dumpable {
         b.add("contents", FM_contents);
 
         FM = b.build();
-    }
-
-    public void print() {
-        System.out.println("" + this.commentCount + " " + this.icon + " " + this.id + " " + this.md5 + " " + this.name
-                + " " + this.path + " " + this.rootId + " " + this.shareCount + " " + this.version);
-        if (contents == null) {
-            System.out.println("contents is null");
-        } else {
-            System.out.println("contents: " + contents.length);
-        }
-
     }
 }

@@ -6,21 +6,19 @@ import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Comment extends Dumpable {
 
-    public String id;
-    public String rootId;
-    public String metaId;
-    public String contents;
-    public Time createdAt;
-    public User createdBy;
+    public String id = null;
+    public String rootId = null;
+    public String metaId = null;
+    public String contents = null;
+    public Time createdAt = null;
+    public User createdBy = null;
 
     public Comment() {
-
     }
 
     public Comment(String id, String rootId, String metaId, String contents, Time createdAt, User createdBy) {
@@ -34,20 +32,17 @@ public class Comment extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("id", id);
-        out.field("root_id", rootId);
-        out.field("meta_id", metaId);
-        out.field("contents", contents);
-        out.field("created_at", createdAt);
-        out.field("created_by", createdBy);
+        out.field("id", this.id);
+        out.field("root_id", this.rootId);
+        out.field("meta_id", this.metaId);
+        out.field("contents", this.contents);
+        out.field("created_at", this.createdAt);
+        out.field("created_by", this.createdBy);
     }
 
-    public static JsonReader<Comment> Reader = new JsonReader<Comment>() {
-
+    public static JsonReader<Comment> reader = new JsonReader<Comment>() {
         @Override
         public Comment read(JsonParser parser) throws IOException, JsonReadException {
-
             String id = null;
             String rootId = null;
             String metaId = null;
@@ -55,7 +50,7 @@ public class Comment extends Dumpable {
             Time createdAt = null;
             User createdBy = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -66,22 +61,22 @@ public class Comment extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_id:
-                        id = JsonReader.StringReader.readField(parser, fieldName, id);
+                        id = JsonReader.STRING_READER.readField(parser, fieldName, id);
                         break;
                     case FM_root_id:
-                        rootId = JsonReader.StringReader.readField(parser, fieldName, rootId);
+                        rootId = JsonReader.STRING_READER.readField(parser, fieldName, rootId);
                         break;
                     case FM_meta_id:
-                        metaId = JsonReader.StringReader.readField(parser, fieldName, metaId);
+                        metaId = JsonReader.STRING_READER.readField(parser, fieldName, metaId);
                         break;
                     case FM_contents:
-                        contents = JsonReader.StringReader.readField(parser, fieldName, contents);
+                        contents = JsonReader.STRING_READER.readField(parser, fieldName, contents);
                         break;
                     case FM_created_at:
-                        createdAt = Time.Reader.readField(parser, fieldName, createdAt);
+                        createdAt = Time.reader.readField(parser, fieldName, createdAt);
                         break;
                     case FM_created_by:
-                        createdBy = User.Reader.readField(parser, fieldName, createdBy);
+                        createdBy = User.reader.readField(parser, fieldName, createdBy);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -92,7 +87,6 @@ public class Comment extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Comment(id, rootId, metaId, contents, createdAt, createdBy);
         }
     };
@@ -116,10 +110,5 @@ public class Comment extends Dumpable {
         b.add("created_by", FM_created_by);
 
         FM = b.build();
-    }
-
-    public void print() {
-        System.out.println(this.contents + " " + this.id + " " + this.metaId + " " + this.rootId + " "
-                + this.createdAt.displayValue);
     }
 }

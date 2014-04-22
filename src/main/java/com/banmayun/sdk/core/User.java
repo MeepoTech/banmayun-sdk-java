@@ -2,39 +2,35 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
-import javax.jws.soap.SOAPBinding.Use;
-
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class User extends Dumpable {
 
-    public String id;
-    public String rootId;
-    public String name;
-    public String email;
-    public String source;
-    public String displayName;
-    public UserRole role;
-    public int groupsCanOwn;
-    public boolean isActivated;
-    public boolean isBlocked;
-    public int groupCount;
-    public Time createdAt;
-    public Relation relation;
-    public Root root;
+    public String id = null;
+    public String rootId = null;
+    public String name = null;
+    public String email = null;
+    public String source = null;
+    public String displayName = null;
+    public EnumElement role = null;
+    public Integer groupsCanOwn = null;
+    public Boolean isActivated = null;
+    public Boolean isBlocked = null;
+    public Integer groupCount = null;
+    public Time createdAt = null;
+    public Relation relation = null;
+    public Root root = null;
 
     public User() {
-
     }
 
-    public User(String id, String rootId, String name, String email, String source, String displayName, UserRole role,
-            int groupsCanOwn, boolean isActivated, boolean isBlocked, int groupCount, Time createdAt,
+    public User(String id, String rootId, String name, String email, String source, String displayName,
+            EnumElement role, int groupsCanOwn, boolean isActivated, boolean isBlocked, int groupCount, Time createdAt,
             Relation relation, Root root) {
         this.id = id;
         this.rootId = rootId;
@@ -54,35 +50,32 @@ public class User extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("id", id);
-        out.field("root_id", rootId);
-        out.field("name", name);
-        out.field("email", email);
-        out.field("source", source);
-        out.field("display_name", displayName);
-        out.field("role", role);
-        out.field("groups_can_own", groupsCanOwn);
-        out.field("is_activated", isActivated);
-        out.field("is_blocked", isBlocked);
-        out.field("group_count", groupCount);
-        out.field("created_at", createdAt);
-        out.field("relation", relation);
-        out.field("root", root);
+        out.field("id", this.id);
+        out.field("root_id", this.rootId);
+        out.field("name", this.name);
+        out.field("email", this.email);
+        out.field("source", this.source);
+        out.field("display_name", this.displayName);
+        out.field("role", this.role);
+        out.field("groups_can_own", this.groupsCanOwn);
+        out.field("is_activated", this.isActivated);
+        out.field("is_blocked", this.isBlocked);
+        out.field("group_count", this.groupCount);
+        out.field("created_at", this.createdAt);
+        out.field("relation", this.relation);
+        out.field("root", this.root);
     }
 
-    public static JsonReader<User> Reader = new JsonReader<User>() {
-
+    public static JsonReader<User> reader = new JsonReader<User>() {
         @Override
         public User read(JsonParser parser) throws IOException, JsonReadException {
-
             String id = null;
             String rootId = null;
             String name = null;
             String email = null;
             String source = null;
             String displayName = null;
-            UserRole role = null;
+            EnumElement role = null;
             int groupsCanOwn = -1;
             boolean isActivated = false;
             boolean isBlocked = false;
@@ -91,7 +84,7 @@ public class User extends Dumpable {
             Relation relation = null;
             Root root = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -102,25 +95,25 @@ public class User extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_id:
-                        id = JsonReader.StringReader.readField(parser, fieldName, id);
+                        id = JsonReader.STRING_READER.readField(parser, fieldName, id);
                         break;
                     case FM_root_id:
-                        rootId = JsonReader.StringReader.readField(parser, fieldName, rootId);
+                        rootId = JsonReader.STRING_READER.readField(parser, fieldName, rootId);
                         break;
                     case FM_name:
-                        name = JsonReader.StringReader.readField(parser, fieldName, name);
+                        name = JsonReader.STRING_READER.readField(parser, fieldName, name);
                         break;
                     case FM_email:
-                        email = JsonReader.StringReader.readField(parser, fieldName, email);
+                        email = JsonReader.STRING_READER.readField(parser, fieldName, email);
                         break;
                     case FM_source:
-                        source = JsonReader.StringReader.readField(parser, fieldName, source);
+                        source = JsonReader.STRING_READER.readField(parser, fieldName, source);
                         break;
                     case FM_display_name:
-                        displayName = JsonReader.StringReader.readField(parser, fieldName, displayName);
+                        displayName = JsonReader.STRING_READER.readField(parser, fieldName, displayName);
                         break;
                     case FM_role:
-                        role = UserRole.Reader.readField(parser, fieldName, role);
+                        role = EnumElement.reader.readField(parser, fieldName, role);
                         break;
                     case FM_groups_can_own:
                         groupsCanOwn = (int) JsonReader.readUnsignedLongField(parser, fieldName, groupsCanOwn);
@@ -135,13 +128,13 @@ public class User extends Dumpable {
                         groupCount = (int) JsonReader.readUnsignedLongField(parser, fieldName, groupCount);
                         break;
                     case FM_created_at:
-                        createdAt = Time.Reader.readField(parser, fieldName, createdAt);
+                        createdAt = Time.reader.readField(parser, fieldName, createdAt);
                         break;
                     case FM_relation:
-                        relation = Relation.Reader.readField(parser, fieldName, relation);
+                        relation = Relation.reader.readField(parser, fieldName, relation);
                         break;
                     case FM_root:
-                        root = Root.Reader.readField(parser, fieldName, root);
+                        root = Root.reader.readField(parser, fieldName, root);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -152,7 +145,6 @@ public class User extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new User(id, rootId, name, email, source, displayName, role, groupsCanOwn, isActivated, isBlocked,
                     groupCount, createdAt, relation, root);
         }
@@ -193,10 +185,5 @@ public class User extends Dumpable {
         b.add("root", FM_root);
 
         FM = b.build();
-    }
-
-    public void print() {
-        System.out.println(this.displayName + " " + this.email + " " + this.groupCount + " " + this.groupsCanOwn + " "
-                + this.id + " " + this.name + " " + this.rootId + " " + this.source);
     }
 }

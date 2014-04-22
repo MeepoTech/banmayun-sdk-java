@@ -6,56 +6,47 @@ import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Relation extends Dumpable {
 
-    public RelationRole role;
-    public boolean isActivated;
-    public boolean isBlocked;
-    public String remark;
-    public Time createdAt;
+    public EnumElement role = null;
+    public Boolean isActivated = null;
+    public Boolean isBlocked = null;
+    public String remarks = null;
+    public Time createdAt = null;
 
     public Relation() {
-        this.role = null;
-        this.isActivated = false;
-        this.isBlocked = false;
-        this.remark = null;
-        this.createdAt = null;
     }
 
-    public Relation(RelationRole role, boolean isActivated, boolean isBlocked, String remark, Time createdAt) {
+    public Relation(EnumElement role, boolean isActivated, boolean isBlocked, String remarks, Time createdAt) {
         this.role = role;
         this.isActivated = isActivated;
         this.isBlocked = isBlocked;
-        this.remark = remark;
+        this.remarks = remarks;
         this.createdAt = createdAt;
     }
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("role", role);
-        out.field("is_activated", isActivated);
-        out.field("is_blocked", isBlocked);
-        out.field("remark", remark);
-        out.field("created_at", createdAt);
+        out.field("role", this.role);
+        out.field("is_activated", this.isActivated);
+        out.field("is_blocked", this.isBlocked);
+        out.field("remarks", this.remarks);
+        out.field("created_at", this.createdAt);
     }
 
-    public static JsonReader<Relation> Reader = new JsonReader<Relation>() {
-
+    public static JsonReader<Relation> reader = new JsonReader<Relation>() {
         @Override
         public Relation read(JsonParser parser) throws IOException, JsonReadException {
-
-            RelationRole role = null;
+            EnumElement role = null;
             boolean isActivated = false;
             boolean isBlocked = false;
             String remark = null;
             Time createdAt = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -66,7 +57,7 @@ public class Relation extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_role:
-                        role = RelationRole.Reader.readField(parser, fieldName, role);
+                        role = EnumElement.reader.readField(parser, fieldName, role);
                         break;
                     case FM_is_activated:
                         isActivated = JsonReader.readBoolean(parser);
@@ -74,11 +65,11 @@ public class Relation extends Dumpable {
                     case FM_is_blocked:
                         isBlocked = JsonReader.readBoolean(parser);
                         break;
-                    case FM_remark:
-                        remark = JsonReader.StringReader.readField(parser, fieldName, remark);
+                    case FM_remarks:
+                        remark = JsonReader.STRING_READER.readField(parser, fieldName, remark);
                         break;
                     case FM_created_at:
-                        createdAt = Time.Reader.readField(parser, fieldName, createdAt);
+                        createdAt = Time.reader.readField(parser, fieldName, createdAt);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -89,7 +80,6 @@ public class Relation extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Relation(role, isActivated, isBlocked, remark, createdAt);
         }
     };
@@ -97,7 +87,7 @@ public class Relation extends Dumpable {
     private static final int FM_role = 0;
     private static final int FM_is_activated = 1;
     private static final int FM_is_blocked = 2;
-    private static final int FM_remark = 3;
+    private static final int FM_remarks = 3;
     private static final int FM_created_at = 4;
 
     private static final JsonReader.FieldMapping FM;
@@ -107,7 +97,7 @@ public class Relation extends Dumpable {
         b.add("role", FM_role);
         b.add("is_activated", FM_is_activated);
         b.add("is_blocked", FM_is_blocked);
-        b.add("remark", FM_remark);
+        b.add("remarks", FM_remarks);
         b.add("created_at", FM_created_at);
 
         FM = b.build();

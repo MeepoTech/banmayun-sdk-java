@@ -6,7 +6,7 @@ import com.banmayun.sdk.core.ErrorResponse;
 
 public class BMYException extends Exception {
 
-    private static final long serialVersionUID = 0L;
+    private static final long serialVersionUID = 1L;
 
     public BMYException(String message) {
         super(message);
@@ -16,21 +16,25 @@ public class BMYException extends Exception {
         super(message, cause);
     }
 
-    public static final class MeePoServerResponseException extends BMYException {
+    public static class BMYServerResponseException extends BMYException {
         private static final long serialVersionUID = 1L;
-        public ErrorResponse response;
 
-        public MeePoServerResponseException(ErrorResponse response) {
+        private ErrorResponse response = null;
+
+        public BMYServerResponseException(ErrorResponse response) {
             super("Server Error Response");
             this.response = response;
         }
 
+        public ErrorResponse getErrorResponse() {
+            return this.response;
+        }
     }
 
     // 403
-    public static final class AccessDenied extends BMYException {
+    public static class AccessDenied extends BMYException {
 
-        private static final long serialVersionUID = 0;
+        private static final long serialVersionUID = 1L;
 
         public AccessDenied(String message) {
             super(message);
@@ -38,8 +42,8 @@ public class BMYException extends Exception {
     }
 
     // 404
-    public static final class NotFound extends BMYException {
-        private static final long serialVersionUID = 0;
+    public static class NotFound extends BMYException {
+        private static final long serialVersionUID = 1L;
 
         public NotFound(String message) {
             super(message);
@@ -47,8 +51,8 @@ public class BMYException extends Exception {
     }
 
     // 409
-    public static final class AlreadyExists extends BMYException {
-        private static final long serialVersionUID = 0;
+    public static class AlreadyExists extends BMYException {
+        private static final long serialVersionUID = 1L;
 
         public AlreadyExists(String message) {
             super(message);
@@ -56,8 +60,8 @@ public class BMYException extends Exception {
     }
 
     // 422
-    public static final class UnacceptableRequest extends BMYException {
-        private static final long serialVersionUID = 0;
+    public static class UnacceptableRequest extends BMYException {
+        private static final long serialVersionUID = 1L;
 
         public UnacceptableRequest(String message) {
             super(message);
@@ -65,41 +69,44 @@ public class BMYException extends Exception {
     }
 
     // 424
-    public static final class OperationNotAllowed extends BMYException {
-        private static final long serialVersionUID = 0;
+    public static class OperationNotAllowed extends BMYException {
+        private static final long serialVersionUID = 1L;
 
         public OperationNotAllowed(String message) {
             super(message);
         }
     }
 
-    public static final class ServerError extends BMYException {
+    // 500
+    public static class ServerError extends BMYException {
+        public static final long serialVersionUID = 1L;
+
         public ServerError(String message) {
             super(message);
         }
-
-        public static final long serialVersionUID = 0;
     }
 
     // 503
-    public static final class RetryLater extends BMYException {
+    public static class RetryLater extends BMYException {
+        public static final long serialVersionUID = 1L;
+
         public RetryLater(String message) {
             super(message);
         }
-
-        public static final long serialVersionUID = 0;
     }
 
     // 507
-    public static final class QuotaOutage extends BMYException {
+    public static class QuotaOutage extends BMYException {
+        public static final long serialVersionUID = 1L;
+
         public QuotaOutage(String message) {
             super(message);
         }
-
-        public static final long serialVersionUID = 0;
     }
 
     public static abstract class ProtocolError extends BMYException {
+        public static final long serialVersionUID = 1L;
+
         public ProtocolError(String message) {
             super(message);
         }
@@ -107,20 +114,20 @@ public class BMYException extends Exception {
         public ProtocolError(String message, Throwable cause) {
             super(message, cause);
         }
-
-        public static final long serialVersionUID = 0;
     }
 
     // 400
-    public static final class BadRequest extends ProtocolError {
+    public static class BadRequest extends ProtocolError {
+        public static final long serialVersionUID = 1L;
+
         public BadRequest(String message) {
             super(message);
         }
-
-        public static final long serialVersionUID = 0;
     }
 
     public static class BadResponse extends ProtocolError {
+        public static final long serialVersionUID = 1L;
+
         public BadResponse(String message) {
             super(message);
         }
@@ -128,12 +135,12 @@ public class BMYException extends Exception {
         public BadResponse(String message, Throwable cause) {
             super(message, cause);
         }
-
-        public static final long serialVersionUID = 0;
     }
 
     public static class BadResponseCode extends BadResponse {
-        public final int statusCode;
+        public static final long serialVersionUID = 1L;
+
+        private int statusCode;
 
         public BadResponseCode(String message, int statusCode) {
             super(message);
@@ -145,27 +152,33 @@ public class BMYException extends Exception {
             this.statusCode = statusCode;
         }
 
-        public static final long serialVersionUID = 0;
+        public int getStatusCode() {
+            return this.statusCode;
+        }
     }
 
-    public static final class NetworkIO extends BMYException {
-        public final IOException underlying;
+    public static class NetworkIO extends BMYException {
+        public static final long serialVersionUID = 1L;
+
+        private IOException underlying;
 
         public NetworkIO(IOException underlying) {
             super(underlying.toString(), underlying);
             this.underlying = underlying;
         }
 
-        public static final long serialVersionUID = 0;
+        @Override
+        public IOException getCause() {
+            return this.underlying;
+        }
     }
 
     // 401
-    public static final class InvalidAccessToken extends BMYException {
+    public static class InvalidAccessToken extends BMYException {
+        public static final long serialVersionUID = 1L;
+
         public InvalidAccessToken(String message) {
             super(message);
         }
-
-        public static final long serialVersionUID = 0;
     }
-
 }

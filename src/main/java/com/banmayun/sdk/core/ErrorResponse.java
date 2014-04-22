@@ -6,15 +6,17 @@ import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class ErrorResponse extends Dumpable {
 
-    public int status;
-    public int code;
-    public String message;
+    public Integer status = null;
+    public Integer code = null;
+    public String message = null;
+
+    public ErrorResponse() {
+    }
 
     public ErrorResponse(int status, int code, String message) {
         this.status = status;
@@ -24,22 +26,19 @@ public class ErrorResponse extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("status", status);
-        out.field("code", code);
-        out.field("message", message);
+        out.field("status", this.status);
+        out.field("code", this.code);
+        out.field("message", this.message);
     }
 
-    public static JsonReader<ErrorResponse> Reader = new JsonReader<ErrorResponse>() {
-
+    public static JsonReader<ErrorResponse> reader = new JsonReader<ErrorResponse>() {
         @Override
         public ErrorResponse read(JsonParser parser) throws IOException, JsonReadException {
-
             int status = -1;
             int code = -1;
             String message = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -56,7 +55,7 @@ public class ErrorResponse extends Dumpable {
                         code = (int) JsonReader.readUnsignedLongField(parser, fieldName, code);
                         break;
                     case FM_message:
-                        message = JsonReader.StringReader.readField(parser, fieldName, message);
+                        message = JsonReader.STRING_READER.readField(parser, fieldName, message);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -67,7 +66,6 @@ public class ErrorResponse extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new ErrorResponse(status, code, message);
         }
     };
@@ -87,12 +85,3 @@ public class ErrorResponse extends Dumpable {
         FM = b.build();
     }
 }
-/*
- * @JsonInclude(Include.NON_NULL) public class ErrorResponse {
- * 
- * @JsonProperty("status") public Integer status = null;
- * 
- * @JsonProperty("code") public Integer code = null;
- * 
- * @JsonProperty("message") public String message = null; }
- */

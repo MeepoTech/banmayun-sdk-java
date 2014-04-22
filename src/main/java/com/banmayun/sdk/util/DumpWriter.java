@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public abstract class DumpWriter {
+
     public abstract DumpWriter recordStart(String name);
 
     public abstract DumpWriter recordEnd();
@@ -19,17 +20,21 @@ public abstract class DumpWriter {
     public abstract DumpWriter verbatim(String s);
 
     public static final class Multiline extends DumpWriter {
-        private final StringBuilder buf;
-        private final int indentAmount;
-        private int currentIndent;
+        private StringBuilder buf = null;
+        private int indentAmount = 4;
+        private int currentIndent = 0;
+        private boolean nl = true;
 
         public Multiline(StringBuilder buf, int indentAmount, int currentIndent, boolean nl) {
-            if (buf == null)
+            if (buf == null) {
                 throw new IllegalArgumentException("'buf' must not be null");
-            if (indentAmount < 0)
+            }
+            if (indentAmount < 0) {
                 throw new IllegalArgumentException("'indentAmount' must be non-negative");
-            if (currentIndent < 0)
+            }
+            if (currentIndent < 0) {
                 throw new IllegalArgumentException("'currentIndent' must be non-negative");
+            }
             this.buf = buf;
             this.indentAmount = indentAmount;
             this.currentIndent = currentIndent;
@@ -40,150 +45,151 @@ public abstract class DumpWriter {
             this(buf, indentAmount, 0, nl);
         }
 
-        boolean nl = true;
-
         private void prefix() {
-            if (nl) {
-                int l = currentIndent;
+            if (this.nl) {
+                int l = this.currentIndent;
                 for (int i = 0; i < l; i++) {
-                    buf.append(' ');
+                    this.buf.append(' ');
                 }
             }
         }
 
         private void indentMore() {
-            currentIndent += indentAmount;
+            this.currentIndent += this.indentAmount;
         }
 
         private void indentLess() {
-            if (indentAmount > currentIndent)
+            if (this.indentAmount > this.currentIndent) {
                 throw new IllegalStateException("indent went negative");
-            currentIndent -= indentAmount;
+            }
+            this.currentIndent -= this.indentAmount;
         }
 
         @Override
         public DumpWriter recordStart(String name) {
             prefix();
             if (name != null) {
-                buf.append(name).append(" ");
+                this.buf.append(name).append(" ");
             }
-            buf.append("{\n");
-            nl = true;
+            this.buf.append("{\n");
+            this.nl = true;
             indentMore();
             return this;
         }
 
         @Override
         public DumpWriter recordEnd() {
-            if (!nl)
+            if (!this.nl) {
                 throw new AssertionError("called recordEnd() in a bad state");
+            }
             indentLess();
             prefix();
-            buf.append("}\n");
-            nl = true;
+            this.buf.append("}\n");
+            this.nl = true;
             return this;
         }
 
         @Override
         public DumpWriter fieldStart(String name) {
-            if (!nl)
+            if (!this.nl) {
                 throw new AssertionError("called fieldStart() in a bad state");
+            }
             prefix();
-            buf.append(name).append(" = ");
-            nl = false;
+            this.buf.append(name).append(" = ");
+            this.nl = false;
             return this;
         }
 
         @Override
         public DumpWriter listStart() {
             prefix();
-            buf.append("[\n");
-            nl = true;
+            this.buf.append("[\n");
+            this.nl = true;
             indentMore();
             return this;
         }
 
         @Override
         public DumpWriter listEnd() {
-            if (!nl)
+            if (!this.nl) {
                 throw new AssertionError("called listEnd() in a bad state");
+            }
             indentLess();
-            buf.append("]\n");
-            nl = true;
+            this.buf.append("]\n");
+            this.nl = true;
             return this;
         }
 
         @Override
         public DumpWriter verbatim(String s) {
             prefix();
-            buf.append(s);
-            buf.append('\n');
-            nl = true;
+            this.buf.append(s);
+            this.buf.append('\n');
+            this.nl = true;
             return this;
         }
     }
 
     public static final class Plain extends DumpWriter {
-        private StringBuilder buf;
+        private StringBuilder buf = null;
+        private boolean needSep = false;
 
         public Plain(StringBuilder buf) {
             this.buf = buf;
         }
 
-        private boolean needSep = false;
-
         private void sep() {
-            if (needSep) {
-                buf.append(", ");
+            if (this.needSep) {
+                this.buf.append(", ");
             } else {
-                needSep = true;
+                this.needSep = true;
             }
         }
 
         @Override
         public DumpWriter recordStart(String name) {
             if (name != null) {
-                buf.append(name);
+                this.buf.append(name);
             }
-            buf.append("(");
-            needSep = false;
+            this.buf.append("(");
+            this.needSep = false;
             return this;
         }
 
         @Override
         public DumpWriter recordEnd() {
-            buf.append(")");
-            needSep = true;
+            this.buf.append(")");
+            this.needSep = true;
             return this;
         }
 
         @Override
         public DumpWriter fieldStart(String name) {
             sep();
-            buf.append(name).append('=');
-            needSep = false;
+            this.buf.append(name).append('=');
+            this.needSep = false;
             return this;
         }
 
         @Override
         public DumpWriter listStart() {
             sep();
-            buf.append("[");
-            needSep = false;
+            this.buf.append("[");
+            this.needSep = false;
             return this;
         }
 
         @Override
         public DumpWriter listEnd() {
-            buf.append("]");
-            needSep = true;
+            this.buf.append("]");
+            this.needSep = true;
             return this;
         }
 
         @Override
         public DumpWriter verbatim(String s) {
             sep();
-            buf.append(s);
+            this.buf.append(s);
             return this;
         }
     }
@@ -266,7 +272,6 @@ public abstract class DumpWriter {
             return "null";
         } else {
             StringBuilder buf = new StringBuilder();
-            // GregorianCalendar c = new GregorianCalendar(JsonDateReader.UTC);
             GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
             c.setTime(date);
             String year = Integer.toString(c.get(Calendar.YEAR));

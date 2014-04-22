@@ -6,19 +6,21 @@ import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Root extends Dumpable {
 
-    public String id;
-    public String type;
-    public Size used;
-    public Size quota;
-    public Permission defaultPermission;
-    public int fileCount;
-    public long byteCount;
+    public String id = null;
+    public String type = null;
+    public Size used = null;
+    public Size quota = null;
+    public Permission defaultPermission = null;
+    public Integer fileCount = null;
+    public Long byteCount = null;
+
+    public Root() {
+    }
 
     public Root(String id, String type, Size used, Size quota, Permission defaultPermission, int fileCount,
             long byteCount) {
@@ -33,20 +35,18 @@ public class Root extends Dumpable {
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        out.field("id", id);
-        out.field("type", type);
-        out.field("used", used);
-        out.field("quota", quota);
-        out.field("default_permission", defaultPermission);
-        out.field("file_count", fileCount);
-        out.field("byte_count", byteCount);
+        out.field("id", this.id);
+        out.field("type", this.type);
+        out.field("used", this.used);
+        out.field("quota", this.quota);
+        out.field("default_permission", this.defaultPermission);
+        out.field("file_count", this.fileCount);
+        out.field("byte_count", this.byteCount);
     }
 
-    public static JsonReader<Root> Reader = new JsonReader<Root>() {
-
+    public static JsonReader<Root> reader = new JsonReader<Root>() {
         @Override
         public Root read(JsonParser parser) throws IOException, JsonReadException {
-
             String id = null;
             String type = null;
             Size used = null;
@@ -55,7 +55,7 @@ public class Root extends Dumpable {
             int fileCount = -1;
             long byteCount = -1;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -66,19 +66,19 @@ public class Root extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_id:
-                        id = JsonReader.StringReader.readField(parser, fieldName, id);
+                        id = JsonReader.STRING_READER.readField(parser, fieldName, id);
                         break;
                     case FM_type:
-                        type = JsonReader.StringReader.readField(parser, fieldName, type);
+                        type = JsonReader.STRING_READER.readField(parser, fieldName, type);
                         break;
                     case FM_used:
-                        used = Size.Reader.readField(parser, fieldName, used);
+                        used = Size.reader.readField(parser, fieldName, used);
                         break;
                     case FM_quota:
-                        quota = Size.Reader.readField(parser, fieldName, quota);
+                        quota = Size.reader.readField(parser, fieldName, quota);
                         break;
                     case FM_default_permission:
-                        defaultPermission = Permission.Reader.readField(parser, fieldName, defaultPermission);
+                        defaultPermission = Permission.reader.readField(parser, fieldName, defaultPermission);
                         break;
                     case FM_file_count:
                         fileCount = (int) JsonReader.readUnsignedLongField(parser, fieldName, fileCount);
@@ -95,7 +95,6 @@ public class Root extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Root(id, type, used, quota, defaultPermission, fileCount, byteCount);
         }
     };
@@ -121,9 +120,5 @@ public class Root extends Dumpable {
         b.add("byte_count", FM_byte_count);
 
         FM = b.build();
-    }
-
-    public void print() {
-        System.out.println(this.byteCount + " " + this.fileCount + " " + this.id + " " + this.type);
     }
 }

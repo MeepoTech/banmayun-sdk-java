@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public final class NoThrowOutputStream extends OutputStream {
-    private final OutputStream underlying;
+
+    private OutputStream underlying = null;
     private long bytesWritten = 0;
 
     public NoThrowOutputStream(OutputStream underlying) {
@@ -19,7 +20,7 @@ public final class NoThrowOutputStream extends OutputStream {
     @Override
     public void flush() {
         try {
-            underlying.flush();
+            this.underlying.flush();
         } catch (IOException e) {
             throw new HiddenException(e);
         }
@@ -28,8 +29,8 @@ public final class NoThrowOutputStream extends OutputStream {
     @Override
     public void write(byte[] b, int off, int len) {
         try {
-            bytesWritten += len;
-            underlying.write(b, off, len);
+            this.bytesWritten += len;
+            this.underlying.write(b, off, len);
         } catch (IOException e) {
             throw new HiddenException(e);
         }
@@ -38,8 +39,8 @@ public final class NoThrowOutputStream extends OutputStream {
     @Override
     public void write(byte[] b) {
         try {
-            bytesWritten += b.length;
-            underlying.write(b);
+            this.bytesWritten += b.length;
+            this.underlying.write(b);
         } catch (IOException e) {
             throw new HiddenException(e);
         }
@@ -48,8 +49,8 @@ public final class NoThrowOutputStream extends OutputStream {
     @Override
     public void write(int b) throws IOException {
         try {
-            bytesWritten += 1;
-            underlying.write(b);
+            this.bytesWritten += 1;
+            this.underlying.write(b);
         } catch (IOException e) {
             throw new HiddenException(e);
         }
@@ -67,6 +68,6 @@ public final class NoThrowOutputStream extends OutputStream {
     }
 
     public long getBytesWritten() {
-        return bytesWritten;
+        return this.bytesWritten;
     }
 }

@@ -3,6 +3,7 @@ package com.banmayun.sdk.util;
 import java.lang.reflect.*;
 
 public class LangUtil {
+
     public static RuntimeException mkAssert(String messagePrefix, Throwable cause) {
         RuntimeException ae = new RuntimeException(messagePrefix + ": " + cause.getMessage());
         ae.initCause(cause);
@@ -24,10 +25,12 @@ public class LangUtil {
     }
 
     public static <T> T[] arrayConcat(T[] a, T[] b) {
-        if (a == null)
+        if (a == null) {
             throw new IllegalArgumentException("'a' can't be null");
-        if (b == null)
+        }
+        if (b == null) {
             throw new IllegalArgumentException("'b' can't be null");
+        }
 
         T[] r = copyOf(a, a.length + b.length);
         System.arraycopy(b, 0, r, a.length, b.length);

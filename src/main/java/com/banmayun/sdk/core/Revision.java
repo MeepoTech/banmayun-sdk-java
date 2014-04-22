@@ -2,51 +2,47 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
-import javax.jws.soap.SOAPBinding.Use;
-
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
 import com.banmayun.sdk.util.Dumpable;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 public class Revision extends Dumpable {
 
-    public long version;
-    public String md5;
-    public Size size;
-    public Time modifiedAt;
-    public User modifiedBy;
-    public Time clientModifiedAt;
+    public Long version = null;
+    public String md5 = null;
+    public Size size = null;
+    public Time modifiedAt = null;
+    public User modifiedBy = null;
+    public Time clientModifiedAt = null;
 
-    Revision(long version, String md5, Size size, Time modifiedAt, User modifiedBy, Time clientModifiedAt) {
+    public Revision() {
+    }
+
+    public Revision(long version, String md5, Size size, Time modifiedAt, User modifiedBy, Time clientModifiedAt) {
         this.version = version;
         this.md5 = md5;
         this.size = size;
         this.modifiedAt = modifiedAt;
         this.modifiedBy = modifiedBy;
         this.clientModifiedAt = clientModifiedAt;
-
     }
 
     @Override
     protected void dumpFields(DumpWriter out) {
-        // TODO Auto-generated method stub
-        out.field("version", version);
-        out.field("md5", md5);
-        out.field("size", size);
-        out.field("modified_at", modifiedAt);
-        out.field("modified_by", modifiedBy);
-        out.field("client_modified_at", clientModifiedAt);
+        out.field("version", this.version);
+        out.field("md5", this.md5);
+        out.field("size", this.size);
+        out.field("modified_at", this.modifiedAt);
+        out.field("modified_by", this.modifiedBy);
+        out.field("client_modified_at", this.clientModifiedAt);
     }
 
-    public static JsonReader<Revision> Reader = new JsonReader<Revision>() {
-
+    public static JsonReader<Revision> reader = new JsonReader<Revision>() {
         @Override
         public Revision read(JsonParser parser) throws IOException, JsonReadException {
-
             long version = -1;
             String md5 = null;
             Size size = null;
@@ -54,7 +50,7 @@ public class Revision extends Dumpable {
             User modifiedBy = null;
             Time clientModifiedAt = null;
 
-            JsonLocation top = JsonReader.expectObjectStart(parser);
+            JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
@@ -68,19 +64,19 @@ public class Revision extends Dumpable {
                         version = JsonReader.readUnsignedLongField(parser, fieldName, version);
                         break;
                     case FM_md5:
-                        md5 = JsonReader.StringReader.readField(parser, fieldName, md5);
+                        md5 = JsonReader.STRING_READER.readField(parser, fieldName, md5);
                         break;
                     case FM_size:
-                        size = Size.Reader.readField(parser, fieldName, size);
+                        size = Size.reader.readField(parser, fieldName, size);
                         break;
                     case FM_modified_at:
-                        modifiedAt = Time.Reader.readField(parser, fieldName, modifiedAt);
+                        modifiedAt = Time.reader.readField(parser, fieldName, modifiedAt);
                         break;
                     case FM_modified_by:
-                        modifiedBy = User.Reader.readField(parser, fieldName, modifiedBy);
+                        modifiedBy = User.reader.readField(parser, fieldName, modifiedBy);
                         break;
                     case FM_client_modified_at:
-                        clientModifiedAt = Time.Reader.readField(parser, fieldName, clientModifiedAt);
+                        clientModifiedAt = Time.reader.readField(parser, fieldName, clientModifiedAt);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -91,7 +87,6 @@ public class Revision extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Revision(version, md5, size, modifiedAt, modifiedBy, clientModifiedAt);
         }
     };
@@ -115,10 +110,5 @@ public class Revision extends Dumpable {
         b.add("client_modified_at", FM_client_modified_at);
 
         FM = b.build();
-    }
-
-    public void print() {
-        System.out.println(this.md5 + " " + this.version + " " + this.size.bytes);
-
     }
 }
