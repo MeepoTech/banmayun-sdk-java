@@ -33,12 +33,18 @@ public class BMYRequestUtil {
         }
     }
 
-    private static String encodeUrlParams(String userLocale, String[] params) {
+    private static String encodeUrlParams(String token, String userLocale, String[] params) {
         StringBuilder buf = new StringBuilder();
         String sep = "";
-        if (userLocale != null) {
-            buf.append("locale=").append(userLocale);
+        if (token != null) {
+            buf.append(sep);
             sep = "&";
+            buf.append("token=").append(token);
+        }
+        if (userLocale != null) {
+            buf.append(sep);
+            sep = "&";
+            buf.append("locale=").append(userLocale);
         }
 
         if (params != null) {
@@ -64,41 +70,11 @@ public class BMYRequestUtil {
 
     public static String buildUri(String host, String path) {
         return "http://" + host + "/" + path;
-        /*
-         * try { //return "http://" + host + "/" + path; return new URI("http",
-         * host, "/" + path, null).toURL().toExternalForm(); } catch
-         * (MalformedURLException ex) { AssertionError ae = new
-         * AssertionError(); ae.initCause(ex); throw ae; } catch
-         * (URISyntaxException ex) { AssertionError ae = new AssertionError();
-         * ae.initCause(ex); throw ae; }
-         */
     }
 
-    // TODO: http instead of https
-    /*
-     * public static String buildUri(String host, String path) { try { return
-     * new URI("https", host, "/" + path, null).toURL().toExternalForm(); //
-     * return new URI("https", host, "/" + path, //
-     * null).toURL().toExternalForm(); } catch (MalformedURLException ex) {
-     * AssertionError ae = new AssertionError(); ae.initCause(ex); throw ae; }
-     * catch (URISyntaxException ex) { AssertionError ae = new AssertionError();
-     * ae.initCause(ex); throw ae; } }
-     */
-
-    public static String buildUrlWithParams(String userLocale, String host, String path, String[] params) {
-        return buildUri(host, path) + "?" + encodeUrlParams(userLocale, params);
+    public static String buildUrlWithParams(String host, String path, String token, String userLocale, String[] params) {
+        return buildUri(host, path) + "?" + encodeUrlParams(token, userLocale, params);
     }
-
-    // private static ArrayList<HttpRequestor.Header>
-    // addAuthHeader(ArrayList<HttpRequestor.Header> headers,
-    // String accessToken) {
-    // if (headers == null) {
-    // headers = new ArrayList<HttpRequestor.Header>();
-    // }
-    // headers.add(new HttpRequestor.Header("Authorization", "Bearer " +
-    // accessToken));
-    // return headers;
-    // }
 
     public static ArrayList<HttpRequestor.Header> addUserAgentHeader(ArrayList<HttpRequestor.Header> headers,
             BMYRequestConfig requestConfig) {
@@ -115,10 +91,10 @@ public class BMYRequestUtil {
     }
 
     public static HttpRequestor.Response startGet(BMYRequestConfig requestConfig, String host, String path,
-            String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException.NetworkIO {
+            String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException.NetworkIO {
         headers = addUserAgentHeader(headers, requestConfig);
 
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+        String url = buildUrlWithParams(host, path, token, requestConfig.userLocale, params);
         try {
             return requestConfig.httpRequestor.doGet(url, headers);
         } catch (IOException ex) {
@@ -127,10 +103,10 @@ public class BMYRequestUtil {
     }
 
     public static HttpRequestor.Response startDelete(BMYRequestConfig requestConfig, String host, String path,
-            String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException.NetworkIO {
+            String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException.NetworkIO {
         headers = addUserAgentHeader(headers, requestConfig);
 
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+        String url = buildUrlWithParams(host, path, token, requestConfig.userLocale, params);
         try {
             return requestConfig.httpRequestor.doDelete(url, headers);
         } catch (IOException ex) {
@@ -138,23 +114,11 @@ public class BMYRequestUtil {
         }
     }
 
-    public static HttpRequestor.Uploader startPut(BMYRequestConfig requestConfig, String host, String path,
-            String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException.NetworkIO {
-        headers = addUserAgentHeader(headers, requestConfig);
-
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
-        try {
-            return requestConfig.httpRequestor.startPut(url, headers);
-        } catch (IOException ex) {
-            throw new BMYException.NetworkIO(ex);
-        }
-    }
-
     public static HttpRequestor.Response startPost(BMYRequestConfig requestConfig, String host, String path,
-            String[] params, String body, ArrayList<HttpRequestor.Header> headers) throws BMYException {
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+            String token, String[] params, String body, ArrayList<HttpRequestor.Header> headers) throws BMYException {
+        String url = buildUrlWithParams(host, path, token, requestConfig.userLocale, params);
         headers = addUserAgentHeader(headers, requestConfig);
-        headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
+        headers.add(new HttpRequestor.Header("Content-Type", "application/json"));
 
         try {
             HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPost(url, headers);
@@ -183,11 +147,6 @@ public class BMYRequestUtil {
 
     public static String parseErrorBody(int statusCode, byte[] body) throws BMYException.BadResponse {
         // Read the error message from the body.
-        // TODO: Get charset from the HTTP Content-Type header. It's wrong to
-        // just
-        // assume UTF-8.
-        // TODO: Maybe try parsing the message as JSON and do something more
-        // structured?
         try {
             return StringUtil.utf8ToString(body);
         } catch (CharacterCodingException e) {
@@ -207,8 +166,7 @@ public class BMYRequestUtil {
                 sb.append(line);
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new BMYException.BadResponse(message, e);
         }
         ErrorResponse errorResponse = readJsonFromResponse(ErrorResponse.reader, new ByteArrayInputStream(body));
         if (errorResponse != null) {
@@ -267,6 +225,7 @@ public class BMYRequestUtil {
 
     public static Map<String, String> parseAsQueryString(InputStream in) throws BMYException {
         // TODO: Maybe just slurp string up to a max limit.
+        @SuppressWarnings("resource")
         Scanner scanner = new Scanner(in).useDelimiter("&");
         Map<String, String> result = new HashMap<String, String>();
         try {
@@ -300,9 +259,9 @@ public class BMYRequestUtil {
         return result;
     }
 
-    public static <T> T doGet(BMYRequestConfig requestConfig, String host, String path, String[] params,
+    public static <T> T doGet(BMYRequestConfig requestConfig, String host, String path, String token, String[] params,
             ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
-        HttpRequestor.Response response = startGet(requestConfig, host, path, params, headers);
+        HttpRequestor.Response response = startGet(requestConfig, host, path, token, params, headers);
         try {
             return handler.handle(response);
         } finally {
@@ -314,9 +273,9 @@ public class BMYRequestUtil {
         }
     }
 
-    public static <T> T doDelete(BMYRequestConfig requestConfig, String host, String path, String[] params,
-            ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
-        HttpRequestor.Response response = startDelete(requestConfig, host, path, params, headers);
+    public static <T> T doDelete(BMYRequestConfig requestConfig, String host, String path, String token,
+            String[] params, ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
+        HttpRequestor.Response response = startDelete(requestConfig, host, path, token, params, headers);
         try {
             return handler.handle(response);
         } finally {
@@ -328,29 +287,15 @@ public class BMYRequestUtil {
         }
     }
 
-    public static <T> T doPut(BMYRequestConfig requestConfig, String host, String path, String[] params, String body,
-            ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
-        HttpRequestor.Response response = startGet(requestConfig, host, path, params, headers);
-        try {
-            return handler.handle(response);
-        } finally {
-            try {
-                response.body.close();
-            } catch (IOException ex) {
-                throw new BMYException.NetworkIO(ex);
-            }
-        }
-    }
-
-    public static <T> T doPost(BMYRequestConfig requestConfig, String host, String path, String[] params, String body,
-            ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
-        HttpRequestor.Response response = startPost(requestConfig, host, path, params, body, headers);
+    public static <T> T doPost(BMYRequestConfig requestConfig, String host, String path, String token, String[] params,
+            String body, ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
+        HttpRequestor.Response response = startPost(requestConfig, host, path, token, params, body, headers);
         return finishResponse(response, handler);
     }
 
     public static HttpRequestor.Uploader getUploaderWithPut(BMYRequestConfig requestConfig, String host, String path,
-            String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+            String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
+        String url = buildUrlWithParams(requestConfig.userLocale, host, path, token, params);
         headers = addUserAgentHeader(headers, requestConfig);
         headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
 
@@ -363,8 +308,8 @@ public class BMYRequestUtil {
     }
 
     public static HttpRequestor.Uploader getUploaderWithPost(BMYRequestConfig requestConfig, String host, String path,
-            String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, params);
+            String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
+        String url = buildUrlWithParams(requestConfig.userLocale, host, path, token, params);
         headers = addUserAgentHeader(headers, requestConfig);
         headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
 
