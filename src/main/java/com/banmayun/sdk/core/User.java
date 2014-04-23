@@ -2,6 +2,7 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
+import com.banmayun.sdk.json.JsonBuilder;
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -30,8 +31,8 @@ public class User extends Dumpable {
     }
 
     public User(String id, String rootId, String name, String email, String source, String displayName,
-            EnumElement role, int groupsCanOwn, boolean isActivated, boolean isBlocked, int groupCount, Time createdAt,
-            Relation relation, Root root) {
+            EnumElement role, Integer groupsCanOwn, Boolean isActivated, Boolean isBlocked, Integer groupCount,
+            Time createdAt, Relation relation, Root root) {
         this.id = id;
         this.rootId = rootId;
         this.name = name;
@@ -76,10 +77,10 @@ public class User extends Dumpable {
             String source = null;
             String displayName = null;
             EnumElement role = null;
-            int groupsCanOwn = -1;
-            boolean isActivated = false;
-            boolean isBlocked = false;
-            int groupCount = -1;
+            Integer groupsCanOwn = null;
+            Boolean isActivated = null;
+            Boolean isBlocked = null;
+            Integer groupCount = -1;
             Time createdAt = null;
             Relation relation = null;
             Root root = null;
@@ -89,7 +90,7 @@ public class User extends Dumpable {
                 String fieldName = parser.getCurrentName();
                 parser.nextToken();
                 try {
-                    int fi = FM.get(fieldName);
+                    Integer fi = FM.get(fieldName);
                     switch (fi) {
                     case -1:
                         JsonReader.skipValue(parser);
@@ -116,7 +117,7 @@ public class User extends Dumpable {
                         role = EnumElement.reader.readField(parser, fieldName, role);
                         break;
                     case FM_groups_can_own:
-                        groupsCanOwn = (int) JsonReader.readUnsignedLongField(parser, fieldName, groupsCanOwn);
+                        groupsCanOwn = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_is_activated:
                         isActivated = JsonReader.readBoolean(parser);
@@ -125,7 +126,7 @@ public class User extends Dumpable {
                         isBlocked = JsonReader.readBoolean(parser);
                         break;
                     case FM_group_count:
-                        groupCount = (int) JsonReader.readUnsignedLongField(parser, fieldName, groupCount);
+                        groupCount = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_created_at:
                         createdAt = Time.reader.readField(parser, fieldName, createdAt);
@@ -185,5 +186,28 @@ public class User extends Dumpable {
         b.add("root", FM_root);
 
         FM = b.build();
+    }
+
+    public String objectToJsonString() {
+        JsonBuilder jb = new JsonBuilder();
+        if (name != null) {
+            jb.addString("name", name);
+        }
+        if (email != null) {
+            jb.addString("email", email);
+        }
+        if (displayName != null) {
+            jb.addString("display_name", displayName);
+        }
+        if (source != null) {
+            jb.addString("source", source);
+        }
+        if (groupsCanOwn != null) {
+            jb.addInt("groups_can_own", groupsCanOwn);
+        }
+        if (role != null) {
+            jb.addEnumElement("role", role);
+        }
+        return jb.makeJsonString();
     }
 }

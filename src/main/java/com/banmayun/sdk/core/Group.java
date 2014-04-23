@@ -2,6 +2,7 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
+import com.banmayun.sdk.json.JsonBuilder;
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -32,7 +33,7 @@ public class Group extends Dumpable {
     }
 
     public Group(String id, String rootId, String name, String source, EnumElement type, String intro, String tags,
-            String annouce, boolean isVisible, boolean isActivated, boolean isBlocked, int userCount, Time createdAt,
+            String annouce, Boolean isVisible, Boolean isActivated, Boolean isBlocked, Integer userCount, Time createdAt,
             User createdBy, Relation relation, Root root) {
         this.id = id;
         this.rootId = rootId;
@@ -83,10 +84,10 @@ public class Group extends Dumpable {
             String intro = null;
             String tags = null;
             String annouce = null;
-            boolean isVisible = false;
-            boolean isActivated = false;
-            boolean isBlocked = false;
-            int userCount = -1;
+            Boolean isVisible = null;
+            Boolean isActivated = null;
+            Boolean isBlocked = null;
+            Integer userCount = null;
             Time createdAt = null;
             User createdBy = null;
             Relation relation = null;
@@ -136,7 +137,7 @@ public class Group extends Dumpable {
                         isBlocked = JsonReader.readBoolean(parser);
                         break;
                     case FM_user_count:
-                        userCount = (int) JsonReader.readUnsignedLongField(parser, fieldName, userCount);
+                        userCount = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_created_at:
                         createdAt = Time.reader.readField(parser, fieldName, createdAt);
@@ -202,5 +203,31 @@ public class Group extends Dumpable {
         b.add("root", FM_root);
 
         FM = b.build();
+    }
+    
+    public String objectToJsonString() {
+        JsonBuilder jb = new JsonBuilder();
+        if (name != null) {
+            jb.addString("name", name);
+        }
+        if (type != null) {
+            jb.addEnumElement("type", type);
+        }
+        if (isVisible != null) {
+            jb.addBoolean("is_visible", isVisible);
+        }
+        if (annouce != null) {
+            jb.addString("announce", annouce);
+        }
+        if (intro != null) {
+            jb.addString("intro", intro);
+        }
+        if (tags != null) {
+            jb.addString("tags", tags);
+        }
+        if (source != null) {
+            jb.addString("source", source);
+        }
+        return jb.makeJsonString();
     }
 }

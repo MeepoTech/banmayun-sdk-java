@@ -27,7 +27,6 @@ import com.banmayun.sdk.core.Trash;
 import com.banmayun.sdk.core.User;
 import com.banmayun.sdk.http.HttpRequestor;
 import com.banmayun.sdk.http.HttpRequestor.Response;
-import com.banmayun.sdk.json.JsonBuilder;
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.CountingOutputStream;
@@ -47,8 +46,7 @@ public class BMYClient {
     private BMYHost host = null;
 
     public enum ThumbnailFormat {
-        JPEG,
-        PNG
+        JPEG, PNG
     }
 
     public String getThumbnailFormatStr(ThumbnailFormat format) {
@@ -67,11 +65,7 @@ public class BMYClient {
     }
 
     public enum ThumbnailSize {
-        XS,
-        S,
-        M,
-        L,
-        XL
+        XS, S, M, L, XL
     }
 
     public String getThumbnailSizeStr(ThumbnailSize size) {
@@ -98,7 +92,7 @@ public class BMYClient {
         return sizeStr;
     }
 
-    public String inputString2String(InputStream is) {
+    public String inputStream2String(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
         String line = null;
@@ -124,8 +118,21 @@ public class BMYClient {
 
     public int getInputStreamLength(InputStream in) {
         InputStream input = in;
-        String inputStr = inputString2String(input);
+        String inputStr = inputStream2String(input);
         return inputStr.length();
+    }
+
+    public List<String> getParamsList(Integer offset, Integer limit) {
+        List<String> paramsList = new ArrayList<String>();
+        if (offset != null) {
+            paramsList.add("offset");
+            paramsList.add("" + offset);
+        }
+        if (limit != null) {
+            paramsList.add("limit");
+            paramsList.add("" + limit);
+        }
+        return paramsList;
     }
 
     public BMYClient(BMYRequestConfig requestConfig) {
@@ -170,6 +177,7 @@ public class BMYClient {
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Link>() {
             @Override
             public Link handle(Response response) throws BMYException {
+                System.out.println(response.statusCode);
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
@@ -224,16 +232,7 @@ public class BMYClient {
 
     public User existsUser(User user) throws BMYException {
         String apiPath = "1/users/exists";
-
-        // body
-        JsonBuilder jb = new JsonBuilder();
-        if (user.name != null) {
-            jb.addString("name", user.name);
-        }
-        if (user.email != null) {
-            jb.addString("email", user.email);
-        }
-        String body = jb.makeJsonString();
+        String body = user.objectToJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<User>() {
             @Override
@@ -247,18 +246,9 @@ public class BMYClient {
     }
 
     public User createUser(User user, String password) throws BMYException {
-        // TODO: admin create?
         String apiPath = "1/users";
         String[] params = { "password", password };
-
-        // body
-        JsonBuilder jb = new JsonBuilder();
-        jb.addString("name", user.name);
-        jb.addString("email", user.email);
-        if (user.displayName != null) {
-            jb.addString("display_name", user.displayName);
-        }
-        String body = jb.makeJsonString();
+        String body = user.objectToJsonString();
 
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<User>() {
             @Override
@@ -287,9 +277,12 @@ public class BMYClient {
 
     public ResultList<User> listUsers(String role, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/users";
-        // TODO: null role, offset, limit?
-        String[] params = { "role", role, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
-
+        List<String> paramList = getParamsList(offset, limit);
+        if (role != null) {
+            paramList.add("role");
+            paramList.add(role);
+        }
+        String[] params = paramList.toArray(new String[0]);
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
             @Override
             public ResultList<User> handle(Response response) throws BMYException {
@@ -303,12 +296,7 @@ public class BMYClient {
 
     public User updateUser(String targetUserId, User update) throws BMYException {
         String apiPath = "1/users" + "/" + targetUserId + "/update";
-        JsonBuilder jb = new JsonBuilder();
-        // TODO: admin
-        if (update.displayName != null) {
-            jb.addString("display_name", update.displayName);
-        }
-        String body = jb.makeJsonString();
+        String body = update.objectToJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<User>() {
             @Override
@@ -337,26 +325,35 @@ public class BMYClient {
     }
 
     public void setUserAvatar(String targetUserId, InputStream input) throws BMYException {
+        String host = this.host.api;
         String apiPath = "1/users/" + targetUserId + "/avatar";
-        // TODO:
-        String body = inputString2String(input);
         ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
-        headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(body.length())));
+        String url = BMYRequestUtil.buildUrlWithParams(host, apiPath, this.token, requestConfig.userLocale, null);
+        System.out.println(url);
+        headers = BMYRequestUtil.addUserAgentHeader(headers, requestConfig);
+        headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
 
-        // TODO: no handle?
-        this.doPost(apiPath, null, headers, body, new BMYRequestUtil.ResponseHandler<Object>() {
-            @Override
-            public Object handle(Response response) throws BMYException {
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
+        try {
+            HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPost(url, headers);
+            try {
+                byte[] buf = new byte[1024];
+                while (true) {
+                    int r = input.read(buf);
+                    if (r == -1) {
+                        break;
+                    }
+                    uploader.getBody().write(buf, 0, r);
                 }
-                return null;
+                uploader.finish();
+            } finally {
+                uploader.close();
             }
-        });
+        } catch (IOException ex) {
+            throw new BMYException.NetworkIO(ex);
+        }
     }
 
-    // TODO: 500
     public InputStream getUserAvatar(String targetUserId, ThumbnailFormat format, ThumbnailSize size)
             throws BMYException {
         String apiPath = "1/users/" + targetUserId + "/avatar";
@@ -365,6 +362,7 @@ public class BMYClient {
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
             @Override
             public InputStream handle(Response response) throws BMYException {
+                System.out.println(response.statusCode);
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
@@ -376,9 +374,7 @@ public class BMYClient {
     public Group addUserGroup(String targetUserId, String groupId, Relation relation) throws BMYException {
         String apiPath = "1/users/" + targetUserId + "/groups";
         String[] params = { "group_id", groupId };
-
-        // TODO: wtf? admin?
-        String body = new JsonBuilder().addEnumElement("role", relation.role).makeJsonString();
+        String body = relation.objectToJsonString();
 
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -408,8 +404,12 @@ public class BMYClient {
     public ResultList<Group> listGroupsForUser(String targetUserId, String role, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/users/" + targetUserId + "/groups";
-        // TODO: null role, offset, limit?
-        String[] params = { "role", role, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (role != null) {
+            paramList.add("role");
+            paramList.add(role);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
             @Override
@@ -424,11 +424,7 @@ public class BMYClient {
 
     public Group updateUserGroup(String targetUserId, String groupId, Relation update) throws BMYException {
         String apiPath = "1/users/" + targetUserId + "/groups/" + groupId + "/update";
-
-        // TODO: wtf?
-        String body = new JsonBuilder().addEnumElement("role", update.role)
-                .addBoolean("is_activated", update.isActivated).addBoolean("is_blocked", update.isBlocked)
-                .makeJsonString();
+        String body = update.objectToJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -457,9 +453,7 @@ public class BMYClient {
 
     public Group existsGroup(Group group) throws BMYException {
         String apiPath = "1/groups/exists";
-
-        // TODO: wtf?
-        String body = new JsonBuilder().addString("name", group.name).makeJsonString();
+        String body = group.objectToJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -474,21 +468,7 @@ public class BMYClient {
 
     public Group createGroup(Group group, String ownerId) throws BMYException {
         String apiPath = "1/groups";
-
-        // TODO: wtf?
-        JsonBuilder jb = new JsonBuilder().addString("name", group.name);
-        jb.addEnumElement("type", group.type);
-        jb.addBoolean("is_visible", group.isVisible);
-        if (group.annouce != null) {
-            jb.addString("announce", group.annouce);
-        }
-        if (group.intro != null) {
-            jb.addString("intro", group.intro);
-        }
-        if (group.tags != null) {
-            jb.addString("tags", group.tags);
-        }
-        String body = jb.makeJsonString();
+        String body = group.objectToJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -517,8 +497,12 @@ public class BMYClient {
 
     public ResultList<Group> listGroups(String type, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/groups";
-        // TODO: null type, offset, limit?
-        String[] params = { "type", type, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (type != null) {
+            paramList.add("type");
+            paramList.add(type);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
             @Override
@@ -533,26 +517,7 @@ public class BMYClient {
 
     public Group updateGroup(String groupId, Group update) throws BMYException {
         String apiPath = "1/groups/" + groupId + "/update";
-
-        // TODO: wtf?
-        JsonBuilder jb = new JsonBuilder();
-        if (update.type != null) {
-            jb.addEnumElement("type", update.type);
-        }
-        jb.addBoolean("is_visible", update.isVisible);
-        if (update.annouce != null) {
-            jb.addString("announce", update.annouce);
-        }
-        if (update.intro != null) {
-            jb.addString("intro", update.intro);
-        }
-        if (update.tags != null) {
-            jb.addString("tags", update.tags);
-        }
-        if (update.source != null) {
-            jb.addString("source", update.source);
-        }
-        String body = jb.makeJsonString();
+        String body = update.objectToJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -580,22 +545,34 @@ public class BMYClient {
     }
 
     public void setGroupLogo(String groupId, InputStream input) throws BMYException {
+        String host = this.host.api;
         String apiPath = "1/groups/" + groupId + "/logo";
-        // TODO: stream
-        String body = inputString2String(input);
+        ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
+        headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
+        String url = BMYRequestUtil.buildUrlWithParams(host, apiPath, this.token, requestConfig.userLocale, null);
+        System.out.println(url);
+        headers = BMYRequestUtil.addUserAgentHeader(headers, requestConfig);
 
-        this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Object>() {
-            @Override
-            public Object handle(Response response) throws BMYException {
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
+        try {
+            HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPost(url, headers);
+            try {
+                byte[] buf = new byte[1024];
+                while (true) {
+                    int r = input.read(buf);
+                    if (r == -1) {
+                        break;
+                    }
+                    uploader.getBody().write(buf, 0, r);
                 }
-                return null;
+                uploader.finish();
+            } finally {
+                uploader.close();
             }
-        });
+        } catch (IOException ex) {
+            throw new BMYException.NetworkIO(ex);
+        }
     }
 
-    // TODO: 500
     public InputStream getGroupLogo(String groupId) throws BMYException {
         String apiPath = "1/groups/" + groupId + "/logo";
 
@@ -642,8 +619,12 @@ public class BMYClient {
     public ResultList<User> listUsersForGroup(String groupId, String role, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/groups/" + groupId + "/users";
-        // TODO: null role, offset, limit?
-        String[] params = { "role", role, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (role != null) {
+            paramList.add("role");
+            paramList.add(role);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
             @Override
@@ -658,13 +639,7 @@ public class BMYClient {
 
     public User updateGroupUser(String groupId, String targetUserId, Relation update) throws BMYException {
         String apiPath = "1/groups/" + groupId + "/users/" + targetUserId + "/update";
-
-        // TODO: wtf?
-        JsonBuilder jb = new JsonBuilder();
-        jb.addEnumElement("role", update.role);
-        jb.addBoolean("is_activated", update.isActivated);
-        jb.addBoolean("is_blocked", update.isBlocked);
-        String body = jb.makeJsonString();
+        String body = update.objectToJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<User>() {
             @Override
@@ -707,18 +682,7 @@ public class BMYClient {
 
     public Root setRootDefaultPermission(String rootId, Permission defaultPermission) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/default_permission";
-
-        // TODO:
-        JsonBuilder jb = new JsonBuilder();
-        jb.addBoolean("insertable_to_owner", defaultPermission.insertableToOwner);
-        jb.addBoolean("readable_to_owner", defaultPermission.readableToOwner);
-        jb.addBoolean("writable_to_owner", defaultPermission.writableToOwner);
-        jb.addBoolean("deletable_to_owner", defaultPermission.deletableToOwner);
-        jb.addBoolean("insertable_to_others", defaultPermission.insertableToOthers);
-        jb.addBoolean("readable_to_others", defaultPermission.readableToOthers);
-        jb.addBoolean("writable_to_others", defaultPermission.writableToOthers);
-        jb.addBoolean("deletable_to_others", defaultPermission.deletableToOthers);
-        String body = jb.makeJsonString();
+        String body = defaultPermission.objectToJsonObject();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Root>() {
             @Override
@@ -757,9 +721,20 @@ public class BMYClient {
     public InputStream getFileByPath(String rootId, String path, Long version, Long offset, Long bytes)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/p/" + path;
-        // TODO: handle null version, offset, bytes
-        String[] params = { "version", String.valueOf(version), "offset", String.valueOf(offset), "size",
-                String.valueOf(bytes) };
+        List<String> paramList = new ArrayList<String>();
+        if (version != null) {
+            paramList.add("version");
+            paramList.add("" + version);
+        }
+        if (offset != null) {
+            paramList.add("offset");
+            paramList.add("" + offset);
+        }
+        if (bytes != null) {
+            paramList.add("size");
+            paramList.add("" + bytes);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
             @Override
@@ -795,9 +770,20 @@ public class BMYClient {
     // TODO: 500
     public InputStream getFile(String rootId, String metaId, Long version, Long offset, Long bytes) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId;
-        // TODO: null version, offset, bytes?
-        String[] params = { "version", String.valueOf(version), "offset", String.valueOf(offset), "size",
-                String.valueOf(bytes) };
+        List<String> paramList = new ArrayList<String>();
+        if (version != null) {
+            paramList.add("version");
+            paramList.add("" + version);
+        }
+        if (offset != null) {
+            paramList.add("offset");
+            paramList.add("" + offset);
+        }
+        if (bytes != null) {
+            paramList.add("size");
+            paramList.add("" + bytes);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
             @Override
@@ -859,8 +845,8 @@ public class BMYClient {
     public ResultList<Revision> listRevisionsForMeta(String rootId, String metaId, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/revisions";
-        // TODO: null offset, limit?
-        String[] params = { "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Revision>>() {
             @Override
@@ -876,8 +862,7 @@ public class BMYClient {
 
     public Comment createComment(String rootId, String metaId, Comment comment) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/comments";
-        // TODO: wtf?
-        String body = new JsonBuilder().addString("contents", comment.contents).makeJsonString();
+        String body = comment.objectToJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Comment>() {
             @Override
@@ -906,9 +891,8 @@ public class BMYClient {
 
     public ResultList<Comment> listComments(Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/roots/all/files/all/comments";
-
-        // TODO: null offset, limit?
-        String[] params = { "offset", Integer.toString(offset), "limit", Integer.toString(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Comment>>() {
             @Override
@@ -941,9 +925,8 @@ public class BMYClient {
     public ResultList<Comment> listCommentsForMeta(String rootId, String metaId, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/comments";
-
-        // TODO: null offset limit?
-        String[] params = { "offset", Integer.toString(offset), "limit", Integer.toString(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Comment>>() {
             @Override
@@ -1175,8 +1158,16 @@ public class BMYClient {
 
     public Meta createFolderByPath(String rootId, String path, Long modifiedAtMillis) throws BMYException {
         String apiPath = "1/fileops/create_folder";
-        // TODO: null modifiedAtMillis
-        String[] params = { "root_id", rootId, "path", path, "modified_at_millis", String.valueOf(modifiedAtMillis) };
+        List<String> paramList = new ArrayList<String>();
+        paramList.add("root_id");
+        paramList.add(rootId);
+        paramList.add("path");
+        paramList.add(path);
+        if (modifiedAtMillis != null) {
+            paramList.add("modified_at_millis");
+            paramList.add("" + modifiedAtMillis);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
             @Override
@@ -1191,8 +1182,16 @@ public class BMYClient {
 
     public Meta getMetaByPath(String rootId, String path, Boolean list) throws BMYException {
         String apiPath = "1/fileops/get_meta";
-        // TODO: null list
-        String[] params = { "root_id", rootId, "path", path, "list", String.valueOf(list) };
+        List<String> paramList = new ArrayList<String>();
+        paramList.add("root_id");
+        paramList.add(rootId);
+        paramList.add("path");
+        paramList.add(path);
+        if (list != null) {
+            paramList.add("list");
+            paramList.add("" + list);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
             @Override
@@ -1215,7 +1214,6 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                // TODO: wtf?
                 JsonParser parser;
                 ArrayList<Meta> metaList = new ArrayList<>();
                 try {
@@ -1233,15 +1231,12 @@ public class BMYClient {
                         parser.nextToken();
                         return metaList;
                     } catch (JsonReadException e) {
-                        // TODO print or exception?
-                        e.printStackTrace();
+                        System.out.println("JsonReadException");
                     }
                 } catch (JsonParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    System.out.println("JsonParseException");
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    System.out.println("IOException");
                 }
 
                 return null;
@@ -1315,18 +1310,7 @@ public class BMYClient {
     public Meta setPermissionByPath(String rootId, String path, Permission permission) throws BMYException {
         String apiPath = "1/fileops/set_permission";
         String[] params = { "root_id", rootId, "path", path };
-
-        // TODO: wtf?
-        JsonBuilder jb = new JsonBuilder();
-        jb.addBoolean("insertable_to_owner", permission.insertableToOwner);
-        jb.addBoolean("readable_to_owner", permission.readableToOwner);
-        jb.addBoolean("writable_to_owner", permission.writableToOwner);
-        jb.addBoolean("deletable_to_owner", permission.deletableToOwner);
-        jb.addBoolean("insertable_to_others", permission.insertableToOthers);
-        jb.addBoolean("readable_to_others", permission.readableToOthers);
-        jb.addBoolean("writable_to_others", permission.writableToOthers);
-        jb.addBoolean("deletable_to_others", permission.deletableToOthers);
-        String body = jb.makeJsonString();
+        String body = permission.objectToJsonObject();
 
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<Meta>() {
             @Override
@@ -1386,8 +1370,8 @@ public class BMYClient {
 
     public ResultList<Trash> listTrashesForRoot(String rootId, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/trashes";
-        // TODO: null offset, limit?
-        String[] params = { "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Trash>>() {
             @Override
@@ -1445,8 +1429,12 @@ public class BMYClient {
 
     public ResultList<User> searchUsers(String query, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/search/users";
-        // TODO: null offset, limit?
-        String[] params = { "query", query, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (query != null) {
+            paramList.add("query");
+            paramList.add(query);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
             @Override
@@ -1462,9 +1450,16 @@ public class BMYClient {
     public ResultList<User> searchUsersForGroup(String groupId, String query, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/search/users";
-        // TODO: null offset, limit?
-        String[] params = { "query", query, "group_id", groupId, "offset", String.valueOf(offset), "limit",
-                String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (groupId != null) {
+            paramList.add("group_id");
+            paramList.add(groupId);
+        }
+        if (query != null) {
+            paramList.add("query");
+            paramList.add(query);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
             @Override
@@ -1479,8 +1474,12 @@ public class BMYClient {
 
     public ResultList<Group> searchGroups(String query, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/search/groups";
-        // TODO: null offset, limit?
-        String[] params = { "query", query, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (query != null) {
+            paramList.add("query");
+            paramList.add(query);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
             @Override
@@ -1496,9 +1495,16 @@ public class BMYClient {
     public ResultList<Group> searchGroupsForUser(String userId, String query, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/search/groups";
-        // TODO: null offset, limit?
-        String[] params = { "query", query, "user_id", userId, "offset", String.valueOf(offset), "limit",
-                String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (query != null) {
+            paramList.add("query");
+            paramList.add(query);
+        }
+        if (userId != null) {
+            paramList.add("user_id");
+            paramList.add(userId);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
             @Override
@@ -1513,8 +1519,12 @@ public class BMYClient {
 
     public ResultList<Meta> searchFiles(String query, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/search/files";
-        // TODO: null offset, limit?
-        String[] params = { "query", query, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (query != null) {
+            paramList.add("query");
+            paramList.add(query);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
             @Override
@@ -1530,9 +1540,16 @@ public class BMYClient {
     public ResultList<Meta> searchFilesForRoot(String rootId, String query, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/search/files";
-        // TODO: null offset, limit?
-        String[] params = { "query", query, "root_id", rootId, "offset", String.valueOf(offset), "limit",
-                String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (query != null) {
+            paramList.add("query");
+            paramList.add(query);
+        }
+        if (rootId != null) {
+            paramList.add("root_id");
+            paramList.add(rootId);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
             @Override
@@ -1548,9 +1565,16 @@ public class BMYClient {
     public ResultList<Meta> searchFilesForMeta(String rootId, String path, String query, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/search/files";
-        // TODO: null offset, limit?
-        String[] params = { "query", query, "path", path, "offset", String.valueOf(offset), "limit",
-                String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (query != null) {
+            paramList.add("query");
+            paramList.add(query);
+        }
+        if (path != null) {
+            paramList.add("path");
+            paramList.add(path);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
             @Override
@@ -1565,8 +1589,12 @@ public class BMYClient {
 
     public ResultList<User> topUsers(String orderBy, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/top/users";
-        // TODO: null offset, limit?
-        String[] params = { "order_by", orderBy, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (orderBy != null) {
+            paramList.add("order_by");
+            paramList.add(orderBy);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
             @Override
@@ -1581,8 +1609,12 @@ public class BMYClient {
 
     public ResultList<Group> topGroups(String orderBy, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/top/groups";
-        // TODO: null offset, limit?
-        String[] params = { "order_by", orderBy, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (orderBy != null) {
+            paramList.add("order_by");
+            paramList.add(orderBy);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
             @Override
@@ -1597,8 +1629,12 @@ public class BMYClient {
 
     public ResultList<Meta> topFiles(String orderBy, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/top/files";
-        // TODO: null offset, limit?
-        String[] params = { "order_by", orderBy, "offset", String.valueOf(offset), "limit", String.valueOf(limit) };
+        List<String> paramList = getParamsList(offset, limit);
+        if (orderBy != null) {
+            paramList.add("order_by");
+            paramList.add(orderBy);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
             @Override
@@ -1638,16 +1674,23 @@ public class BMYClient {
         }
     }
 
-    public Uploader startUploadFileSingle(String rootId, String path, long numBytes, long modifiedAtMillis,
+    public Uploader startUploadFileSingle(String rootId, String path, Long numBytes, Long modifiedAtMillis,
             Boolean overwrite) throws BMYException {
         if (numBytes < 0) {
             throw new IllegalArgumentException("numBytes must be zero or greater");
         }
 
         String apiPath = "1/roots/" + rootId + "/files/p/" + path;
-        // TODO: null overwrite?
-        String[] params = { "modified_at_millis", String.valueOf(modifiedAtMillis), "overwrite",
-                String.valueOf(overwrite) };
+        List<String> paramList = new ArrayList<String>();
+        if (modifiedAtMillis != numBytes) {
+            paramList.add("modified_at_millis");
+            paramList.add("" + modifiedAtMillis);
+        }
+        if (overwrite != null) {
+            paramList.add("overwrite");
+            paramList.add("" + overwrite);
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));

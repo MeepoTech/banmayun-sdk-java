@@ -17,7 +17,7 @@ public class Size extends Dumpable {
     public Size() {
     }
 
-    public Size(long bytes, String displayValue) {
+    public Size(Long bytes, String displayValue) {
         this.bytes = bytes;
         this.displayValue = displayValue;
     }
@@ -31,7 +31,7 @@ public class Size extends Dumpable {
     public static JsonReader<Size> reader = new JsonReader<Size>() {
         @Override
         public Size read(JsonParser parser) throws IOException, JsonReadException {
-            long bytes = -1;
+            Long bytes = null;
             String displayValue = null;
 
             JsonReader.expectObjectStart(parser);
@@ -45,7 +45,7 @@ public class Size extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_bytes:
-                        bytes = JsonReader.readUnsignedLongField(parser, fieldName, bytes);
+                        bytes = JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_display_value:
                         displayValue = JsonReader.STRING_READER.readField(parser, fieldName, displayValue);

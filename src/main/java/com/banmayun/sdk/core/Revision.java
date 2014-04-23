@@ -21,7 +21,7 @@ public class Revision extends Dumpable {
     public Revision() {
     }
 
-    public Revision(long version, String md5, Size size, Time modifiedAt, User modifiedBy, Time clientModifiedAt) {
+    public Revision(Long version, String md5, Size size, Time modifiedAt, User modifiedBy, Time clientModifiedAt) {
         this.version = version;
         this.md5 = md5;
         this.size = size;
@@ -43,7 +43,7 @@ public class Revision extends Dumpable {
     public static JsonReader<Revision> reader = new JsonReader<Revision>() {
         @Override
         public Revision read(JsonParser parser) throws IOException, JsonReadException {
-            long version = -1;
+            Long version = null;
             String md5 = null;
             Size size = null;
             Time modifiedAt = null;
@@ -61,7 +61,7 @@ public class Revision extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_version:
-                        version = JsonReader.readUnsignedLongField(parser, fieldName, version);
+                        version = JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_md5:
                         md5 = JsonReader.STRING_READER.readField(parser, fieldName, md5);

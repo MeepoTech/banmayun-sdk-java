@@ -31,7 +31,7 @@ public class Time extends Dumpable {
     public static JsonReader<Time> reader = new JsonReader<Time>() {
         @Override
         public Time read(JsonParser parser) throws IOException, JsonReadException {
-            long millis = -1;
+            Long millis = null;
             String displayValue = null;
 
             JsonReader.expectObjectStart(parser);
@@ -45,7 +45,7 @@ public class Time extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_millis:
-                        millis = JsonReader.readUnsignedLongField(parser, fieldName, millis);
+                        millis = JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_display_value:
                         displayValue = JsonReader.STRING_READER.readField(parser, fieldName, displayValue);

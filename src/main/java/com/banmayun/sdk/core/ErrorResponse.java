@@ -18,7 +18,7 @@ public class ErrorResponse extends Dumpable {
     public ErrorResponse() {
     }
 
-    public ErrorResponse(int status, int code, String message) {
+    public ErrorResponse(Integer status, Integer code, String message) {
         this.status = status;
         this.code = code;
         this.message = message;
@@ -34,8 +34,8 @@ public class ErrorResponse extends Dumpable {
     public static JsonReader<ErrorResponse> reader = new JsonReader<ErrorResponse>() {
         @Override
         public ErrorResponse read(JsonParser parser) throws IOException, JsonReadException {
-            int status = -1;
-            int code = -1;
+            Integer status = null;
+            Integer code = null;
             String message = null;
 
             JsonReader.expectObjectStart(parser);
@@ -49,10 +49,10 @@ public class ErrorResponse extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_status:
-                        status = (int) JsonReader.readUnsignedLongField(parser, fieldName, status);
+                        status = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_code:
-                        code = (int) JsonReader.readUnsignedLongField(parser, fieldName, code);
+                        code = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_message:
                         message = JsonReader.STRING_READER.readField(parser, fieldName, message);

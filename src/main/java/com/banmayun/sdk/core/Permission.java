@@ -2,6 +2,7 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
+import com.banmayun.sdk.json.JsonBuilder;
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -23,9 +24,9 @@ public class Permission extends Dumpable {
     public Permission() {
     }
 
-    public Permission(boolean insertableToOwner, boolean readableToOwner, boolean writableToOwner,
-            boolean deletableToOwner, boolean insertableToOthers, boolean readableToOthers, boolean writableToOthers,
-            boolean deletableToOthers) {
+    public Permission(Boolean insertableToOwner, Boolean readableToOwner, Boolean writableToOwner,
+            Boolean deletableToOwner, Boolean insertableToOthers, Boolean readableToOthers, Boolean writableToOthers,
+            Boolean deletableToOthers) {
         this.insertableToOwner = insertableToOwner;
         this.readableToOwner = readableToOwner;
         this.writableToOwner = writableToOwner;
@@ -51,14 +52,14 @@ public class Permission extends Dumpable {
     public static JsonReader<Permission> reader = new JsonReader<Permission>() {
         @Override
         public Permission read(JsonParser parser) throws IOException, JsonReadException {
-            boolean insertableToOwner = true;
-            boolean readableToOwner = true;
-            boolean writableToOwner = true;
-            boolean deletableToOwner = true;
-            boolean insertableToOthers = true;
-            boolean readableToOthers = true;
-            boolean writableToOthers = true;
-            boolean deletableToOthers = true;
+            Boolean insertableToOwner = true;
+            Boolean readableToOwner = true;
+            Boolean writableToOwner = true;
+            Boolean deletableToOwner = true;
+            Boolean insertableToOthers = true;
+            Boolean readableToOthers = true;
+            Boolean writableToOthers = true;
+            Boolean deletableToOthers = true;
 
             JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
@@ -131,5 +132,36 @@ public class Permission extends Dumpable {
         b.add("deletable_to_others", FM_deletable_to_others);
 
         FM = b.build();
+    }
+
+    public String objectToJsonObject() {
+        JsonBuilder jb = new JsonBuilder();
+        if (insertableToOwner != null) {
+            jb.addBoolean("insertable_to_owner", insertableToOwner);
+        }
+        if (readableToOwner != null) {
+            jb.addBoolean("readable_to_owner", readableToOwner);
+        }
+        if (writableToOwner != null) {
+            jb.addBoolean("writable_to_owner", writableToOwner);
+        }
+        if (deletableToOwner != null) {
+            jb.addBoolean("deletable_to_owner", deletableToOwner);
+        }
+        if (insertableToOthers != null) {
+            jb.addBoolean("insertable_to_others", insertableToOthers);
+        }
+        if (readableToOthers != null) {
+            jb.addBoolean("readable_to_others", readableToOthers);
+        }
+        if (writableToOthers != null) {
+            jb.addBoolean("writable_to_others", writableToOthers);
+        }
+        if (deletableToOthers != null) {
+            jb.addBoolean("deletable_to_others", deletableToOthers);
+        }
+        
+        return jb.makeJsonString();
+        
     }
 }

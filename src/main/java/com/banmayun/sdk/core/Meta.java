@@ -40,9 +40,9 @@ public class Meta extends Dumpable {
     }
 
     public Meta(String id, String rootId, String name, String path, String md5, Size size, long version, String icon,
-            boolean isDir, boolean thumbExists, boolean insertable, boolean readable, boolean writable,
-            boolean deletable, int commentCount, int shareCount, Time createdAt, User createdBy, Time modifiedAt,
-            User modifiedBy, Time clientModifiedAt, Permission permission, Meta[] contents) {
+            Boolean isDir, Boolean thumbExists, Boolean insertable, Boolean readable, Boolean writable,
+            Boolean deletable, Integer commentCount, Integer shareCount, Time createdAt, User createdBy,
+            Time modifiedAt, User modifiedBy, Time clientModifiedAt, Permission permission, Meta[] contents) {
         this.id = id;
         this.rootId = rootId;
         this.name = name;
@@ -103,16 +103,16 @@ public class Meta extends Dumpable {
             String path = null;
             String md5 = null;
             Size size = null;
-            long version = -1;
+            Long version = null;
             String icon = null;
-            boolean isDir = false;
-            boolean thumbExists = false;
-            boolean insertable = false;
-            boolean readable = false;
-            boolean writable = false;
-            boolean deletable = false;
-            int commentCount = -1;
-            int shareCount = -1;
+            Boolean isDir = null;
+            Boolean thumbExists = null;
+            Boolean insertable = null;
+            Boolean readable = null;
+            Boolean writable = null;
+            Boolean deletable = null;
+            Integer commentCount = null;
+            Integer shareCount = null;
             Time createdAt = null;
             User createdBy = null;
             Time modifiedAt = null;
@@ -150,7 +150,7 @@ public class Meta extends Dumpable {
                         size = Size.reader.readField(parser, fieldName, size);
                         break;
                     case FM_version:
-                        version = JsonReader.readUnsignedLongField(parser, fieldName, version);
+                        version = JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_icon:
                         icon = JsonReader.STRING_READER.readField(parser, fieldName, icon);
@@ -174,10 +174,10 @@ public class Meta extends Dumpable {
                         deletable = JsonReader.readBoolean(parser);
                         break;
                     case FM_comment_count:
-                        commentCount = (int) JsonReader.readUnsignedLongField(parser, fieldName, commentCount);
+                        commentCount = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_share_count:
-                        shareCount = (int) JsonReader.readUnsignedLongField(parser, fieldName, shareCount);
+                        shareCount = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_created_at:
                         createdAt = Time.reader.readField(parser, fieldName, createdAt);

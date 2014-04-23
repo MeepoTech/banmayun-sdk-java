@@ -20,7 +20,7 @@ public class ChunkedUpload extends Dumpable {
     public ChunkedUpload() {
     }
 
-    public ChunkedUpload(String id, long offset, Size size, Time expiresAt, Time createdAt) {
+    public ChunkedUpload(String id, Long offset, Size size, Time expiresAt, Time createdAt) {
         this.id = id;
         this.offset = offset;
         this.size = size;
@@ -41,7 +41,7 @@ public class ChunkedUpload extends Dumpable {
         @Override
         public ChunkedUpload read(JsonParser parser) throws IOException, JsonReadException {
             String id = null;
-            long offset = -1;
+            Long offset = null;
             Size size = null;
             Time expiresAt = null;
             Time createdAt = null;
@@ -60,7 +60,7 @@ public class ChunkedUpload extends Dumpable {
                         id = JsonReader.STRING_READER.readField(parser, fieldName, id);
                         break;
                     case FM_offset:
-                        offset = JsonReader.readUnsignedLongField(parser, fieldName, offset);
+                        offset = JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_size:
                         size = Size.reader.readField(parser, fieldName, size);

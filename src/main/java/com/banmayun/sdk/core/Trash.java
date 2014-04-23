@@ -1,7 +1,6 @@
 package com.banmayun.sdk.core;
 
 import java.io.IOException;
-
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -77,23 +76,7 @@ public class Trash extends Dumpable {
                         createdBy = User.reader.readField(parser, fieldName, createdBy);
                         break;
                     case FM_meta:
-                        JsonReader.expectArrayStart(parser);
-                        // TODO:
-                        // ArrayList<Meta> metaList = new ArrayList<>();
-                        // while (!JsonReader.isArrayEnd(parser)) {
-                        // Meta temp;
-                        // temp = Meta.reader.read(parser);
-                        // metaList.add(temp);
-                        // }
-                        // parser.nextToken();
-                        // if (metaList.size() > 0) {
-                        // meta = new Meta[metaList.size()];
-                        // for (int i = 0; i < metaList.size(); i++) {
-                        // meta[i] = metaList.get(i);
-                        // }
-                        // } else {
-                        // meta = null;
-                        // }
+                        meta = Meta.reader.readField(parser, fieldName, meta);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
@@ -104,7 +87,6 @@ public class Trash extends Dumpable {
             }
             JsonReader.expectObjectEnd(parser);
 
-            // TODO: add some checks?
             return new Trash(id, rootId, metaId, createdAt, createdBy, meta);
         }
     };

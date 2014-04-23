@@ -20,7 +20,7 @@ public class ResultList<T extends Dumpable> extends Dumpable {
     public ResultList() {
     }
 
-    public ResultList(int total, int offset, List<T> entries) {
+    public ResultList(Integer total, Integer offset, List<T> entries) {
         this.total = total;
         this.offset = offset;
         this.entries = entries;
@@ -46,8 +46,8 @@ public class ResultList<T extends Dumpable> extends Dumpable {
 
         public static <T extends Dumpable> ResultList<T> read(JsonParser parser, JsonReader<T> metadataReader)
                 throws IOException, JsonReadException {
-            int total = -1;
-            int offset = -1;
+            Integer total = null;
+            Integer offset = null;
             List<T> entries = null;
 
             JsonReader.expectObjectStart(parser);
@@ -61,10 +61,10 @@ public class ResultList<T extends Dumpable> extends Dumpable {
                         JsonReader.skipValue(parser);
                         break;
                     case FM_total:
-                        total = (int) JsonReader.readUnsignedLongField(parser, fieldName, total);
+                        total = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_offset:
-                        offset = (int) JsonReader.readUnsignedLongField(parser, fieldName, offset);
+                        offset = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_entries:
                         JsonReader.expectArrayStart(parser);

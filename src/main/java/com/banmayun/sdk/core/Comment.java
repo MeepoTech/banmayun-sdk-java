@@ -2,6 +2,7 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
+import com.banmayun.sdk.json.JsonBuilder;
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -110,5 +111,13 @@ public class Comment extends Dumpable {
         b.add("created_by", FM_created_by);
 
         FM = b.build();
+    }
+    
+    public String objectToJsonString() {
+        JsonBuilder jb = new JsonBuilder();
+        if (contents != null) {
+            jb.addString("contents", contents);
+        }
+        return jb.makeJsonString();
     }
 }

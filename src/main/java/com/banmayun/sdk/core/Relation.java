@@ -2,6 +2,7 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
+import com.banmayun.sdk.json.JsonBuilder;
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -20,7 +21,7 @@ public class Relation extends Dumpable {
     public Relation() {
     }
 
-    public Relation(EnumElement role, boolean isActivated, boolean isBlocked, String remarks, Time createdAt) {
+    public Relation(EnumElement role, Boolean isActivated, Boolean isBlocked, String remarks, Time createdAt) {
         this.role = role;
         this.isActivated = isActivated;
         this.isBlocked = isBlocked;
@@ -41,8 +42,8 @@ public class Relation extends Dumpable {
         @Override
         public Relation read(JsonParser parser) throws IOException, JsonReadException {
             EnumElement role = null;
-            boolean isActivated = false;
-            boolean isBlocked = false;
+            Boolean isActivated = null;
+            Boolean isBlocked = null;
             String remark = null;
             Time createdAt = null;
 
@@ -101,5 +102,19 @@ public class Relation extends Dumpable {
         b.add("created_at", FM_created_at);
 
         FM = b.build();
+    }
+    
+    public String objectToJsonString() {
+        JsonBuilder jb = new JsonBuilder();
+        if (role != null) {
+            jb.addEnumElement("role", role);
+        }
+        if (isActivated != null) {
+            jb.addBoolean("is_activated", isActivated);
+        }
+        if (isBlocked != null) {
+            jb.addBoolean("is_blocked", isBlocked);
+        }
+        return jb.makeJsonString();
     }
 }

@@ -24,7 +24,7 @@ public class Link extends Dumpable {
     }
 
     public Link(String id, String userId, String name, String device, String token, Time expiresAt, Time createdAt,
-            boolean isCurrent) {
+            Boolean isCurrent) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -57,7 +57,7 @@ public class Link extends Dumpable {
             String token = null;
             Time expiresAt = null;
             Time createdAt = null;
-            boolean isCurrent = false;
+            Boolean isCurrent = null;
 
             JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {

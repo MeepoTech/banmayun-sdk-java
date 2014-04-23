@@ -73,7 +73,8 @@ public class BMYRequestUtil {
     }
 
     public static String buildUrlWithParams(String host, String path, String token, String userLocale, String[] params) {
-        return buildUri(host, path) + "?" + encodeUrlParams(token, userLocale, params);
+        String url = buildUri(host, path) + "?" + encodeUrlParams(token, userLocale, params);
+        return url;
     }
 
     public static ArrayList<HttpRequestor.Header> addUserAgentHeader(ArrayList<HttpRequestor.Header> headers,

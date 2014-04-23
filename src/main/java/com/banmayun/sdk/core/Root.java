@@ -22,8 +22,8 @@ public class Root extends Dumpable {
     public Root() {
     }
 
-    public Root(String id, String type, Size used, Size quota, Permission defaultPermission, int fileCount,
-            long byteCount) {
+    public Root(String id, String type, Size used, Size quota, Permission defaultPermission, Integer fileCount,
+            Long byteCount) {
         this.id = id;
         this.type = type;
         this.used = used;
@@ -52,8 +52,8 @@ public class Root extends Dumpable {
             Size used = null;
             Size quota = null;
             Permission defaultPermission = null;
-            int fileCount = -1;
-            long byteCount = -1;
+            Integer fileCount = null;
+            Long byteCount = null;
 
             JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
@@ -81,10 +81,10 @@ public class Root extends Dumpable {
                         defaultPermission = Permission.reader.readField(parser, fieldName, defaultPermission);
                         break;
                     case FM_file_count:
-                        fileCount = (int) JsonReader.readUnsignedLongField(parser, fieldName, fileCount);
+                        fileCount = (int) JsonReader.readUnsignedLong(parser);
                         break;
                     case FM_byte_count:
-                        byteCount = JsonReader.readUnsignedLongField(parser, fieldName, byteCount);
+                        byteCount = JsonReader.readUnsignedLong(parser);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
