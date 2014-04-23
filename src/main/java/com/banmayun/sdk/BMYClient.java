@@ -46,7 +46,8 @@ public class BMYClient {
     private BMYHost host = null;
 
     public enum ThumbnailFormat {
-        JPEG, PNG
+        JPEG,
+        PNG
     }
 
     public String getThumbnailFormatStr(ThumbnailFormat format) {
@@ -65,7 +66,11 @@ public class BMYClient {
     }
 
     public enum ThumbnailSize {
-        XS, S, M, L, XL
+        XS,
+        S,
+        M,
+        L,
+        XL
     }
 
     public String getThumbnailSizeStr(ThumbnailSize size) {
@@ -120,19 +125,6 @@ public class BMYClient {
         InputStream input = in;
         String inputStr = inputStream2String(input);
         return inputStr.length();
-    }
-
-    public List<String> getParamsList(Integer offset, Integer limit) {
-        List<String> paramsList = new ArrayList<String>();
-        if (offset != null) {
-            paramsList.add("offset");
-            paramsList.add("" + offset);
-        }
-        if (limit != null) {
-            paramsList.add("limit");
-            paramsList.add("" + limit);
-        }
-        return paramsList;
     }
 
     public BMYClient(BMYRequestConfig requestConfig) {
@@ -277,12 +269,13 @@ public class BMYClient {
 
     public ResultList<User> listUsers(String role, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/users";
-        List<String> paramList = getParamsList(offset, limit);
+        List<String> paramList = getPaginationParams(offset, limit);
         if (role != null) {
             paramList.add("role");
             paramList.add(role);
         }
         String[] params = paramList.toArray(new String[0]);
+
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
             @Override
             public ResultList<User> handle(Response response) throws BMYException {
@@ -332,6 +325,7 @@ public class BMYClient {
         String url = BMYRequestUtil.buildUrlWithParams(host, apiPath, this.token, requestConfig.userLocale, null);
         System.out.println(url);
         headers = BMYRequestUtil.addUserAgentHeader(headers, requestConfig);
+        // TODO: what? think before code!
         headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
 
         try {
@@ -357,6 +351,7 @@ public class BMYClient {
     public InputStream getUserAvatar(String targetUserId, ThumbnailFormat format, ThumbnailSize size)
             throws BMYException {
         String apiPath = "1/users/" + targetUserId + "/avatar";
+        // TODO: format and size is optional! see api doc!!!!!!!
         String[] params = { "format", getThumbnailFormatStr(format), "size", getThumbnailSizeStr(size) };
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
@@ -374,7 +369,7 @@ public class BMYClient {
     public Group addUserGroup(String targetUserId, String groupId, Relation relation) throws BMYException {
         String apiPath = "1/users/" + targetUserId + "/groups";
         String[] params = { "group_id", groupId };
-        String body = relation.objectToJsonString();
+        String body = relation.toJsonString();
 
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -404,7 +399,7 @@ public class BMYClient {
     public ResultList<Group> listGroupsForUser(String targetUserId, String role, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/users/" + targetUserId + "/groups";
-        List<String> paramList = getParamsList(offset, limit);
+        List<String> paramList = getPaginationParams(offset, limit);
         if (role != null) {
             paramList.add("role");
             paramList.add(role);
@@ -424,7 +419,7 @@ public class BMYClient {
 
     public Group updateUserGroup(String targetUserId, String groupId, Relation update) throws BMYException {
         String apiPath = "1/users/" + targetUserId + "/groups/" + groupId + "/update";
-        String body = update.objectToJsonString();
+        String body = update.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -453,7 +448,7 @@ public class BMYClient {
 
     public Group existsGroup(Group group) throws BMYException {
         String apiPath = "1/groups/exists";
-        String body = group.objectToJsonString();
+        String body = group.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -468,7 +463,7 @@ public class BMYClient {
 
     public Group createGroup(Group group, String ownerId) throws BMYException {
         String apiPath = "1/groups";
-        String body = group.objectToJsonString();
+        String body = group.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -497,7 +492,7 @@ public class BMYClient {
 
     public ResultList<Group> listGroups(String type, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/groups";
-        List<String> paramList = getParamsList(offset, limit);
+        List<String> paramList = getPaginationParams(offset, limit);
         if (type != null) {
             paramList.add("type");
             paramList.add(type);
@@ -517,7 +512,7 @@ public class BMYClient {
 
     public Group updateGroup(String groupId, Group update) throws BMYException {
         String apiPath = "1/groups/" + groupId + "/update";
-        String body = update.objectToJsonString();
+        String body = update.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
             @Override
@@ -551,6 +546,7 @@ public class BMYClient {
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
         String url = BMYRequestUtil.buildUrlWithParams(host, apiPath, this.token, requestConfig.userLocale, null);
         System.out.println(url);
+        // TODO: again
         headers = BMYRequestUtil.addUserAgentHeader(headers, requestConfig);
 
         try {
@@ -619,7 +615,7 @@ public class BMYClient {
     public ResultList<User> listUsersForGroup(String groupId, String role, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/groups/" + groupId + "/users";
-        List<String> paramList = getParamsList(offset, limit);
+        List<String> paramList = getPaginationParams(offset, limit);
         if (role != null) {
             paramList.add("role");
             paramList.add(role);
@@ -639,7 +635,7 @@ public class BMYClient {
 
     public User updateGroupUser(String groupId, String targetUserId, Relation update) throws BMYException {
         String apiPath = "1/groups/" + groupId + "/users/" + targetUserId + "/update";
-        String body = update.objectToJsonString();
+        String body = update.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<User>() {
             @Override
@@ -724,15 +720,15 @@ public class BMYClient {
         List<String> paramList = new ArrayList<String>();
         if (version != null) {
             paramList.add("version");
-            paramList.add("" + version);
+            paramList.add(String.valueOf(version));
         }
         if (offset != null) {
             paramList.add("offset");
-            paramList.add("" + offset);
+            paramList.add(String.valueOf(offset));
         }
         if (bytes != null) {
-            paramList.add("size");
-            paramList.add("" + bytes);
+            paramList.add("bytes");
+            paramList.add(String.valueOf(bytes));
         }
         String[] params = paramList.toArray(new String[0]);
 
@@ -773,15 +769,15 @@ public class BMYClient {
         List<String> paramList = new ArrayList<String>();
         if (version != null) {
             paramList.add("version");
-            paramList.add("" + version);
+            paramList.add(String.valueOf(version));
         }
         if (offset != null) {
             paramList.add("offset");
-            paramList.add("" + offset);
+            paramList.add(String.valueOf(offset));
         }
         if (bytes != null) {
-            paramList.add("size");
-            paramList.add("" + bytes);
+            paramList.add("bytes");
+            paramList.add(String.valueOf(bytes));
         }
         String[] params = paramList.toArray(new String[0]);
 
@@ -829,6 +825,7 @@ public class BMYClient {
     public InputStream getFileThumbnail(String rootId, String metaId, ThumbnailFormat format, ThumbnailSize size)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/thumbnail";
+        // TODO: format and size is optional
         String[] params = { "format", getThumbnailFormatStr(format), "size", getThumbnailSizeStr(size) };
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
@@ -845,7 +842,7 @@ public class BMYClient {
     public ResultList<Revision> listRevisionsForMeta(String rootId, String metaId, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/revisions";
-        List<String> paramList = getParamsList(offset, limit);
+        List<String> paramList = getPaginationParams(offset, limit);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Revision>>() {
@@ -862,7 +859,7 @@ public class BMYClient {
 
     public Comment createComment(String rootId, String metaId, Comment comment) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/comments";
-        String body = comment.objectToJsonString();
+        String body = comment.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Comment>() {
             @Override
@@ -891,7 +888,7 @@ public class BMYClient {
 
     public ResultList<Comment> listComments(Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/roots/all/files/all/comments";
-        List<String> paramList = getParamsList(offset, limit);
+        List<String> paramList = getPaginationParams(offset, limit);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Comment>>() {
@@ -908,6 +905,7 @@ public class BMYClient {
 
     public ResultList<Comment> listCommentsForRoot(String rootId, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/all/comments";
+        // TODO:
         String[] params = { "offset", Integer.toString(offset), "limit", Integer.toString(limit) };
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Comment>>() {
@@ -925,7 +923,7 @@ public class BMYClient {
     public ResultList<Comment> listCommentsForMeta(String rootId, String metaId, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/comments";
-        List<String> paramList = getParamsList(offset, limit);
+        List<String> paramList = getPaginationParams(offset, limit);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Comment>>() {
@@ -998,6 +996,7 @@ public class BMYClient {
 
     public Share createShare(String rootId, String metaId, String password, Long expiresAtMillis) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/shares";
+        // TODO: expiresAtMillis is optional
         String[] params = { "password", password, "expires_at_millis", String.valueOf(expiresAtMillis) };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Share>() {
@@ -1165,7 +1164,7 @@ public class BMYClient {
         paramList.add(path);
         if (modifiedAtMillis != null) {
             paramList.add("modified_at_millis");
-            paramList.add("" + modifiedAtMillis);
+            paramList.add(String.valueOf(modifiedAtMillis));
         }
         String[] params = paramList.toArray(new String[0]);
 
@@ -1189,7 +1188,7 @@ public class BMYClient {
         paramList.add(path);
         if (list != null) {
             paramList.add("list");
-            paramList.add("" + list);
+            paramList.add(String.valueOf(list));
         }
         String[] params = paramList.toArray(new String[0]);
 
@@ -1223,19 +1222,19 @@ public class BMYClient {
                         parser.nextToken();
                         JsonReader.expectArrayStart(parser);
                         while (!JsonReader.isArrayEnd(parser)) {
-                            Meta meta;
-
-                            meta = Meta.reader.read(parser);
-                            metaList.add(meta);
+                            metaList.add(Meta.reader.read(parser));
                         }
                         parser.nextToken();
                         return metaList;
                     } catch (JsonReadException e) {
+                        // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         System.out.println("JsonReadException");
                     }
                 } catch (JsonParseException e) {
+                    // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     System.out.println("JsonParseException");
                 } catch (IOException e) {
+                    // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     System.out.println("IOException");
                 }
 
@@ -1370,7 +1369,7 @@ public class BMYClient {
 
     public ResultList<Trash> listTrashesForRoot(String rootId, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/trashes";
-        List<String> paramList = getParamsList(offset, limit);
+        List<String> paramList = getPaginationParams(offset, limit);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Trash>>() {
@@ -1414,6 +1413,7 @@ public class BMYClient {
 
     public Trash restoreTrashRecursively(String rootId, String trashId, String toPath) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/trashes/" + trashId + "/restore";
+        // TODO: null toPath?
         String[] params = { "to_path", toPath };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Trash>() {
@@ -1429,11 +1429,9 @@ public class BMYClient {
 
     public ResultList<User> searchUsers(String query, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/search/users";
-        List<String> paramList = getParamsList(offset, limit);
-        if (query != null) {
-            paramList.add("query");
-            paramList.add(query);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("query");
+        paramList.add(query);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
@@ -1450,15 +1448,11 @@ public class BMYClient {
     public ResultList<User> searchUsersForGroup(String groupId, String query, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/search/users";
-        List<String> paramList = getParamsList(offset, limit);
-        if (groupId != null) {
-            paramList.add("group_id");
-            paramList.add(groupId);
-        }
-        if (query != null) {
-            paramList.add("query");
-            paramList.add(query);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("group_id");
+        paramList.add(groupId);
+        paramList.add("query");
+        paramList.add(query);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
@@ -1474,11 +1468,9 @@ public class BMYClient {
 
     public ResultList<Group> searchGroups(String query, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/search/groups";
-        List<String> paramList = getParamsList(offset, limit);
-        if (query != null) {
-            paramList.add("query");
-            paramList.add(query);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("query");
+        paramList.add(query);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
@@ -1495,15 +1487,11 @@ public class BMYClient {
     public ResultList<Group> searchGroupsForUser(String userId, String query, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/search/groups";
-        List<String> paramList = getParamsList(offset, limit);
-        if (query != null) {
-            paramList.add("query");
-            paramList.add(query);
-        }
-        if (userId != null) {
-            paramList.add("user_id");
-            paramList.add(userId);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("query");
+        paramList.add(query);
+        paramList.add("user_id");
+        paramList.add(userId);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
@@ -1519,11 +1507,9 @@ public class BMYClient {
 
     public ResultList<Meta> searchFiles(String query, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/search/files";
-        List<String> paramList = getParamsList(offset, limit);
-        if (query != null) {
-            paramList.add("query");
-            paramList.add(query);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("query");
+        paramList.add(query);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
@@ -1540,15 +1526,11 @@ public class BMYClient {
     public ResultList<Meta> searchFilesForRoot(String rootId, String query, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/search/files";
-        List<String> paramList = getParamsList(offset, limit);
-        if (query != null) {
-            paramList.add("query");
-            paramList.add(query);
-        }
-        if (rootId != null) {
-            paramList.add("root_id");
-            paramList.add(rootId);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("query");
+        paramList.add(query);
+        paramList.add("root_id");
+        paramList.add(rootId);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
@@ -1565,15 +1547,13 @@ public class BMYClient {
     public ResultList<Meta> searchFilesForMeta(String rootId, String path, String query, Integer offset, Integer limit)
             throws BMYException {
         String apiPath = "1/search/files";
-        List<String> paramList = getParamsList(offset, limit);
-        if (query != null) {
-            paramList.add("query");
-            paramList.add(query);
-        }
-        if (path != null) {
-            paramList.add("path");
-            paramList.add(path);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("query");
+        paramList.add(query);
+        paramList.add("root_id");
+        paramList.add(rootId);
+        paramList.add("path");
+        paramList.add(path);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
@@ -1589,11 +1569,9 @@ public class BMYClient {
 
     public ResultList<User> topUsers(String orderBy, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/top/users";
-        List<String> paramList = getParamsList(offset, limit);
-        if (orderBy != null) {
-            paramList.add("order_by");
-            paramList.add(orderBy);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("order_by");
+        paramList.add(orderBy);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
@@ -1609,11 +1587,9 @@ public class BMYClient {
 
     public ResultList<Group> topGroups(String orderBy, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/top/groups";
-        List<String> paramList = getParamsList(offset, limit);
-        if (orderBy != null) {
-            paramList.add("order_by");
-            paramList.add(orderBy);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("order_by");
+        paramList.add(orderBy);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
@@ -1629,11 +1605,9 @@ public class BMYClient {
 
     public ResultList<Meta> topFiles(String orderBy, Integer offset, Integer limit) throws BMYException {
         String apiPath = "1/top/files";
-        List<String> paramList = getParamsList(offset, limit);
-        if (orderBy != null) {
-            paramList.add("order_by");
-            paramList.add(orderBy);
-        }
+        List<String> paramList = getPaginationParams(offset, limit);
+        paramList.add("order_by");
+        paramList.add(orderBy);
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
@@ -1674,7 +1648,7 @@ public class BMYClient {
         }
     }
 
-    public Uploader startUploadFileSingle(String rootId, String path, Long numBytes, Long modifiedAtMillis,
+    public Uploader startUploadFileSingle(String rootId, String path, long numBytes, long modifiedAtMillis,
             Boolean overwrite) throws BMYException {
         if (numBytes < 0) {
             throw new IllegalArgumentException("numBytes must be zero or greater");
@@ -1682,19 +1656,17 @@ public class BMYClient {
 
         String apiPath = "1/roots/" + rootId + "/files/p/" + path;
         List<String> paramList = new ArrayList<String>();
-        if (modifiedAtMillis != numBytes) {
-            paramList.add("modified_at_millis");
-            paramList.add("" + modifiedAtMillis);
-        }
+        paramList.add("modified_at_millis");
+        paramList.add(String.valueOf(modifiedAtMillis));
         if (overwrite != null) {
             paramList.add("overwrite");
-            paramList.add("" + overwrite);
+            paramList.add(String.valueOf(overwrite));
         }
         String[] params = paramList.toArray(new String[0]);
 
         ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
-        headers.add(new HttpRequestor.Header("Content-Length", Long.toString(numBytes)));
+        headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
 
         HttpRequestor.Uploader uploader = this.getUploaderWithPut(apiPath, params, headers);
         return new SingleUploader(uploader, numBytes);
@@ -1799,7 +1771,7 @@ public class BMYClient {
         String apiPath = "1/chunked_upload";
         ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
-        headers.add(new HttpRequestor.Header("Content-Length", Long.toString(chunkSize)));
+        headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(chunkSize)));
 
         HttpRequestor.Uploader uploader = this.getUploaderWithPost(apiPath, params, headers);
 
@@ -2046,7 +2018,7 @@ public class BMYClient {
                         // Everything ok
                         this.uploadOffset = expectedOffset;
                         break;
-                    } else {/* the following code never get executed by BMY */
+                    } else { /* the following code never get executed by BMY */
                         // Make sure the returned offset is within what we
                         // expect.
                         assert correctedOffset != expectedOffset;
@@ -2144,6 +2116,19 @@ public class BMYClient {
         public void close() {
             IOUtil.closeInput(this.body);
         }
+    }
+
+    private List<String> getPaginationParams(Integer offset, Integer limit) {
+        List<String> params = new ArrayList<String>(8);
+        if (offset != null) {
+            params.add("offset");
+            params.add(String.valueOf(offset));
+        }
+        if (limit != null) {
+            params.add("limit");
+            params.add(String.valueOf(limit));
+        }
+        return params;
     }
 
     private <T> T doDelete(String path, String[] params, ArrayList<HttpRequestor.Header> headers,

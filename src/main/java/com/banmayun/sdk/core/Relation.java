@@ -103,8 +103,8 @@ public class Relation extends Dumpable {
 
         FM = b.build();
     }
-    
-    public String objectToJsonString() {
+
+    public String toJsonString() {
         JsonBuilder jb = new JsonBuilder();
         if (role != null) {
             jb.addEnumElement("role", role);

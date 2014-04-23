@@ -134,6 +134,7 @@ public class Permission extends Dumpable {
         FM = b.build();
     }
 
+    // TODO: "objectToJsonObject" ?!!!
     public String objectToJsonObject() {
         JsonBuilder jb = new JsonBuilder();
         if (insertableToOwner != null) {
@@ -160,8 +161,8 @@ public class Permission extends Dumpable {
         if (deletableToOthers != null) {
             jb.addBoolean("deletable_to_others", deletableToOthers);
         }
-        
+
         return jb.makeJsonString();
-        
+
     }
 }

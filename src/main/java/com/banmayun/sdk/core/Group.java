@@ -33,8 +33,8 @@ public class Group extends Dumpable {
     }
 
     public Group(String id, String rootId, String name, String source, EnumElement type, String intro, String tags,
-            String annouce, Boolean isVisible, Boolean isActivated, Boolean isBlocked, Integer userCount, Time createdAt,
-            User createdBy, Relation relation, Root root) {
+            String annouce, Boolean isVisible, Boolean isActivated, Boolean isBlocked, Integer userCount,
+            Time createdAt, User createdBy, Relation relation, Root root) {
         this.id = id;
         this.rootId = rootId;
         this.name = name;
@@ -204,8 +204,9 @@ public class Group extends Dumpable {
 
         FM = b.build();
     }
-    
-    public String objectToJsonString() {
+
+    public String toJsonString() {
+        // TODO: finish!!!!!!
         JsonBuilder jb = new JsonBuilder();
         if (name != null) {
             jb.addString("name", name);

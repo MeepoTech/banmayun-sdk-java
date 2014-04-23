@@ -112,8 +112,8 @@ public class Comment extends Dumpable {
 
         FM = b.build();
     }
-    
-    public String objectToJsonString() {
+
+    public String toJsonString() {
         JsonBuilder jb = new JsonBuilder();
         if (contents != null) {
             jb.addString("contents", contents);
