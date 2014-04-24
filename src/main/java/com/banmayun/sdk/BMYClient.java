@@ -46,7 +46,8 @@ public class BMYClient {
     private BMYHost host = null;
 
     public enum ThumbnailFormat {
-        JPEG, PNG
+        JPEG,
+        PNG
     }
 
     public String getThumbnailFormatStr(ThumbnailFormat format) {
@@ -65,7 +66,11 @@ public class BMYClient {
     }
 
     public enum ThumbnailSize {
-        XS, S, M, L, XL
+        XS,
+        S,
+        M,
+        L,
+        XL
     }
 
     public String getThumbnailSizeStr(ThumbnailSize size) {
@@ -343,7 +348,7 @@ public class BMYClient {
         ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
         headers = BMYRequestUtil.addUserAgentHeader(headers, requestConfig);
-        
+
         String url = BMYRequestUtil.buildUrlWithParams(host, apiPath, this.token, requestConfig.userLocale, null);
         // TODO: what? think before code!
 
@@ -595,7 +600,6 @@ public class BMYClient {
         headers = BMYRequestUtil.addUserAgentHeader(headers, requestConfig);
         String url = BMYRequestUtil.buildUrlWithParams(host, apiPath, this.token, requestConfig.userLocale, null);
         // TODO: again
-        
 
         try {
             HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPost(url, headers);
@@ -1243,18 +1247,9 @@ public class BMYClient {
         });
     }
 
-    public Meta createFolderByPath(String rootId, String path, Long modifiedAtMillis) throws BMYException {
+    public Meta createFolderByPath(String rootId, String path, long modifiedAtMillis) throws BMYException {
         String apiPath = "1/fileops/create_folder";
-        List<String> paramList = new ArrayList<String>();
-        paramList.add("root_id");
-        paramList.add(rootId);
-        paramList.add("path");
-        paramList.add(path);
-        if (modifiedAtMillis != null) {
-            paramList.add("modified_at_millis");
-            paramList.add(String.valueOf(modifiedAtMillis));
-        }
-        String[] params = paramList.toArray(new String[0]);
+        String[] params = { "root_id", rootId, "path", path, "modifiedAtMillis", String.valueOf(modifiedAtMillis) };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
             @Override

@@ -190,47 +190,47 @@ public class User extends Dumpable {
 
     public String toJsonString() {
         JsonBuilder jb = new JsonBuilder();
-        if (id != null) {
-            jb.addString("id", id);
+        if (this.id != null) {
+            jb.addString("id", this.id);
         }
-        if (rootId != null) {
-            jb.addString("root_id", rootId);
+        if (this.rootId != null) {
+            jb.addString("root_id", this.rootId);
         }
-        if (name != null) {
-            jb.addString("name", name);
+        if (this.name != null) {
+            jb.addString("name", this.name);
         }
-        if (email != null) {
-            jb.addString("email", email);
+        if (this.email != null) {
+            jb.addString("email", this.email);
         }
-        if (source != null) {
-            jb.addString("source", source);
+        if (this.source != null) {
+            jb.addString("source", this.source);
         }
-        if (displayName != null) {
-            jb.addString("display_name", displayName);
+        if (this.displayName != null) {
+            jb.addString("display_name", this.displayName);
         }
-        if (role != null) {
-            jb.addString("role", role.toJsonString());
+        if (this.role != null) {
+            jb.addString("role", this.role.toJsonString());
         }
-        if (groupsCanOwn != null) {
-            jb.addInt("groups_can_own", groupsCanOwn);
+        if (this.groupsCanOwn != null) {
+            jb.addInt("groups_can_own", this.groupsCanOwn);
         }
-        if (isActivated != null) {
-            jb.addBoolean("is_activated", isActivated);
+        if (this.isActivated != null) {
+            jb.addBoolean("is_activated", this.isActivated);
         }
-        if (isBlocked != null) {
-            jb.addBoolean("is_blocked", isBlocked);
+        if (this.isBlocked != null) {
+            jb.addBoolean("is_blocked", this.isBlocked);
         }
-        if (groupCount != null) {
-            jb.addInt("group_count", groupCount);
+        if (this.groupCount != null) {
+            jb.addInt("group_count", this.groupCount);
         }
-        if (createdAt != null) {
-            jb.addString("created_at", createdAt.toJsonString());
+        if (this.createdAt != null) {
+            jb.addString("created_at", this.createdAt.toJsonString());
         }
-        if (relation != null) {
-            jb.addString("relation", relation.toJsonString());
+        if (this.relation != null) {
+            jb.addString("relation", this.relation.toJsonString());
         }
-        if (root != null) {
-            jb.addString("root", root.toJsonString());
+        if (this.root != null) {
+            jb.addString("root", this.root.toJsonString());
         }
         return jb.makeJsonString();
     }

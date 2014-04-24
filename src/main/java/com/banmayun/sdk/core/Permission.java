@@ -136,32 +136,31 @@ public class Permission extends Dumpable {
 
     public String toJsonString() {
         JsonBuilder jb = new JsonBuilder();
-        if (insertableToOwner != null) {
-            jb.addBoolean("insertable_to_owner", insertableToOwner);
+        if (this.insertableToOwner != null) {
+            jb.addBoolean("insertable_to_owner", this.insertableToOwner);
         }
-        if (readableToOwner != null) {
-            jb.addBoolean("readable_to_owner", readableToOwner);
+        if (this.readableToOwner != null) {
+            jb.addBoolean("readable_to_owner", this.readableToOwner);
         }
-        if (writableToOwner != null) {
-            jb.addBoolean("writable_to_owner", writableToOwner);
+        if (this.writableToOwner != null) {
+            jb.addBoolean("writable_to_owner", this.writableToOwner);
         }
-        if (deletableToOwner != null) {
-            jb.addBoolean("deletable_to_owner", deletableToOwner);
+        if (this.deletableToOwner != null) {
+            jb.addBoolean("deletable_to_owner", this.deletableToOwner);
         }
-        if (insertableToOthers != null) {
-            jb.addBoolean("insertable_to_others", insertableToOthers);
+        if (this.insertableToOthers != null) {
+            jb.addBoolean("insertable_to_others", this.insertableToOthers);
         }
-        if (readableToOthers != null) {
-            jb.addBoolean("readable_to_others", readableToOthers);
+        if (this.readableToOthers != null) {
+            jb.addBoolean("readable_to_others", this.readableToOthers);
         }
-        if (writableToOthers != null) {
-            jb.addBoolean("writable_to_others", writableToOthers);
+        if (this.writableToOthers != null) {
+            jb.addBoolean("writable_to_others", this.writableToOthers);
         }
-        if (deletableToOthers != null) {
-            jb.addBoolean("deletable_to_others", deletableToOthers);
+        if (this.deletableToOthers != null) {
+            jb.addBoolean("deletable_to_others", this.deletableToOthers);
         }
 
         return jb.makeJsonString();
-
     }
 }
