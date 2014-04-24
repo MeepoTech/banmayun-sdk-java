@@ -23,7 +23,6 @@ import com.banmayun.sdk.core.ResultList;
 import com.banmayun.sdk.core.Revision;
 import com.banmayun.sdk.core.Root;
 import com.banmayun.sdk.core.Share;
-import com.banmayun.sdk.core.Time;
 import com.banmayun.sdk.core.Trash;
 import com.banmayun.sdk.core.User;
 import com.banmayun.sdk.http.HttpRequestor;
@@ -39,8 +38,8 @@ import com.fasterxml.jackson.core.JsonParser;
 /* BMYClient Version 1*/
 public class BMYClient {
 
-    private static final long CHUNKED_UPLOAD_THRESHOLD = 64 * 1024 * 1024;
-    private static final long CHUNKED_UPLOAD_CHUNK_SIZE = 4 * 1024 * 1024;
+    private static final long CHUNKED_UPLOAD_THRESHOLD = 64L * 1024L * 1024L;
+    private static final int CHUNKED_UPLOAD_CHUNK_SIZE = 4 * 1024 * 1024;
 
     private BMYRequestConfig requestConfig = null;
     private String token = null;
@@ -51,51 +50,12 @@ public class BMYClient {
         PNG
     }
 
-    public String getThumbnailFormatStr(ThumbnailFormat format) {
-        String formatStr = "";
-        switch (format) {
-        case JPEG:
-            formatStr = "jpeg";
-            break;
-        case PNG:
-            formatStr = "png";
-            break;
-        default:
-            break;
-        }
-        return formatStr;
-    }
-
     public enum ThumbnailSize {
         XS,
         S,
         M,
         L,
         XL
-    }
-
-    public String getThumbnailSizeStr(ThumbnailSize size) {
-        String sizeStr = "";
-        switch (size) {
-        case XS:
-            sizeStr = "xs";
-            break;
-        case S:
-            sizeStr = "s";
-            break;
-        case M:
-            sizeStr = "m";
-            break;
-        case L:
-            sizeStr = "l";
-            break;
-        case XL:
-            sizeStr = "xl";
-            break;
-        default:
-            break;
-        }
-        return sizeStr;
     }
 
     public String inputStream2String(InputStream is) {
@@ -124,7 +84,7 @@ public class BMYClient {
 
     public int getInputStreamLength(InputStream in) {
         InputStream input = in;
-        String inputStr = inputStream2String(input);
+        String inputStr = this.inputStream2String(input);
         return inputStr.length();
     }
 
@@ -182,7 +142,6 @@ public class BMYClient {
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Link>() {
             @Override
             public Link handle(Response response) throws BMYException {
-                System.out.println(response.statusCode);
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
@@ -261,7 +220,6 @@ public class BMYClient {
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<User>() {
             @Override
             public User handle(Response response) throws BMYException {
-                System.out.println(response.statusCode);
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
@@ -308,7 +266,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<User>(User.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<User>(User.reader), response.body);
             }
         });
     }
@@ -343,14 +301,14 @@ public class BMYClient {
         });
     }
 
-    public <E extends Throwable> void setUserAvatar(String targetUserId, long numBytes, BMYStreamWriter<E> writer)
-            throws BMYException, E {
+    public void setUserAvatar(String targetUserId, long numBytes, InputStream input) throws BMYException, Throwable {
         String apiPath = "1/users/" + targetUserId + "/avatar";
         List<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
         headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
 
         HttpRequestor.Uploader uploader = this.getUploaderWithPost(apiPath, null, headers);
+        BMYStreamWriter<?> writer = new BMYStreamWriter.InputStreamCopier(input);
         this.finishUploadFile(new SingleUploader(uploader, numBytes), writer);
     }
 
@@ -360,24 +318,16 @@ public class BMYClient {
         List<String> paramList = new ArrayList<String>();
         if (format != null) {
             paramList.add("format");
-            paramList.add(getThumbnailFormatStr(format));
+            paramList.add(format.toString().toLowerCase());
         }
         if (size != null) {
             paramList.add("size");
-            paramList.add(getThumbnailSizeStr(size));
+            paramList.add(size.toString().toLowerCase());
         }
         String[] params = paramList.toArray(new String[0]);
 
-        return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
-            @Override
-            public InputStream handle(Response response) throws BMYException {
-                System.out.println(response.statusCode);
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
-                }
-                return response.body;
-            }
-        });
+        HttpRequestor.Response response = this.startGet(apiPath, params, null);
+        return response.body;
     }
 
     public Group addUserGroup(String targetUserId, String groupId, Relation relation) throws BMYException {
@@ -434,7 +384,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Group>(Group.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Group>(Group.reader), response.body);
             }
         });
     }
@@ -540,7 +490,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Group>(Group.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Group>(Group.reader), response.body);
             }
         });
     }
@@ -574,14 +524,14 @@ public class BMYClient {
         });
     }
 
-    public <E extends Throwable> void setGroupLogo(String groupId, long numBytes, BMYStreamWriter<E> writer)
-            throws BMYException, E {
+    public void setGroupLogo(String groupId, long numBytes, InputStream input) throws BMYException, Throwable {
         String apiPath = "1/groups/" + groupId + "/logo";
         List<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
         headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
 
         HttpRequestor.Uploader uploader = this.getUploaderWithPost(apiPath, null, headers);
+        BMYStreamWriter<?> writer = new BMYStreamWriter.InputStreamCopier(input);
         this.finishUploadFile(new SingleUploader(uploader, numBytes), writer);
     }
 
@@ -590,23 +540,16 @@ public class BMYClient {
         List<String> paramList = new ArrayList<String>();
         if (format != null) {
             paramList.add("format");
-            paramList.add(getThumbnailFormatStr(format));
+            paramList.add(format.toString().toLowerCase());
         }
         if (size != null) {
             paramList.add("size");
-            paramList.add(getThumbnailSizeStr(size));
+            paramList.add(size.toString().toLowerCase());
         }
         String[] params = paramList.toArray(new String[0]);
 
-        return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
-            @Override
-            public InputStream handle(Response response) throws BMYException {
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
-                }
-                return response.body;
-            }
-        });
+        HttpRequestor.Response response = this.startGet(apiPath, params, null);
+        return response.body;
     }
 
     public User addGroupUser(String groupId, String targetUserId, Relation relation) throws BMYException {
@@ -662,7 +605,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<User>(User.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<User>(User.reader), response.body);
             }
         });
     }
@@ -740,14 +683,79 @@ public class BMYClient {
         });
     }
 
-    public <E extends Throwable> Meta uploadFileByPath(String rootId, String path, long modifiedAtMillis,
-            Boolean overwrite, InputStream input, long numBytes) throws Throwable {
+    public Meta uploadFile(String rootId, String metaId, long numBytes, long modifiedAtMillis, InputStream input)
+            throws Throwable {
+        Uploader uploader = this.startUploadFile(rootId, metaId, numBytes, modifiedAtMillis);
         BMYStreamWriter<?> writer = new BMYStreamWriter.InputStreamCopier(input);
-        Uploader uploader = startUploadFile(rootId, path, numBytes, modifiedAtMillis, overwrite);
-        return finishUploadFile(uploader, writer);
+        return this.finishUploadFile(uploader, writer);
     }
 
-    // TODO: 500
+    public Uploader startUploadFile(String rootId, String metaId, long numBytes, long modifiedAtMillis)
+            throws BMYException {
+        if (numBytes < 0) {
+            throw new IllegalArgumentException("numBytes must be -1 or greater; given " + numBytes);
+        } else if (numBytes > CHUNKED_UPLOAD_THRESHOLD) {
+            throw new IllegalArgumentException("file too large; given " + numBytes);
+        } else {
+            return this.startUploadFileSingle(rootId, metaId, numBytes, modifiedAtMillis);
+        }
+    }
+
+    public Meta uploadFileByPath(String rootId, String path, long numBytes, long modifiedAtMillis, Boolean overwrite,
+            InputStream input) throws Throwable {
+        Uploader uploader = this.startUploadFileByPath(rootId, path, numBytes, modifiedAtMillis, overwrite);
+        BMYStreamWriter<?> writer = new BMYStreamWriter.InputStreamCopier(input);
+        return this.finishUploadFile(uploader, writer);
+    }
+
+    public Uploader startUploadFileByPath(String rootId, String path, long numBytes, long modifiedAtMillis,
+            Boolean overwrite) throws BMYException {
+        if (numBytes < 0) {
+            if (numBytes != -1) {
+                throw new IllegalArgumentException("numBytes must be -1 or greater; given " + numBytes);
+            }
+            return this.startUploadFileChunked(rootId, path, numBytes, modifiedAtMillis, overwrite);
+        } else if (numBytes > CHUNKED_UPLOAD_THRESHOLD) {
+            return this.startUploadFileChunked(rootId, path, numBytes, modifiedAtMillis, overwrite);
+        } else {
+            return this.startUploadFileSingleByPath(rootId, path, numBytes, modifiedAtMillis, overwrite);
+        }
+    }
+
+    public <E extends Throwable> Meta finishUploadFile(Uploader uploader, BMYStreamWriter<E> writer)
+            throws BMYException, E {
+        NoThrowOutputStream streamWrapper = new NoThrowOutputStream(uploader.getBody());
+        try {
+            writer.write(streamWrapper);
+            return uploader.finish();
+        } catch (NoThrowOutputStream.HiddenException e) {
+            throw new BMYException.NetworkIO(e.underlying);
+        } finally {
+            uploader.close();
+        }
+    }
+
+    public InputStream getFile(String rootId, String metaId, Long version, Long offset, Long bytes) throws BMYException {
+        String apiPath = "1/roots/" + rootId + "/files/" + metaId;
+        List<String> paramList = new ArrayList<String>();
+        if (version != null) {
+            paramList.add("version");
+            paramList.add(String.valueOf(version));
+        }
+        if (offset != null) {
+            paramList.add("offset");
+            paramList.add(String.valueOf(offset));
+        }
+        if (bytes != null) {
+            paramList.add("bytes");
+            paramList.add(String.valueOf(bytes));
+        }
+        String[] params = paramList.toArray(new String[0]);
+
+        HttpRequestor.Response response = this.startGet(apiPath, params, null);
+        return response.body;
+    }
+
     public InputStream getFileByPath(String rootId, String path, Long version, Long offset, Long bytes)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/p/" + path;
@@ -766,15 +774,8 @@ public class BMYClient {
         }
         String[] params = paramList.toArray(new String[0]);
 
-        return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
-            @Override
-            public InputStream handle(Response response) throws BMYException {
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
-                }
-                return response.body;
-            }
-        });
+        HttpRequestor.Response response = this.startGet(apiPath, params, null);
+        return response.body;
     }
 
     public Meta trashRecursivelyByPath(String rootId, String path) throws BMYException {
@@ -787,41 +788,6 @@ public class BMYClient {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
                 return BMYRequestUtil.readJsonFromResponse(Meta.reader, response.body);
-            }
-        });
-    }
-
-    public Meta uploadFile(String rootId, String metaId, Time clientMtime, InputStream input) throws BMYException {
-        // TODO:
-        return null;
-    }
-
-    // TODO: return downloader?
-    // TODO: 500
-    public InputStream getFile(String rootId, String metaId, Long version, Long offset, Long bytes) throws BMYException {
-        String apiPath = "1/roots/" + rootId + "/files/" + metaId;
-        List<String> paramList = new ArrayList<String>();
-        if (version != null) {
-            paramList.add("version");
-            paramList.add(String.valueOf(version));
-        }
-        if (offset != null) {
-            paramList.add("offset");
-            paramList.add(String.valueOf(offset));
-        }
-        if (bytes != null) {
-            paramList.add("bytes");
-            paramList.add(String.valueOf(bytes));
-        }
-        String[] params = paramList.toArray(new String[0]);
-
-        return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
-            @Override
-            public InputStream handle(Response response) throws BMYException {
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
-                }
-                return response.body;
             }
         });
     }
@@ -854,31 +820,22 @@ public class BMYClient {
         });
     }
 
-    // TODO: return downloader?
-    // TODO: 500
     public InputStream getFileThumbnail(String rootId, String metaId, ThumbnailFormat format, ThumbnailSize size)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/thumbnail";
         List<String> paramList = new ArrayList<String>();
         if (format != null) {
             paramList.add("format");
-            paramList.add(getThumbnailFormatStr(format));
+            paramList.add(format.toString().toLowerCase());
         }
         if (size != null) {
             paramList.add("size");
-            paramList.add(getThumbnailSizeStr(size));
+            paramList.add(size.toString().toLowerCase());
         }
         String[] params = paramList.toArray(new String[0]);
 
-        return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
-            @Override
-            public InputStream handle(Response response) throws BMYException {
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
-                }
-                return response.body;
-            }
-        });
+        HttpRequestor.Response response = this.startGet(apiPath, params, null);
+        return response.body;
     }
 
     public ResultList<Revision> listRevisionsForMeta(String rootId, String metaId, Integer offset, Integer limit)
@@ -893,7 +850,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Revision>(Revision.reader),
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Revision>(Revision.reader),
                         response.body);
             }
         });
@@ -939,7 +896,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Comment>(Comment.reader),
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Comment>(Comment.reader),
                         response.body);
             }
         });
@@ -956,7 +913,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Comment>(Comment.reader),
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Comment>(Comment.reader),
                         response.body);
             }
         });
@@ -974,7 +931,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Comment>(Comment.reader),
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Comment>(Comment.reader),
                         response.body);
             }
         });
@@ -1085,7 +1042,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<>(Share.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<>(Share.reader), response.body);
             }
         });
     }
@@ -1101,7 +1058,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<>(Share.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<>(Share.reader), response.body);
             }
         });
     }
@@ -1118,7 +1075,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<>(Share.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<>(Share.reader), response.body);
             }
         });
     }
@@ -1260,10 +1217,10 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                JsonParser parser;
+
                 List<Meta> metaList = new LinkedList<Meta>();
                 try {
-                    parser = new JsonFactory().createParser(response.body);
+                    JsonParser parser = new JsonFactory().createParser(response.body);
                     try {
                         parser.nextToken();
                         JsonReader.expectArrayStart(parser);
@@ -1389,7 +1346,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(Delta.Reader, response.body);
+                return BMYRequestUtil.readJsonFromResponse(Delta.reader, response.body);
             }
         });
     }
@@ -1419,7 +1376,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Trash>(Trash.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Trash>(Trash.reader), response.body);
             }
         });
     }
@@ -1483,7 +1440,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<User>(User.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<User>(User.reader), response.body);
             }
         });
     }
@@ -1504,7 +1461,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<User>(User.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<User>(User.reader), response.body);
             }
         });
     }
@@ -1522,7 +1479,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Group>(Group.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Group>(Group.reader), response.body);
             }
         });
     }
@@ -1543,7 +1500,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Group>(Group.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Group>(Group.reader), response.body);
             }
         });
     }
@@ -1561,7 +1518,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Meta>(Meta.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Meta>(Meta.reader), response.body);
             }
         });
     }
@@ -1582,7 +1539,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Meta>(Meta.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Meta>(Meta.reader), response.body);
             }
         });
     }
@@ -1605,7 +1562,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Meta>(Meta.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Meta>(Meta.reader), response.body);
             }
         });
     }
@@ -1623,7 +1580,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<User>(User.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<User>(User.reader), response.body);
             }
         });
     }
@@ -1641,7 +1598,7 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Group>(Group.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Group>(Group.reader), response.body);
             }
         });
     }
@@ -1659,39 +1616,29 @@ public class BMYClient {
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
-                return BMYRequestUtil.readJsonFromResponse(new ResultList.Reader<Meta>(Meta.reader), response.body);
+                return BMYRequestUtil.readJsonFromResponse(new ResultList.reader<Meta>(Meta.reader), response.body);
             }
         });
     }
 
-    public Uploader startUploadFile(String rootId, String path, long numBytes, long modifiedAtMillis, Boolean overwrite)
+    protected Uploader startUploadFileSingle(String rootId, String metaId, long numBytes, long modifiedAtMillis)
             throws BMYException {
         if (numBytes < 0) {
-            if (numBytes != -1) {
-                throw new IllegalArgumentException("numBytes must be -1 or greater; given " + numBytes);
-            }
-            return startUploadFileChunked(rootId, path, numBytes, modifiedAtMillis, overwrite);
-        } else if (numBytes > CHUNKED_UPLOAD_THRESHOLD) {
-            return startUploadFileChunked(rootId, path, numBytes, modifiedAtMillis, overwrite);
-        } else {
-            return startUploadFileSingle(rootId, path, numBytes, modifiedAtMillis, overwrite);
+            throw new IllegalArgumentException("numBytes must be zero or greater");
         }
+
+        String apiPath = "1/roots/" + rootId + "/files/" + metaId;
+        String[] params = { "modified_at_millis", String.valueOf(modifiedAtMillis) };
+
+        List<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
+        headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
+        headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
+
+        HttpRequestor.Uploader uploader = this.getUploaderWithPost(apiPath, params, headers);
+        return new SingleUploader(uploader, numBytes);
     }
 
-    public <E extends Throwable> Meta finishUploadFile(Uploader uploader, BMYStreamWriter<E> writer)
-            throws BMYException, E {
-        NoThrowOutputStream streamWrapper = new NoThrowOutputStream(uploader.getBody());
-        try {
-            writer.write(streamWrapper);
-            return uploader.finish();
-        } catch (NoThrowOutputStream.HiddenException e) {
-            throw new BMYException.NetworkIO(e.underlying);
-        } finally {
-            uploader.close();
-        }
-    }
-
-    public Uploader startUploadFileSingle(String rootId, String path, long numBytes, long modifiedAtMillis,
+    protected Uploader startUploadFileSingleByPath(String rootId, String path, long numBytes, long modifiedAtMillis,
             Boolean overwrite) throws BMYException {
         if (numBytes < 0) {
             throw new IllegalArgumentException("numBytes must be zero or greater");
@@ -1715,9 +1662,9 @@ public class BMYClient {
         return new SingleUploader(uploader, numBytes);
     }
 
-    public <E extends Throwable> Meta uploadFileSingle(String rootId, String path, long numBytes,
+    protected <E extends Throwable> Meta uploadFileSingleByPath(String rootId, String path, long numBytes,
             long modifiedAtMillis, Boolean overwrite, BMYStreamWriter<E> writer) throws BMYException, E {
-        Uploader uploader = startUploadFileSingle(rootId, path, numBytes, modifiedAtMillis, overwrite);
+        Uploader uploader = startUploadFileSingleByPath(rootId, path, numBytes, modifiedAtMillis, overwrite);
         return finishUploadFile(uploader, writer);
     }
 
@@ -1746,9 +1693,9 @@ public class BMYClient {
             if (this.httpUploader == null) {
                 throw new IllegalStateException("already called 'finish', 'abort', or 'close'");
             }
-            HttpRequestor.Uploader p = httpUploader;
+            HttpRequestor.Uploader uploader = this.httpUploader;
             this.httpUploader = null;
-            p.abort();
+            uploader.abort();
         }
 
         @Override
@@ -1756,8 +1703,7 @@ public class BMYClient {
             if (this.httpUploader == null) {
                 return;
             }
-
-            abort();
+            this.abort();
         }
 
         @Override
@@ -1766,25 +1712,25 @@ public class BMYClient {
                 throw new IllegalStateException("already called 'finish', 'abort', or 'close'");
             }
 
-            HttpRequestor.Uploader u = this.httpUploader;
+            HttpRequestor.Uploader uploader = this.httpUploader;
             this.httpUploader = null;
 
             HttpRequestor.Response response;
+
             final long bytesWritten;
             try {
                 bytesWritten = this.body.getBytesWritten();
 
                 if (this.claimedBytes != bytesWritten) {
-                    u.abort();
-                    throw new IllegalStateException("You said you were going to upload " + claimedBytes
+                    uploader.abort();
+                    throw new IllegalStateException("You said you were going to upload " + this.claimedBytes
                             + " bytes, but you wrote " + bytesWritten + " bytes to the Uploader's 'body' stream.");
                 }
-
-                response = u.finish();
+                response = uploader.finish();
             } catch (IOException ex) {
                 throw new BMYException.NetworkIO(ex);
             } finally {
-                u.close();
+                uploader.close();
             }
 
             return BMYRequestUtil.finishResponse(response, new BMYRequestUtil.ResponseHandler<Meta>() {
@@ -1798,12 +1744,12 @@ public class BMYClient {
                         throw new BMYException.BadResponse(
                                 "uploaded file, but server returned metadata entry for a folder");
                     }
-                    Meta f = entry;
-                    if (f.size.bytes != bytesWritten) {
+                    Meta file = entry;
+                    if (file.size.bytes != bytesWritten) {
                         throw new BMYException.BadResponse("we uploaded " + bytesWritten
-                                + ", but server returned metadata entry with file size " + f.size);
+                                + ", but server returned metadata entry with file size " + file.size);
                     }
-                    return f;
+                    return file;
                 }
             });
         }
@@ -1843,15 +1789,15 @@ public class BMYClient {
         return BMYRequestUtil.readJsonFromResponse(ChunkedUpload.reader, response.body);
     }
 
-    public String chunkedUploadFirst(String rootId, byte[] data) throws BMYException {
+    protected String chunkedUploadFirst(String rootId, byte[] data) throws BMYException {
         return chunkedUploadFirst(rootId, data, 0, data.length);
     }
 
-    public String chunkedUploadFirst(String rootId, byte[] data, int dataOffset, int dataLength) throws BMYException {
+    protected String chunkedUploadFirst(String rootId, byte[] data, int dataOffset, int dataLength) throws BMYException {
         return chunkedUploadFirst(rootId, dataLength, new BMYStreamWriter.ByteArrayCopier(data, dataOffset, dataLength));
     }
 
-    public <E extends Throwable> String chunkedUploadFirst(String rootId, int chunkSize, BMYStreamWriter<E> writer)
+    protected <E extends Throwable> String chunkedUploadFirst(String rootId, int chunkSize, BMYStreamWriter<E> writer)
             throws BMYException, E {
         HttpRequestor.Response response = chunkedUploadCommon(rootId, null, chunkSize, writer);
         try {
@@ -1870,18 +1816,18 @@ public class BMYClient {
         }
     }
 
-    public long chunkedUploadAppend(String rootId, String uploadId, long uploadOffset, byte[] data) throws BMYException {
-        return chunkedUploadAppend(rootId, uploadId, uploadOffset, data, 0, data.length);
+    protected void chunkedUploadAppend(String rootId, String uploadId, long uploadOffset, byte[] data)
+            throws BMYException {
+        this.chunkedUploadAppend(rootId, uploadId, uploadOffset, data, 0, data.length);
     }
 
-    public long chunkedUploadAppend(String rootId, String uploadId, long uploadOffset, byte[] data, int dataOffset,
+    protected void chunkedUploadAppend(String rootId, String uploadId, long uploadOffset, byte[] data, int dataOffset,
             int dataLength) throws BMYException {
-        return chunkedUploadAppend(rootId, uploadId, uploadOffset, dataLength, new BMYStreamWriter.ByteArrayCopier(
-                data, dataOffset, dataLength));
+        this.chunkedUploadAppend(rootId, uploadId, uploadOffset, dataLength, new BMYStreamWriter.ByteArrayCopier(data,
+                dataOffset, dataLength));
     }
 
-    /* return -1 when correct, which is strange but same as dropbox */
-    public <E extends Throwable> long chunkedUploadAppend(String rootId, String uploadId, long uploadOffset,
+    protected <E extends Throwable> void chunkedUploadAppend(String rootId, String uploadId, long uploadOffset,
             long chunkSize, BMYStreamWriter<E> writer) throws BMYException, E {
         if (uploadId == null) {
             throw new IllegalArgumentException("'uploadId' can't be null");
@@ -1895,46 +1841,33 @@ public class BMYClient {
 
         String[] params = { "upload_id", uploadId, "offset", Long.toString(uploadOffset) };
 
-        HttpRequestor.Response response = chunkedUploadCommon(rootId, params, chunkSize, writer);
+        HttpRequestor.Response response = this.chunkedUploadCommon(rootId, params, chunkSize, writer);
         try {
             if (response.statusCode != 200) {
                 throw BMYRequestUtil.unexpectedStatus(response);
             }
-            ChunkedUpload returnedState = chunkedUploadParse200(response);
+            ChunkedUpload returnedState = this.chunkedUploadParse200(response);
             long expectedOffset = uploadOffset + chunkSize;
             if (returnedState.offset != expectedOffset) {
                 throw new BMYException.BadResponse("Expected offset " + expectedOffset
                         + " bytes, but returned offset is " + returnedState.offset);
             }
-            return -1;
         } finally {
             IOUtil.closeInput(response.body);
         }
     }
 
-    public Uploader startUploadFileChunked(String rootId, String path, long numBytes, long modifiedAtMillis,
+    private Uploader startUploadFileChunked(String rootId, String path, long numBytes, long modifiedAtMillis,
             Boolean overwrite) {
-        return startUploadFileChunked(rootId, path, (int) CHUNKED_UPLOAD_CHUNK_SIZE, numBytes, modifiedAtMillis,
-                overwrite);
+        return this.startUploadFileChunked(rootId, path, numBytes, modifiedAtMillis, overwrite,
+                CHUNKED_UPLOAD_CHUNK_SIZE);
     }
 
-    public Uploader startUploadFileChunked(String rootId, String path, int chunkSize, long numBytes,
-            long modifiedAtMillis, Boolean overwrite) {
+    private Uploader startUploadFileChunked(String rootId, String path, long numBytes, long modifiedAtMillis,
+            Boolean overwrite, int chunkSize) {
         Uploader uploader = new ChunkedUploader(rootId, path, numBytes, modifiedAtMillis, overwrite,
                 new ChunkedUploadOutputStream(rootId, chunkSize));
         return uploader;
-    }
-
-    public <E extends Throwable> Meta uploadFileChunked(String rootId, String path, long numBytes,
-            long modifiedAtMillis, Boolean overwrite, BMYStreamWriter<E> writer) throws BMYException, E {
-        Uploader uploader = startUploadFileChunked(rootId, path, numBytes, modifiedAtMillis, overwrite);
-        return finishUploadFile(uploader, writer);
-    }
-
-    public <E extends Throwable> Meta uploadFileChunked(String rootId, String path, int chunkSize, long numBytes,
-            long modifiedAtMillis, Boolean overwrite, BMYStreamWriter<E> writer) throws BMYException, E {
-        Uploader uploader = startUploadFileChunked(rootId, path, chunkSize, numBytes, modifiedAtMillis, overwrite);
-        return finishUploadFile(uploader, writer);
     }
 
     public class ChunkedUploader extends Uploader {
@@ -1968,8 +1901,9 @@ public class BMYClient {
         @Override
         public Meta finish() throws BMYException {
             if (this.body.uploadId == null) {
-                return uploadFileSingle(this.rootId, this.path, this.numBytes, this.modifiedAtMillis, this.overwrite,
-                        new BMYStreamWriter.ByteArrayCopier(body.chunk, 0, body.chunkPos));
+                return BMYClient.this.uploadFileSingleByPath(this.rootId, this.path, this.numBytes,
+                        this.modifiedAtMillis, this.overwrite, new BMYStreamWriter.ByteArrayCopier(this.body.chunk, 0,
+                                this.body.chunkPos));
             } else {
                 this.body.finishChunk();
                 if (this.numBytes != -1) {
@@ -1983,8 +1917,9 @@ public class BMYClient {
 
                 return BMYRequestUtil.runAndRetry(3, new BMYRequestUtil.RequestMaker<Meta, RuntimeException>() {
                     public Meta run() throws BMYException {
-                        return commitChunkedUploadByPath(ChunkedUploader.this.rootId, ChunkedUploader.this.path,
-                                ChunkedUploader.this.body.uploadId, ChunkedUploader.this.modifiedAtMillis);
+                        return BMYClient.this.commitChunkedUploadByPath(ChunkedUploader.this.rootId,
+                                ChunkedUploader.this.path, ChunkedUploader.this.body.uploadId,
+                                ChunkedUploader.this.modifiedAtMillis);
                     }
                 });
             }
@@ -2013,7 +1948,7 @@ public class BMYClient {
         public void write(int i) throws IOException {
             this.chunk[this.chunkPos++] = (byte) i;
             try {
-                finishChunkIfNecessary();
+                this.finishChunkIfNecessary();
             } catch (BMYException e) {
                 throw new IOBMYException(e);
             }
@@ -2022,7 +1957,7 @@ public class BMYClient {
         private void finishChunkIfNecessary() throws BMYException {
             assert this.chunkPos <= this.chunk.length;
             if (this.chunkPos == this.chunk.length) {
-                finishChunk();
+                this.finishChunk();
             }
         }
 
@@ -2035,7 +1970,7 @@ public class BMYClient {
                         new BMYRequestUtil.RequestMaker<String, RuntimeException>() {
                             @Override
                             public String run() throws BMYException, RuntimeException {
-                                return chunkedUploadFirst(ChunkedUploadOutputStream.this.rootId,
+                                return BMYClient.this.chunkedUploadFirst(ChunkedUploadOutputStream.this.rootId,
                                         ChunkedUploadOutputStream.this.chunk, 0,
                                         ChunkedUploadOutputStream.this.chunkPos);
                             }
@@ -2045,40 +1980,18 @@ public class BMYClient {
                 int arrayOffset = 0;
                 while (true) {
                     final int arrayOffsetFinal = arrayOffset;
-                    long correctedOffset = BMYRequestUtil.runAndRetry(3,
-                            new BMYRequestUtil.RequestMaker<Long, RuntimeException>() {
-                                @Override
-                                public Long run() throws BMYException, RuntimeException {
-                                    return chunkedUploadAppend(ChunkedUploadOutputStream.this.rootId,
-                                            ChunkedUploadOutputStream.this.uploadId,
-                                            ChunkedUploadOutputStream.this.uploadOffset,
-                                            ChunkedUploadOutputStream.this.chunk, arrayOffsetFinal,
-                                            ChunkedUploadOutputStream.this.chunkPos - arrayOffsetFinal);
-                                }
-                            });
-                    long expectedOffset = this.uploadOffset + this.chunkPos;
-                    if (correctedOffset == -1) {
-                        // Everything ok
-                        this.uploadOffset = expectedOffset;
-                        break;
-                    } else { /* the following code never get executed by BMY */
-                        // Make sure the returned offset is within what we
-                        // expect.
-                        assert correctedOffset != expectedOffset;
-                        if (correctedOffset < this.uploadOffset) {
-                            // Somehow the server lost track of the previous
-                            // data we sent it.
-                            throw new BMYException.BadResponse("we were at offset " + this.uploadOffset
-                                    + ", server said " + correctedOffset);
-                        } else if (correctedOffset > expectedOffset) {
-                            // Somehow the server has more data than we gave it!
-                            throw new BMYException.BadResponse("we were at offset " + this.uploadOffset
-                                    + ", server said " + correctedOffset);
+                    BMYRequestUtil.runAndRetry(3, new BMYRequestUtil.RequestMaker<Object, RuntimeException>() {
+                        @Override
+                        public Object run() throws BMYException, RuntimeException {
+                            BMYClient.this.chunkedUploadAppend(ChunkedUploadOutputStream.this.rootId,
+                                    ChunkedUploadOutputStream.this.uploadId,
+                                    ChunkedUploadOutputStream.this.uploadOffset, ChunkedUploadOutputStream.this.chunk,
+                                    arrayOffsetFinal, ChunkedUploadOutputStream.this.chunkPos - arrayOffsetFinal);
+                            return null;
                         }
-                        // Server needs us to resend partial data.
-                        int adjustAmount = (int) (correctedOffset - this.uploadOffset);
-                        arrayOffset += adjustAmount;
-                    }
+                    });
+                    long expectedOffset = this.uploadOffset + this.chunkPos;
+                    this.uploadOffset = expectedOffset;
                 }
             }
             this.chunkPos = 0;
@@ -2096,7 +2009,7 @@ public class BMYClient {
                 this.chunkPos += bytesToCopy;
                 inputPos += bytesToCopy;
                 try {
-                    finishChunkIfNecessary();
+                    this.finishChunkIfNecessary();
                 } catch (BMYException ex) {
                     throw new IOBMYException(ex);
                 }
@@ -2182,6 +2095,10 @@ public class BMYClient {
     private <T> T doGet(String path, String[] params, List<HttpRequestor.Header> headers,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
         return BMYRequestUtil.doGet(this.requestConfig, this.host.api, path, this.token, params, headers, handler);
+    }
+
+    private Response startGet(String path, String[] params, List<HttpRequestor.Header> headers) throws BMYException {
+        return BMYRequestUtil.startGet(this.requestConfig, this.host.api, path, this.token, params, headers);
     }
 
     private <T> T doPost(String path, String[] params, List<HttpRequestor.Header> headers, String body,

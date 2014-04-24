@@ -1,7 +1,7 @@
 package com.banmayun.sdk.core;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.banmayun.sdk.json.JsonReadException;
@@ -32,10 +32,10 @@ public class ResultList<T extends Dumpable> extends Dumpable {
         out.field("offset", this.offset);
     }
 
-    public static class Reader<T extends Dumpable> extends JsonReader<ResultList<T>> {
+    public static class reader<T extends Dumpable> extends JsonReader<ResultList<T>> {
         private JsonReader<T> metadataReader = null;
 
-        public Reader(JsonReader<T> metadataReader) {
+        public reader(JsonReader<T> metadataReader) {
             this.metadataReader = metadataReader;
         }
 
@@ -44,7 +44,7 @@ public class ResultList<T extends Dumpable> extends Dumpable {
             return read(parser, metadataReader);
         }
 
-        public static <T extends Dumpable> ResultList<T> read(JsonParser parser, JsonReader<T> metadataReader)
+        public static <T extends Dumpable> ResultList<T> read(JsonParser parser, JsonReader<T> entryReader)
                 throws IOException, JsonReadException {
             Integer total = null;
             Integer offset = null;
@@ -68,18 +68,17 @@ public class ResultList<T extends Dumpable> extends Dumpable {
                         break;
                     case FM_entries:
                         JsonReader.expectArrayStart(parser);
-                        ArrayList<T> metaList = new ArrayList<>();
+                        List<T> entryList = new LinkedList<>();
                         while (!JsonReader.isArrayEnd(parser)) {
-                            T meta;
-                            meta = metadataReader.read(parser);
-                            metaList.add(meta);
+                            T entry;
+                            entry = entryReader.read(parser);
+                            entryList.add(entry);
                         }
                         parser.nextToken();
-                        if (metaList.size() > 0) {
-                            entries = new ArrayList<>();
-                            entries = metaList;
+                        if (entryList.size() > 0) {
+                            entries = entryList;
                         } else {
-                            entries = null;
+                            entries = new LinkedList<>();
                         }
                         break;
                     default:

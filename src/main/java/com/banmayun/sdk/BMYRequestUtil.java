@@ -294,25 +294,10 @@ public class BMYRequestUtil {
         return finishResponse(response, handler);
     }
 
-    public static HttpRequestor.Uploader getUploaderWithPut(BMYRequestConfig requestConfig, String host, String path,
-            String token, String[] params, List<HttpRequestor.Header> headers) throws BMYException {
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, token, params);
-        headers = addUserAgentHeader(headers, requestConfig);
-        headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
-
-        try {
-            HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPut(url, headers);
-            return uploader;
-        } catch (IOException e) {
-            throw new BMYException.NetworkIO(e);
-        }
-    }
-
     public static HttpRequestor.Uploader getUploaderWithPost(BMYRequestConfig requestConfig, String host, String path,
             String token, String[] params, List<HttpRequestor.Header> headers) throws BMYException {
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, token, params);
+        String url = buildUrlWithParams(host, path, token, requestConfig.userLocale, params);
         headers = addUserAgentHeader(headers, requestConfig);
-        headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
 
         try {
             HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPost(url, headers);

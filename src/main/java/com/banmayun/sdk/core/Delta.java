@@ -1,7 +1,8 @@
 package com.banmayun.sdk.core;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
@@ -98,7 +99,7 @@ public class Delta extends Dumpable {
         out.field("reset", this.reset);
     }
 
-    public static JsonReader<Delta> Reader = new JsonReader<Delta>() {
+    public static JsonReader<Delta> reader = new JsonReader<Delta>() {
         @Override
         public Delta read(JsonParser parser) throws IOException, JsonReadException {
             String cursorId = null;
@@ -122,7 +123,7 @@ public class Delta extends Dumpable {
                         reset = JsonReader.readBoolean(parser);
                     case FM_entries:
                         JsonReader.expectArrayStart(parser);
-                        ArrayList<Entry> entryList = new ArrayList<>();
+                        List<Entry> entryList = new LinkedList<>();
                         while (!JsonReader.isArrayEnd(parser)) {
                             Entry entry;
                             entry = Entry.reader.read(parser);
