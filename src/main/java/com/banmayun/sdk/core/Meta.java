@@ -1,7 +1,8 @@
 package com.banmayun.sdk.core;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
@@ -199,7 +200,7 @@ public class Meta extends Dumpable {
                         break;
                     case FM_contents:
                         JsonReader.expectArrayStart(parser);
-                        ArrayList<Meta> metaList = new ArrayList<>();
+                        List<Meta> metaList = new LinkedList<>();
                         while (!JsonReader.isArrayEnd(parser)) {
                             Meta meta;
                             meta = Meta.reader.read(parser);

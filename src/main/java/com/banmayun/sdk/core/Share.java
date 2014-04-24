@@ -1,7 +1,6 @@
 package com.banmayun.sdk.core;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
@@ -18,12 +17,12 @@ public class Share extends Dumpable {
     public Time expiresAt = null;
     public Time createdAt = null;
     public User createdBy = null;
-    public Meta[] meta = null;
+    public Meta meta = null;
 
     public Share() {
     }
 
-    public Share(String id, String rootId, String metaId, Time expiresAt, Time createdAt, User createdBy, Meta[] meta) {
+    public Share(String id, String rootId, String metaId, Time expiresAt, Time createdAt, User createdBy, Meta meta) {
         this.id = id;
         this.rootId = rootId;
         this.metaId = metaId;
@@ -52,7 +51,7 @@ public class Share extends Dumpable {
             Time expiresAt = null;
             Time createdAt = null;
             User createdBy = null;
-            Meta[] meta = null;
+            Meta meta = null;
 
             JsonReader.expectObjectStart(parser);
             while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
@@ -84,21 +83,7 @@ public class Share extends Dumpable {
                         break;
                     case FM_meta:
                         JsonReader.expectArrayStart(parser);
-                        ArrayList<Meta> metaList = new ArrayList<>();
-                        while (!JsonReader.isArrayEnd(parser)) {
-                            Meta temp;
-                            temp = Meta.reader.read(parser);
-                            metaList.add(temp);
-                        }
-                        parser.nextToken();
-                        if (metaList.size() > 0) {
-                            meta = new Meta[metaList.size()];
-                            for (int i = 0; i < metaList.size(); i++) {
-                                meta[i] = metaList.get(i);
-                            }
-                        } else {
-                            meta = null;
-                        }
+                        meta = Meta.reader.read(parser);
                         break;
                     default:
                         throw new AssertionError("bad index: " + fi + ", field = \"" + fieldName + "\"");
