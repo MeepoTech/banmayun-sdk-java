@@ -342,34 +342,15 @@ public class BMYClient {
         });
     }
 
-    public void setUserAvatar(String targetUserId, InputStream input) throws BMYException {
-        String host = this.host.api;
+    public <E extends Throwable> void setUserAvatar(String targetUserId, long numBytes, BMYStreamWriter<E> writer)
+            throws BMYException, E {
         String apiPath = "1/users/" + targetUserId + "/avatar";
         ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
-        headers = BMYRequestUtil.addUserAgentHeader(headers, requestConfig);
+        headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
 
-        String url = BMYRequestUtil.buildUrlWithParams(host, apiPath, this.token, requestConfig.userLocale, null);
-        // TODO: what? think before code!
-
-        try {
-            HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPost(url, headers);
-            try {
-                byte[] buf = new byte[1024];
-                while (true) {
-                    int r = input.read(buf);
-                    if (r == -1) {
-                        break;
-                    }
-                    uploader.getBody().write(buf, 0, r);
-                }
-                uploader.finish();
-            } finally {
-                uploader.close();
-            }
-        } catch (IOException ex) {
-            throw new BMYException.NetworkIO(ex);
-        }
+        HttpRequestor.Uploader uploader = this.getUploaderWithPost(apiPath, null, headers);
+        this.finishUploadFile(new SingleUploader(uploader, numBytes), writer);
     }
 
     public InputStream getUserAvatar(String targetUserId, ThumbnailFormat format, ThumbnailSize size)
@@ -592,33 +573,15 @@ public class BMYClient {
         });
     }
 
-    public void setGroupLogo(String groupId, InputStream input) throws BMYException {
-        String host = this.host.api;
+    public <E extends Throwable> void setGroupLogo(String groupId, long numBytes, BMYStreamWriter<E> writer)
+            throws BMYException, E {
         String apiPath = "1/groups/" + groupId + "/logo";
         ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
-        headers = BMYRequestUtil.addUserAgentHeader(headers, requestConfig);
-        String url = BMYRequestUtil.buildUrlWithParams(host, apiPath, this.token, requestConfig.userLocale, null);
-        // TODO: again
+        headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
 
-        try {
-            HttpRequestor.Uploader uploader = requestConfig.httpRequestor.startPost(url, headers);
-            try {
-                byte[] buf = new byte[1024];
-                while (true) {
-                    int r = input.read(buf);
-                    if (r == -1) {
-                        break;
-                    }
-                    uploader.getBody().write(buf, 0, r);
-                }
-                uploader.finish();
-            } finally {
-                uploader.close();
-            }
-        } catch (IOException ex) {
-            throw new BMYException.NetworkIO(ex);
-        }
+        HttpRequestor.Uploader uploader = this.getUploaderWithPost(apiPath, null, headers);
+        this.finishUploadFile(new SingleUploader(uploader, numBytes), writer);
     }
 
     public InputStream getGroupLogo(String groupId, ThumbnailFormat format, ThumbnailSize size) throws BMYException {
@@ -1739,7 +1702,7 @@ public class BMYClient {
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
         headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
 
-        HttpRequestor.Uploader uploader = this.getUploaderWithPut(apiPath, params, headers);
+        HttpRequestor.Uploader uploader = this.getUploaderWithPost(apiPath, params, headers);
         return new SingleUploader(uploader, numBytes);
     }
 
@@ -2216,11 +2179,6 @@ public class BMYClient {
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
         return BMYRequestUtil.doPost(this.requestConfig, this.host.api, path, this.token, params, body, headers,
                 handler);
-    }
-
-    private HttpRequestor.Uploader getUploaderWithPut(String path, String[] params,
-            ArrayList<HttpRequestor.Header> headers) throws BMYException {
-        return BMYRequestUtil.getUploaderWithPut(this.requestConfig, this.host.api, path, this.token, params, headers);
     }
 
     private HttpRequestor.Uploader getUploaderWithPost(String path, String[] params,
