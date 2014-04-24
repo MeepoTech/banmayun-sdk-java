@@ -258,7 +258,6 @@ public class BMYClient {
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<User>() {
             @Override
             public User handle(Response response) throws BMYException {
-                System.out.println(response.statusCode);
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
@@ -365,7 +364,6 @@ public class BMYClient {
         }
         String[] params = paramList.toArray(new String[0]);
         HttpRequestor.Response response = BMYRequestUtil.startGet(requestConfig, this.host.api, apiPath, this.token, params, null);
-        System.out.println(response.statusCode);
         return response.body;
     }
 
@@ -763,7 +761,6 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
         
         HttpRequestor.Response response = BMYRequestUtil.startGet(requestConfig, this.host.api, apiPath, this.token, params, null);
-        System.out.println(response.statusCode);
         return response.body;
     }
 
@@ -800,7 +797,6 @@ public class BMYClient {
         }
         String[] params = paramList.toArray(new String[0]);
         HttpRequestor.Response response = BMYRequestUtil.startGet(requestConfig, this.host.api, apiPath, this.token, params, null);
-        System.out.println(response.statusCode);
         return response.body;
         
     }
@@ -848,7 +844,6 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         HttpRequestor.Response response = BMYRequestUtil.startGet(requestConfig, this.host.api, apiPath, this.token, params, null);
-        System.out.println(response.statusCode);
         return response.body;
     }
 
@@ -1792,7 +1787,6 @@ public class BMYClient {
             return BMYRequestUtil.finishResponse(response, new BMYRequestUtil.ResponseHandler<Meta>() {
                 @Override
                 public Meta handle(HttpRequestor.Response response) throws BMYException {
-                    System.out.println("response: " + response.statusCode);
                     if (response.statusCode != 200) {
                         throw BMYRequestUtil.unexpectedStatus(response);
                     }

@@ -74,7 +74,6 @@ public class BMYRequestUtil {
 
     public static String buildUrlWithParams(String host, String path, String token, String userLocale, String[] params) {
         String url = buildUri(host, path) + "?" + encodeUrlParams(token, userLocale, params);
-        System.out.println(url);
         return url;
     }
 
