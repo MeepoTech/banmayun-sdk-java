@@ -1,7 +1,5 @@
 package com.banmayun.sdk.json;
 
-import com.banmayun.sdk.core.EnumElement;
-
 /* this class is not good for general purpose json builder, 
  * as Banmayun APIs are simple, we can use this simple JsonBuilder 
  * for building the request body */
@@ -39,11 +37,11 @@ public class JsonBuilder {
         return this;
     }
 
-    public JsonBuilder addEnumElement(String field, EnumElement e) {
-        this.sb.append("\"" + field + "\":{\"name\":\"" + e.name + "\",\"display_value\":\"" + e.displayValue
-                + "\"},\n");
-        return this;
-    }
+    /*
+     * public JsonBuilder addEnumElement(String field, EnumElement e) {
+     * this.sb.append("\"" + field + "\":{\"name\":\"" + e.name +
+     * "\",\"display_value\":\"" + e.displayValue + "\"},\n"); return this; }
+     */
 
     public String makeJsonString() {
         /* replace the last ',' */

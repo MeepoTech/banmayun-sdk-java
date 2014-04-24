@@ -2,6 +2,7 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
+import com.banmayun.sdk.json.JsonBuilder;
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -17,7 +18,7 @@ public class Time extends Dumpable {
     public Time() {
     }
 
-    public Time(long millis, String displayValue) {
+    public Time(Long millis, String displayValue) {
         this.millis = millis;
         this.displayValue = displayValue;
     }
@@ -74,5 +75,16 @@ public class Time extends Dumpable {
         b.add("display_value", FM_display_value);
 
         FM = b.build();
+    }
+
+    public String toJsonString() {
+        JsonBuilder jb = new JsonBuilder();
+        if (millis != null) {
+            jb.addLong("millis", millis);
+        }
+        if (displayValue != null) {
+            jb.addString("display_value", displayValue);
+        }
+        return jb.makeJsonString();
     }
 }

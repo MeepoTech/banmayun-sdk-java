@@ -2,6 +2,7 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
+import com.banmayun.sdk.json.JsonBuilder;
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -120,5 +121,31 @@ public class Root extends Dumpable {
         b.add("byte_count", FM_byte_count);
 
         FM = b.build();
+    }
+
+    public String toJsonString() {
+        JsonBuilder jb = new JsonBuilder();
+        if (id != null) {
+            jb.addString("id", id);
+        }
+        if (type != null) {
+            jb.addString("type", type);
+        }
+        if (used != null) {
+            jb.addString("user", used.toJsonString());
+        }
+        if (quota != null) {
+            jb.addString("quota", quota.toJsonString());
+        }
+        if (defaultPermission != null) {
+            jb.addString("default_permission", defaultPermission.toJsonString());
+        }
+        if (fileCount != null) {
+            jb.addInt("file_count", fileCount);
+        }
+        if (byteCount != null) {
+            jb.addLong("byte_count", byteCount);
+        }
+        return jb.makeJsonString();
     }
 }

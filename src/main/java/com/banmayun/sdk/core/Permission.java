@@ -134,8 +134,7 @@ public class Permission extends Dumpable {
         FM = b.build();
     }
 
-    // TODO: "objectToJsonObject" ?!!!
-    public String objectToJsonObject() {
+    public String toJsonString() {
         JsonBuilder jb = new JsonBuilder();
         if (insertableToOwner != null) {
             jb.addBoolean("insertable_to_owner", insertableToOwner);

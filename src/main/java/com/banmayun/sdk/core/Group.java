@@ -206,19 +206,22 @@ public class Group extends Dumpable {
     }
 
     public String toJsonString() {
-        // TODO: finish!!!!!!
+
         JsonBuilder jb = new JsonBuilder();
+        if (id != null) {
+            jb.addString("id", id);
+        }
+        if (rootId != null) {
+            jb.addString("root_id", rootId);
+        }
         if (name != null) {
             jb.addString("name", name);
         }
+        if (source != null) {
+            jb.addString("source", source);
+        }
         if (type != null) {
-            jb.addEnumElement("type", type);
-        }
-        if (isVisible != null) {
-            jb.addBoolean("is_visible", isVisible);
-        }
-        if (annouce != null) {
-            jb.addString("announce", annouce);
+            jb.addString("type", type.toJsonString());
         }
         if (intro != null) {
             jb.addString("intro", intro);
@@ -226,8 +229,32 @@ public class Group extends Dumpable {
         if (tags != null) {
             jb.addString("tags", tags);
         }
-        if (source != null) {
-            jb.addString("source", source);
+        if (annouce != null) {
+            jb.addString("announce", annouce);
+        }
+        if (isVisible != null) {
+            jb.addBoolean("is_visible", isVisible);
+        }
+        if (isActivated != null) {
+            jb.addBoolean("is_activated", isActivated);
+        }
+        if (isBlocked != null) {
+            jb.addBoolean("is_blocked", isBlocked);
+        }
+        if (userCount != null) {
+            jb.addInt("user_count", userCount);
+        }
+        if (createdAt != null) {
+            jb.addString("created_at", createdAt.toJsonString());
+        }
+        if (createdBy != null) {
+            jb.addString("created_by", createdBy.toJsonString());
+        }
+        if (relation != null) {
+            jb.addString("relation", relation.toJsonString());
+        }
+        if (root != null) {
+            jb.addString("root", root.toJsonString());
         }
         return jb.makeJsonString();
     }

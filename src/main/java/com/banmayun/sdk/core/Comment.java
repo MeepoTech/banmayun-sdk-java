@@ -115,8 +115,23 @@ public class Comment extends Dumpable {
 
     public String toJsonString() {
         JsonBuilder jb = new JsonBuilder();
+        if (id != null) {
+            jb.addString("id", id);
+        }
+        if (rootId != null) {
+            jb.addString("root_id", rootId);
+        }
+        if (metaId != null) {
+            jb.addString("meta_id", metaId);
+        }
         if (contents != null) {
             jb.addString("contents", contents);
+        }
+        if (createdAt != null) {
+            jb.addString("created_at", createdAt.toJsonString());
+        }
+        if (createdBy != null) {
+            jb.addString("created_by", createdBy.toJsonString());
         }
         return jb.makeJsonString();
     }

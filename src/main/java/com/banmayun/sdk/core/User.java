@@ -188,25 +188,49 @@ public class User extends Dumpable {
         FM = b.build();
     }
 
-    public String objectToJsonString() {
+    public String toJsonString() {
         JsonBuilder jb = new JsonBuilder();
+        if (id != null) {
+            jb.addString("id", id);
+        }
+        if (rootId != null) {
+            jb.addString("root_id", rootId);
+        }
         if (name != null) {
             jb.addString("name", name);
         }
         if (email != null) {
             jb.addString("email", email);
         }
+        if (source != null) {
+            jb.addString("source", source);
+        }
         if (displayName != null) {
             jb.addString("display_name", displayName);
         }
-        if (source != null) {
-            jb.addString("source", source);
+        if (role != null) {
+            jb.addString("role", role.toJsonString());
         }
         if (groupsCanOwn != null) {
             jb.addInt("groups_can_own", groupsCanOwn);
         }
-        if (role != null) {
-            jb.addEnumElement("role", role);
+        if (isActivated != null) {
+            jb.addBoolean("is_activated", isActivated);
+        }
+        if (isBlocked != null) {
+            jb.addBoolean("is_blocked", isBlocked);
+        }
+        if (groupCount != null) {
+            jb.addInt("group_count", groupCount);
+        }
+        if (createdAt != null) {
+            jb.addString("created_at", createdAt.toJsonString());
+        }
+        if (relation != null) {
+            jb.addString("relation", relation.toJsonString());
+        }
+        if (root != null) {
+            jb.addString("root", root.toJsonString());
         }
         return jb.makeJsonString();
     }

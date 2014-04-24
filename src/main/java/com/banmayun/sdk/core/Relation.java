@@ -107,13 +107,19 @@ public class Relation extends Dumpable {
     public String toJsonString() {
         JsonBuilder jb = new JsonBuilder();
         if (role != null) {
-            jb.addEnumElement("role", role);
+            jb.addString("role", role.toJsonString());
         }
         if (isActivated != null) {
             jb.addBoolean("is_activated", isActivated);
         }
         if (isBlocked != null) {
             jb.addBoolean("is_blocked", isBlocked);
+        }
+        if (remarks != null) {
+            jb.addString("remarks", remarks);
+        }
+        if (createdAt != null) {
+            jb.addString("created_at", createdAt.toJsonString());
         }
         return jb.makeJsonString();
     }

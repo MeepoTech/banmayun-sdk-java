@@ -2,6 +2,7 @@ package com.banmayun.sdk.core;
 
 import java.io.IOException;
 
+import com.banmayun.sdk.json.JsonBuilder;
 import com.banmayun.sdk.json.JsonReadException;
 import com.banmayun.sdk.json.JsonReader;
 import com.banmayun.sdk.util.DumpWriter;
@@ -74,5 +75,16 @@ public class EnumElement extends Dumpable {
         b.add("display_value", FM_display_value);
 
         FM = b.build();
+    }
+
+    public String toJsonString() {
+        JsonBuilder jb = new JsonBuilder();
+        if (name != null) {
+            jb.addString("name", name);
+        }
+        if (displayValue != null) {
+            jb.addString("display_value", displayValue);
+        }
+        return jb.makeJsonString();
     }
 }
