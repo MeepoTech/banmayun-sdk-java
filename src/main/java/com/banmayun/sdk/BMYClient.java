@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.banmayun.sdk.core.ChunkedUpload;
@@ -345,7 +346,7 @@ public class BMYClient {
     public <E extends Throwable> void setUserAvatar(String targetUserId, long numBytes, BMYStreamWriter<E> writer)
             throws BMYException, E {
         String apiPath = "1/users/" + targetUserId + "/avatar";
-        ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
+        List<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
         headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
 
@@ -576,7 +577,7 @@ public class BMYClient {
     public <E extends Throwable> void setGroupLogo(String groupId, long numBytes, BMYStreamWriter<E> writer)
             throws BMYException, E {
         String apiPath = "1/groups/" + groupId + "/logo";
-        ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
+        List<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
         headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
 
@@ -1037,7 +1038,7 @@ public class BMYClient {
 
     public Share createShare(String rootId, String metaId, String password, Long expiresAtMillis) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/shares";
-        ArrayList<String> paramList = new ArrayList<String>();
+        List<String> paramList = new ArrayList<String>();
         if (password != null) {
             paramList.add("password");
             paramList.add(password);
@@ -1210,9 +1211,18 @@ public class BMYClient {
         });
     }
 
-    public Meta createFolderByPath(String rootId, String path, long modifiedAtMillis) throws BMYException {
+    public Meta createFolderByPath(String rootId, String path, Long modifiedAtMillis) throws BMYException {
         String apiPath = "1/fileops/create_folder";
-        String[] params = { "root_id", rootId, "path", path, "modifiedAtMillis", String.valueOf(modifiedAtMillis) };
+        List<String> paramList = new ArrayList<String>(6);
+        paramList.add("root_id");
+        paramList.add(rootId);
+        paramList.add("path");
+        paramList.add(path);
+        if (modifiedAtMillis != null) {
+            paramList.add("modified_at_millis");
+            paramList.add(String.valueOf(modifiedAtMillis));
+        }
+        String[] params = paramList.toArray(new String[0]);
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
             @Override
@@ -1251,10 +1261,9 @@ public class BMYClient {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
                 JsonParser parser;
-                ArrayList<Meta> metaList = new ArrayList<>();
+                List<Meta> metaList = new LinkedList<Meta>();
                 try {
                     parser = new JsonFactory().createParser(response.body);
-
                     try {
                         parser.nextToken();
                         JsonReader.expectArrayStart(parser);
@@ -1264,12 +1273,12 @@ public class BMYClient {
                         parser.nextToken();
                         return metaList;
                     } catch (JsonReadException e) {
-                        throw new BMYException("JsonReadException");
+                        throw new BMYException("JsonReadException", e);
                     }
                 } catch (JsonParseException e) {
-                    throw new BMYException("JsonParseException");
+                    throw new BMYException("JsonParseException", e);
                 } catch (IOException e) {
-                    throw new BMYException("IOException");
+                    throw new BMYException("IOException", e);
                 }
             }
         });
@@ -1698,7 +1707,7 @@ public class BMYClient {
         }
         String[] params = paramList.toArray(new String[0]);
 
-        ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
+        List<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
         headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
 
@@ -1803,7 +1812,7 @@ public class BMYClient {
     private <E extends Throwable> HttpRequestor.Response chunkedUploadCommon(String rootId, String[] params,
             long chunkSize, BMYStreamWriter<E> writer) throws BMYException, E {
         String apiPath = "1/chunked_upload";
-        ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
+        List<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
         headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
         headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(chunkSize)));
 
@@ -2165,24 +2174,24 @@ public class BMYClient {
         return params;
     }
 
-    private <T> T doDelete(String path, String[] params, ArrayList<HttpRequestor.Header> headers,
+    private <T> T doDelete(String path, String[] params, List<HttpRequestor.Header> headers,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
         return BMYRequestUtil.doDelete(this.requestConfig, this.host.api, path, this.token, params, headers, handler);
     }
 
-    private <T> T doGet(String path, String[] params, ArrayList<HttpRequestor.Header> headers,
+    private <T> T doGet(String path, String[] params, List<HttpRequestor.Header> headers,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
         return BMYRequestUtil.doGet(this.requestConfig, this.host.api, path, this.token, params, headers, handler);
     }
 
-    private <T> T doPost(String path, String[] params, ArrayList<HttpRequestor.Header> headers, String body,
+    private <T> T doPost(String path, String[] params, List<HttpRequestor.Header> headers, String body,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
         return BMYRequestUtil.doPost(this.requestConfig, this.host.api, path, this.token, params, body, headers,
                 handler);
     }
 
-    private HttpRequestor.Uploader getUploaderWithPost(String path, String[] params,
-            ArrayList<HttpRequestor.Header> headers) throws BMYException {
+    private HttpRequestor.Uploader getUploaderWithPost(String path, String[] params, List<HttpRequestor.Header> headers)
+            throws BMYException {
         return BMYRequestUtil.getUploaderWithPost(this.requestConfig, this.host.api, path, this.token, params, headers);
     }
 }

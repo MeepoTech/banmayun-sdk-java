@@ -77,7 +77,7 @@ public class BMYRequestUtil {
         return url;
     }
 
-    public static ArrayList<HttpRequestor.Header> addUserAgentHeader(ArrayList<HttpRequestor.Header> headers,
+    public static List<HttpRequestor.Header> addUserAgentHeader(List<HttpRequestor.Header> headers,
             BMYRequestConfig requestConfig) {
         if (headers == null) {
             headers = new ArrayList<HttpRequestor.Header>();
@@ -92,7 +92,7 @@ public class BMYRequestUtil {
     }
 
     public static HttpRequestor.Response startGet(BMYRequestConfig requestConfig, String host, String path,
-            String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException.NetworkIO {
+            String token, String[] params, List<HttpRequestor.Header> headers) throws BMYException.NetworkIO {
         headers = addUserAgentHeader(headers, requestConfig);
 
         String url = buildUrlWithParams(host, path, token, requestConfig.userLocale, params);
@@ -104,7 +104,7 @@ public class BMYRequestUtil {
     }
 
     public static HttpRequestor.Response startDelete(BMYRequestConfig requestConfig, String host, String path,
-            String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException.NetworkIO {
+            String token, String[] params, List<HttpRequestor.Header> headers) throws BMYException.NetworkIO {
         headers = addUserAgentHeader(headers, requestConfig);
 
         String url = buildUrlWithParams(host, path, token, requestConfig.userLocale, params);
@@ -116,7 +116,7 @@ public class BMYRequestUtil {
     }
 
     public static HttpRequestor.Response startPost(BMYRequestConfig requestConfig, String host, String path,
-            String token, String[] params, String body, ArrayList<HttpRequestor.Header> headers) throws BMYException {
+            String token, String[] params, String body, List<HttpRequestor.Header> headers) throws BMYException {
         String url = buildUrlWithParams(host, path, token, requestConfig.userLocale, params);
         headers = addUserAgentHeader(headers, requestConfig);
         headers.add(new HttpRequestor.Header("Content-Type", "application/json"));
@@ -261,7 +261,7 @@ public class BMYRequestUtil {
     }
 
     public static <T> T doGet(BMYRequestConfig requestConfig, String host, String path, String token, String[] params,
-            ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
+            List<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
         HttpRequestor.Response response = startGet(requestConfig, host, path, token, params, headers);
         try {
             return handler.handle(response);
@@ -275,7 +275,7 @@ public class BMYRequestUtil {
     }
 
     public static <T> T doDelete(BMYRequestConfig requestConfig, String host, String path, String token,
-            String[] params, ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
+            String[] params, List<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
         HttpRequestor.Response response = startDelete(requestConfig, host, path, token, params, headers);
         try {
             return handler.handle(response);
@@ -289,13 +289,13 @@ public class BMYRequestUtil {
     }
 
     public static <T> T doPost(BMYRequestConfig requestConfig, String host, String path, String token, String[] params,
-            String body, ArrayList<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
+            String body, List<HttpRequestor.Header> headers, ResponseHandler<T> handler) throws BMYException {
         HttpRequestor.Response response = startPost(requestConfig, host, path, token, params, body, headers);
         return finishResponse(response, handler);
     }
 
     public static HttpRequestor.Uploader getUploaderWithPut(BMYRequestConfig requestConfig, String host, String path,
-            String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
+            String token, String[] params, List<HttpRequestor.Header> headers) throws BMYException {
         String url = buildUrlWithParams(requestConfig.userLocale, host, path, token, params);
         headers = addUserAgentHeader(headers, requestConfig);
         headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
@@ -309,7 +309,7 @@ public class BMYRequestUtil {
     }
 
     public static HttpRequestor.Uploader getUploaderWithPost(BMYRequestConfig requestConfig, String host, String path,
-            String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
+            String token, String[] params, List<HttpRequestor.Header> headers) throws BMYException {
         String url = buildUrlWithParams(requestConfig.userLocale, host, path, token, params);
         headers = addUserAgentHeader(headers, requestConfig);
         headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
