@@ -11,16 +11,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class JsonReader<T> {
 
     public abstract T read(JsonParser parser) throws IOException, JsonReadException;
 
     public final T readField(JsonParser parser, String fieldName, T v) throws IOException, JsonReadException {
-        if (v != null)
+        if (v != null) {
             throw new JsonReadException("duplicate field \"" + fieldName + "\"", parser.getTokenLocation());
+        }
         return read(parser);
     }
 
@@ -94,8 +95,9 @@ public abstract class JsonReader<T> {
 
     public static long readUnsignedLongField(JsonParser parser, String fieldName, long v) throws IOException,
             JsonReadException {
-        if (v >= 0)
+        if (v >= 0) {
             throw new JsonReadException("duplicate field \"" + fieldName + "\"", parser.getCurrentLocation());
+        }
         return JsonReader.readUnsignedLong(parser);
     }
 
@@ -130,15 +132,15 @@ public abstract class JsonReader<T> {
     }
 
     public static class FieldMapping {
-        private HashMap<String, Integer> fields = null;
+        private Map<String, Integer> fields = null;
 
-        private FieldMapping(HashMap<String, Integer> fields) {
+        private FieldMapping(Map<String, Integer> fields) {
             assert fields != null;
             this.fields = fields;
         }
 
         public int get(String fieldName) {
-            Integer i = fields.get(fieldName);
+            Integer i = this.fields.get(fieldName);
             if (i == null) {
                 return -1;
             }
@@ -146,7 +148,7 @@ public abstract class JsonReader<T> {
         }
 
         public static class Builder {
-            private HashMap<String, Integer> fields = new HashMap<String, Integer>();
+            private Map<String, Integer> fields = new HashMap<String, Integer>();
 
             public void add(String fieldName, int expectedIndex) {
                 if (this.fields == null) {
@@ -156,7 +158,7 @@ public abstract class JsonReader<T> {
                 if (expectedIndex != i) {
                     throw new IllegalStateException("expectedIndex = " + expectedIndex + ", actual = " + i);
                 }
-                Object displaced = fields.put(fieldName, i);
+                Object displaced = this.fields.put(fieldName, i);
                 if (displaced != null) {
                     throw new IllegalStateException("duplicate field name: \"" + fieldName + "\"");
                 }
@@ -166,7 +168,7 @@ public abstract class JsonReader<T> {
                 if (this.fields == null) {
                     throw new IllegalStateException("already called build(); can't call build() again");
                 }
-                HashMap<String, Integer> f = fields;
+                Map<String, Integer> f = this.fields;
                 this.fields = null;
                 return new FieldMapping(f);
             }
@@ -188,7 +190,7 @@ public abstract class JsonReader<T> {
         try {
             JsonParser parser = JSON_FACTORY.createParser(body);
             try {
-                return readFully(parser);
+                return this.readFully(parser);
             } finally {
                 parser.close();
             }
@@ -205,7 +207,7 @@ public abstract class JsonReader<T> {
         try {
             JsonParser parser = JSON_FACTORY.createParser(utf8Body);
             try {
-                return readFully(parser);
+                return this.readFully(parser);
             } finally {
                 parser.close();
             }
@@ -219,14 +221,14 @@ public abstract class JsonReader<T> {
     }
 
     public T readFromFile(String filePath) throws FileLoadException {
-        return readFromFile(new File(filePath));
+        return this.readFromFile(new File(filePath));
     }
 
     public T readFromFile(File file) throws FileLoadException {
         try {
             InputStream in = new FileInputStream(file);
             try {
-                return readFully(in);
+                return this.readFully(in);
             } finally {
                 IOUtil.closeInput(in);
             }

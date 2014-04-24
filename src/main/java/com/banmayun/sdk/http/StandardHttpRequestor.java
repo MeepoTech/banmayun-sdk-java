@@ -43,7 +43,7 @@ public class StandardHttpRequestor extends HttpRequestor {
 
     @Override
     public Response doGet(String url, Iterable<Header> headers) throws IOException {
-        HttpURLConnection conn = prepRequest(url, headers);
+        HttpURLConnection conn = this.prepRequest(url, headers);
         conn.setRequestMethod("GET");
         conn.connect();
         return toResponse(conn);
@@ -51,7 +51,7 @@ public class StandardHttpRequestor extends HttpRequestor {
 
     @Override
     public Response doDelete(String url, Iterable<Header> headers) throws IOException {
-        HttpURLConnection conn = prepRequest(url, headers);
+        HttpURLConnection conn = this.prepRequest(url, headers);
         conn.setRequestMethod("DELETE");
         conn.connect();
         return toResponse(conn);
@@ -59,14 +59,14 @@ public class StandardHttpRequestor extends HttpRequestor {
 
     @Override
     public Uploader startPost(String url, Iterable<Header> headers) throws IOException {
-        HttpURLConnection conn = prepRequest(url, headers);
+        HttpURLConnection conn = this.prepRequest(url, headers);
         conn.setRequestMethod("POST");
         return new Uploader(conn);
     }
 
     @Override
     public Uploader startPut(String url, Iterable<Header> headers) throws IOException {
-        HttpURLConnection conn = prepRequest(url, headers);
+        HttpURLConnection conn = this.prepRequest(url, headers);
         conn.setRequestMethod("PUT");
         return new Uploader(conn);
     }
@@ -124,7 +124,7 @@ public class StandardHttpRequestor extends HttpRequestor {
         conn.setUseCaches(false);
         conn.setAllowUserInteraction(false);
 
-        configureConnection(conn);
+        this.configureConnection(conn);
 
         for (Header header : headers) {
             conn.addRequestProperty(header.key, header.value);
