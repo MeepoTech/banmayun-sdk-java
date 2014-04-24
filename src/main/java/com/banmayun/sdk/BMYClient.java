@@ -22,7 +22,6 @@ import com.banmayun.sdk.core.ResultList;
 import com.banmayun.sdk.core.Revision;
 import com.banmayun.sdk.core.Root;
 import com.banmayun.sdk.core.Share;
-import com.banmayun.sdk.core.Time;
 import com.banmayun.sdk.core.Trash;
 import com.banmayun.sdk.core.User;
 import com.banmayun.sdk.http.HttpRequestor;
@@ -181,7 +180,6 @@ public class BMYClient {
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Link>() {
             @Override
             public Link handle(Response response) throws BMYException {
-                System.out.println(response.statusCode);
                 if (response.statusCode != 200) {
                     throw BMYRequestUtil.unexpectedStatus(response);
                 }
@@ -366,17 +364,9 @@ public class BMYClient {
             paramList.add(getThumbnailSizeStr(size));
         }
         String[] params = paramList.toArray(new String[0]);
-
-        return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
-            @Override
-            public InputStream handle(Response response) throws BMYException {
-                System.out.println(response.statusCode);
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
-                }
-                return response.body;
-            }
-        });
+        HttpRequestor.Response response = BMYRequestUtil.startGet(requestConfig, this.host.api, apiPath, this.token, params, null);
+        System.out.println(response.statusCode);
+        return response.body;
     }
 
     public Group addUserGroup(String targetUserId, String groupId, Relation relation) throws BMYException {
@@ -742,11 +732,18 @@ public class BMYClient {
     public <E extends Throwable> Meta uploadFileByPath(String rootId, String path, long modifiedAtMillis,
             Boolean overwrite, InputStream input, long numBytes) throws Throwable {
         BMYStreamWriter<?> writer = new BMYStreamWriter.InputStreamCopier(input);
-        Uploader uploader = startUploadFile(rootId, path, numBytes, modifiedAtMillis, overwrite);
+        Uploader uploader = startUploadFileByPath(rootId, path, numBytes, modifiedAtMillis, overwrite);
+        
+        return finishUploadFile(uploader, writer);
+    }
+    
+    public <E extends Throwable> Meta uploadFile(String rootId, String metaId, long modifiedAtMillis,
+            Boolean overwrite, InputStream input, long numBytes) throws Throwable {
+        BMYStreamWriter<?> writer = new BMYStreamWriter.InputStreamCopier(input);
+        Uploader uploader = startUploadFile(rootId, metaId, numBytes, modifiedAtMillis, overwrite);
         return finishUploadFile(uploader, writer);
     }
 
-    // TODO: 500
     public InputStream getFileByPath(String rootId, String path, Long version, Long offset, Long bytes)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/p/" + path;
@@ -764,16 +761,10 @@ public class BMYClient {
             paramList.add(String.valueOf(bytes));
         }
         String[] params = paramList.toArray(new String[0]);
-
-        return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
-            @Override
-            public InputStream handle(Response response) throws BMYException {
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
-                }
-                return response.body;
-            }
-        });
+        
+        HttpRequestor.Response response = BMYRequestUtil.startGet(requestConfig, this.host.api, apiPath, this.token, params, null);
+        System.out.println(response.statusCode);
+        return response.body;
     }
 
     public Meta trashRecursivelyByPath(String rootId, String path) throws BMYException {
@@ -790,13 +781,8 @@ public class BMYClient {
         });
     }
 
-    public Meta uploadFile(String rootId, String metaId, Time clientMtime, InputStream input) throws BMYException {
-        // TODO:
-        return null;
-    }
+    
 
-    // TODO: return downloader?
-    // TODO: 500
     public InputStream getFile(String rootId, String metaId, Long version, Long offset, Long bytes) throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId;
         List<String> paramList = new ArrayList<String>();
@@ -813,16 +799,10 @@ public class BMYClient {
             paramList.add(String.valueOf(bytes));
         }
         String[] params = paramList.toArray(new String[0]);
-
-        return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
-            @Override
-            public InputStream handle(Response response) throws BMYException {
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
-                }
-                return response.body;
-            }
-        });
+        HttpRequestor.Response response = BMYRequestUtil.startGet(requestConfig, this.host.api, apiPath, this.token, params, null);
+        System.out.println(response.statusCode);
+        return response.body;
+        
     }
 
     public Meta trashRecursively(String rootId, String metaId) throws BMYException {
@@ -853,8 +833,6 @@ public class BMYClient {
         });
     }
 
-    // TODO: return downloader?
-    // TODO: 500
     public InputStream getFileThumbnail(String rootId, String metaId, ThumbnailFormat format, ThumbnailSize size)
             throws BMYException {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/thumbnail";
@@ -869,15 +847,9 @@ public class BMYClient {
         }
         String[] params = paramList.toArray(new String[0]);
 
-        return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<InputStream>() {
-            @Override
-            public InputStream handle(Response response) throws BMYException {
-                if (response.statusCode != 200) {
-                    throw BMYRequestUtil.unexpectedStatus(response);
-                }
-                return response.body;
-            }
-        });
+        HttpRequestor.Response response = BMYRequestUtil.startGet(requestConfig, this.host.api, apiPath, this.token, params, null);
+        System.out.println(response.statusCode);
+        return response.body;
     }
 
     public ResultList<Revision> listRevisionsForMeta(String rootId, String metaId, Integer offset, Integer limit)
@@ -1654,8 +1626,22 @@ public class BMYClient {
             }
         });
     }
+    
+    public Uploader startUploadFile(String rootId, String metaId, long numBytes, long modifiedAtMillis, Boolean overwrite)
+            throws BMYException {
+        if (numBytes < 0) {
+            if (numBytes != -1) {
+                throw new IllegalArgumentException("numBytes must be -1 or greater; given " + numBytes);
+            }
+            return startUploadFileChunked(rootId, metaId, numBytes, modifiedAtMillis, overwrite);
+        } else if (numBytes > CHUNKED_UPLOAD_THRESHOLD) {
+            return startUploadFileChunked(rootId, metaId, numBytes, modifiedAtMillis, overwrite);
+        } else {
+            return startUploadFileSingle(rootId, metaId, numBytes, modifiedAtMillis, overwrite);
+        }
+    }
 
-    public Uploader startUploadFile(String rootId, String path, long numBytes, long modifiedAtMillis, Boolean overwrite)
+    public Uploader startUploadFileByPath(String rootId, String path, long numBytes, long modifiedAtMillis, Boolean overwrite)
             throws BMYException {
         if (numBytes < 0) {
             if (numBytes != -1) {
@@ -1665,7 +1651,7 @@ public class BMYClient {
         } else if (numBytes > CHUNKED_UPLOAD_THRESHOLD) {
             return startUploadFileChunked(rootId, path, numBytes, modifiedAtMillis, overwrite);
         } else {
-            return startUploadFileSingle(rootId, path, numBytes, modifiedAtMillis, overwrite);
+            return startUploadFileSingleByPath(rootId, path, numBytes, modifiedAtMillis, overwrite);
         }
     }
 
@@ -1681,8 +1667,32 @@ public class BMYClient {
             uploader.close();
         }
     }
+    
+    public Uploader startUploadFileSingle(String rootId, String metaId, long numBytes, long modifiedAtMillis,
+            Boolean overwrite) throws BMYException {
+        if (numBytes < 0) {
+            throw new IllegalArgumentException("numBytes must be zero or greater");
+        }
 
-    public Uploader startUploadFileSingle(String rootId, String path, long numBytes, long modifiedAtMillis,
+        String apiPath = "1/roots/" + rootId + "/files/" + metaId;
+        List<String> paramList = new ArrayList<String>();
+        paramList.add("modified_at_millis");
+        paramList.add(String.valueOf(modifiedAtMillis));
+        if (overwrite != null) {
+            paramList.add("overwrite");
+            paramList.add(String.valueOf(overwrite));
+        }
+        String[] params = paramList.toArray(new String[0]);
+
+        ArrayList<HttpRequestor.Header> headers = new ArrayList<HttpRequestor.Header>();
+        headers.add(new HttpRequestor.Header("Content-Type", "application/octet-stream"));
+        headers.add(new HttpRequestor.Header("Content-Length", String.valueOf(numBytes)));
+
+        HttpRequestor.Uploader uploader = this.getUploaderWithPost(apiPath, params, headers);
+        return new SingleUploader(uploader, numBytes);
+    }
+
+    public Uploader startUploadFileSingleByPath(String rootId, String path, long numBytes, long modifiedAtMillis,
             Boolean overwrite) throws BMYException {
         if (numBytes < 0) {
             throw new IllegalArgumentException("numBytes must be zero or greater");
@@ -1708,7 +1718,7 @@ public class BMYClient {
 
     public <E extends Throwable> Meta uploadFileSingle(String rootId, String path, long numBytes,
             long modifiedAtMillis, Boolean overwrite, BMYStreamWriter<E> writer) throws BMYException, E {
-        Uploader uploader = startUploadFileSingle(rootId, path, numBytes, modifiedAtMillis, overwrite);
+        Uploader uploader = startUploadFileSingleByPath(rootId, path, numBytes, modifiedAtMillis, overwrite);
         return finishUploadFile(uploader, writer);
     }
 
@@ -1761,6 +1771,7 @@ public class BMYClient {
             this.httpUploader = null;
 
             HttpRequestor.Response response;
+            
             final long bytesWritten;
             try {
                 bytesWritten = this.body.getBytesWritten();
@@ -1781,6 +1792,7 @@ public class BMYClient {
             return BMYRequestUtil.finishResponse(response, new BMYRequestUtil.ResponseHandler<Meta>() {
                 @Override
                 public Meta handle(HttpRequestor.Response response) throws BMYException {
+                    System.out.println("response: " + response.statusCode);
                     if (response.statusCode != 200) {
                         throw BMYRequestUtil.unexpectedStatus(response);
                     }

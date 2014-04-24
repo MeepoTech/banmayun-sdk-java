@@ -74,6 +74,7 @@ public class BMYRequestUtil {
 
     public static String buildUrlWithParams(String host, String path, String token, String userLocale, String[] params) {
         String url = buildUri(host, path) + "?" + encodeUrlParams(token, userLocale, params);
+        System.out.println(url);
         return url;
     }
 
@@ -296,7 +297,7 @@ public class BMYRequestUtil {
 
     public static HttpRequestor.Uploader getUploaderWithPut(BMYRequestConfig requestConfig, String host, String path,
             String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, token, params);
+        String url = buildUrlWithParams(host, path, token, requestConfig.userLocale, params);
         headers = addUserAgentHeader(headers, requestConfig);
         headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
 
@@ -310,7 +311,8 @@ public class BMYRequestUtil {
 
     public static HttpRequestor.Uploader getUploaderWithPost(BMYRequestConfig requestConfig, String host, String path,
             String token, String[] params, ArrayList<HttpRequestor.Header> headers) throws BMYException {
-        String url = buildUrlWithParams(requestConfig.userLocale, host, path, token, params);
+        String url = buildUrlWithParams(host, path, token, requestConfig.userLocale, params);
+        
         headers = addUserAgentHeader(headers, requestConfig);
         headers.add(new HttpRequestor.Header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
 
