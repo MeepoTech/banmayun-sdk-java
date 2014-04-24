@@ -92,11 +92,11 @@ public class BMYClient {
         this(requestConfig, null);
     }
 
-    public BMYClient(BMYRequestConfig requestConfig, String accessToken) {
-        this(requestConfig, accessToken, BMYHost.DEFAULT);
+    public BMYClient(BMYRequestConfig requestConfig, String token) {
+        this(requestConfig, token, BMYHost.DEFAULT);
     }
 
-    public BMYClient(BMYRequestConfig requestConfig, String accessToken, BMYHost host) {
+    public BMYClient(BMYRequestConfig requestConfig, String token, BMYHost host) {
         if (requestConfig == null) {
             throw new IllegalArgumentException("'requestConfig' is null");
         }
@@ -105,7 +105,7 @@ public class BMYClient {
         }
 
         this.requestConfig = requestConfig;
-        this.token = accessToken;
+        this.token = token;
         this.host = host;
     }
 
@@ -272,7 +272,7 @@ public class BMYClient {
     }
 
     public User updateUser(String targetUserId, User update) throws BMYException {
-        String apiPath = "1/users" + "/" + targetUserId + "/update";
+        String apiPath = "1/users/" + targetUserId + "/update";
         String body = update.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<User>() {
