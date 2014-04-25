@@ -170,39 +170,39 @@ public class BMYRequestUtil {
             throw new BMYException.BadResponse(message, e);
         }
         ErrorResponse errorResponse = readJsonFromResponse(ErrorResponse.reader, new ByteArrayInputStream(body));
-        if (errorResponse != null) {
-            return new BMYException.BMYServerResponseException(errorResponse);
+        if (errorResponse == null) {
+            return new BMYException.BadResponse(message);
         }
 
         if (response.statusCode == 400) {
-            return new BMYException.BadRequest(message);
+            return new BMYException.BadRequest(errorResponse);
         }
         if (response.statusCode == 401) {
-            return new BMYException.InvalidAccessToken(message);
+            return new BMYException.InvalidToken(errorResponse);
         }
         if (response.statusCode == 403) {
-            return new BMYException.AccessDenied(message);
+            return new BMYException.AccessDenied(errorResponse);
         }
         if (response.statusCode == 404) {
-            return new BMYException.NotFound(message);
+            return new BMYException.NotFound(errorResponse);
         }
         if (response.statusCode == 409) {
-            return new BMYException.AlreadyExists(message);
+            return new BMYException.AlreadyExists(errorResponse);
         }
         if (response.statusCode == 422) {
-            return new BMYException.UnacceptableRequest(message);
+            return new BMYException.UnacceptableRequest(errorResponse);
         }
         if (response.statusCode == 424) {
-            return new BMYException.OperationNotAllowed(message);
+            return new BMYException.OperationNotAllowed(errorResponse);
         }
         if (response.statusCode == 500) {
-            return new BMYException.ServerError(message);
+            return new BMYException.ServerError(errorResponse);
         }
         if (response.statusCode == 503) {
-            return new BMYException.RetryLater(message);
+            return new BMYException.RetryLater(errorResponse);
         }
         if (response.statusCode == 507) {
-            return new BMYException.QuotaOutage(message);
+            return new BMYException.QuotaOutage(errorResponse);
         }
 
         return new BMYException.BadResponseCode("unexpected HTTP status code: " + response.statusCode + ": " + message,

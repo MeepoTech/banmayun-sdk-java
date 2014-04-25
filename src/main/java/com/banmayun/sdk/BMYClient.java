@@ -2089,28 +2089,30 @@ public class BMYClient {
 
     private <T> T doDelete(String path, String[] params, List<HttpRequestor.Header> headers,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
-        return BMYRequestUtil.doDelete(this.requestConfig, this.host.api, path, this.link.token, params, headers,
-                handler);
+        return BMYRequestUtil.doDelete(this.requestConfig, this.host.api, path, this.link == null ? null
+                : this.link.token, params, headers, handler);
     }
 
     private <T> T doGet(String path, String[] params, List<HttpRequestor.Header> headers,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
-        return BMYRequestUtil.doGet(this.requestConfig, this.host.api, path, this.link.token, params, headers, handler);
+        return BMYRequestUtil.doGet(this.requestConfig, this.host.api, path,
+                this.link == null ? null : this.link.token, params, headers, handler);
     }
 
     private Response startGet(String path, String[] params, List<HttpRequestor.Header> headers) throws BMYException {
-        return BMYRequestUtil.startGet(this.requestConfig, this.host.api, path, this.link.token, params, headers);
+        return BMYRequestUtil.startGet(this.requestConfig, this.host.api, path, this.link == null ? null
+                : this.link.token, params, headers);
     }
 
     private <T> T doPost(String path, String[] params, List<HttpRequestor.Header> headers, String body,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
-        return BMYRequestUtil.doPost(this.requestConfig, this.host.api, path, this.link.token, params, body, headers,
-                handler);
+        return BMYRequestUtil.doPost(this.requestConfig, this.host.api, path, this.link == null ? null
+                : this.link.token, params, body, headers, handler);
     }
 
     private HttpRequestor.Uploader getUploaderWithPost(String path, String[] params, List<HttpRequestor.Header> headers)
             throws BMYException {
-        return BMYRequestUtil.getUploaderWithPost(this.requestConfig, this.host.api, path, this.link.token, params,
-                headers);
+        return BMYRequestUtil.getUploaderWithPost(this.requestConfig, this.host.api, path, this.link == null ? null
+                : this.link.token, params, headers);
     }
 }

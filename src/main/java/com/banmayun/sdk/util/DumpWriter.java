@@ -254,6 +254,9 @@ public abstract class DumpWriter {
     }
 
     public DumpWriter value(Dumpable v) {
+        if (v == null) {
+            return this.value((String) null);
+        }
         recordStart(v.getTypeName());
         v.dumpFields(this);
         return recordEnd();

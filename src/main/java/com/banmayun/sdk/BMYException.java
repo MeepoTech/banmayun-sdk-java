@@ -8,6 +8,8 @@ public class BMYException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
+    private ErrorResponse errorResponse = null;
+
     public BMYException(String message) {
         super(message);
     }
@@ -16,18 +18,38 @@ public class BMYException extends Exception {
         super(message, cause);
     }
 
-    public static class BMYServerResponseException extends BMYException {
-        private static final long serialVersionUID = 1L;
+    public BMYException(ErrorResponse errorResponse) {
+        super("[" + errorResponse.code + "] " + errorResponse.message);
+        this.errorResponse = errorResponse;
+    }
 
-        private ErrorResponse response = null;
+    public ErrorResponse getErrorResponse() {
+        return this.errorResponse;
+    }
 
-        public BMYServerResponseException(ErrorResponse response) {
-            super("Server Error Response");
-            this.response = response;
+    // 400
+    public static class BadRequest extends ProtocolError {
+        public static final long serialVersionUID = 1L;
+
+        public BadRequest(String message) {
+            super(message);
         }
 
-        public ErrorResponse getErrorResponse() {
-            return this.response;
+        public BadRequest(ErrorResponse errorResponse) {
+            super(errorResponse);
+        }
+    }
+
+    // 401
+    public static class InvalidToken extends BMYException {
+        public static final long serialVersionUID = 1L;
+
+        public InvalidToken(String message) {
+            super(message);
+        }
+
+        public InvalidToken(ErrorResponse errorResponse) {
+            super(errorResponse);
         }
     }
 
@@ -39,6 +61,10 @@ public class BMYException extends Exception {
         public AccessDenied(String message) {
             super(message);
         }
+
+        public AccessDenied(ErrorResponse errorResponse) {
+            super(errorResponse);
+        }
     }
 
     // 404
@@ -47,6 +73,10 @@ public class BMYException extends Exception {
 
         public NotFound(String message) {
             super(message);
+        }
+
+        public NotFound(ErrorResponse errorResponse) {
+            super(errorResponse);
         }
     }
 
@@ -57,6 +87,10 @@ public class BMYException extends Exception {
         public AlreadyExists(String message) {
             super(message);
         }
+
+        public AlreadyExists(ErrorResponse errorResponse) {
+            super(errorResponse);
+        }
     }
 
     // 422
@@ -65,6 +99,10 @@ public class BMYException extends Exception {
 
         public UnacceptableRequest(String message) {
             super(message);
+        }
+
+        public UnacceptableRequest(ErrorResponse errorResponse) {
+            super(errorResponse);
         }
     }
 
@@ -75,6 +113,10 @@ public class BMYException extends Exception {
         public OperationNotAllowed(String message) {
             super(message);
         }
+
+        public OperationNotAllowed(ErrorResponse errorResponse) {
+            super(errorResponse);
+        }
     }
 
     // 500
@@ -83,6 +125,10 @@ public class BMYException extends Exception {
 
         public ServerError(String message) {
             super(message);
+        }
+
+        public ServerError(ErrorResponse errorResponse) {
+            super(errorResponse);
         }
     }
 
@@ -93,6 +139,10 @@ public class BMYException extends Exception {
         public RetryLater(String message) {
             super(message);
         }
+
+        public RetryLater(ErrorResponse errorResponse) {
+            super(errorResponse);
+        }
     }
 
     // 507
@@ -101,6 +151,10 @@ public class BMYException extends Exception {
 
         public QuotaOutage(String message) {
             super(message);
+        }
+
+        public QuotaOutage(ErrorResponse errorResponse) {
+            super(errorResponse);
         }
     }
 
@@ -114,14 +168,9 @@ public class BMYException extends Exception {
         public ProtocolError(String message, Throwable cause) {
             super(message, cause);
         }
-    }
 
-    // 400
-    public static class BadRequest extends ProtocolError {
-        public static final long serialVersionUID = 1L;
-
-        public BadRequest(String message) {
-            super(message);
+        public ProtocolError(ErrorResponse errorResponse) {
+            super(errorResponse);
         }
     }
 
@@ -170,15 +219,6 @@ public class BMYException extends Exception {
         @Override
         public IOException getCause() {
             return this.underlying;
-        }
-    }
-
-    // 401
-    public static class InvalidAccessToken extends BMYException {
-        public static final long serialVersionUID = 1L;
-
-        public InvalidAccessToken(String message) {
-            super(message);
         }
     }
 }
