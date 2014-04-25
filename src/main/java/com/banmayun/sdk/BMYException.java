@@ -19,12 +19,38 @@ public class BMYException extends Exception {
     }
 
     public BMYException(ErrorResponse errorResponse) {
-        super(errorResponse.message);
+        super("[" + errorResponse.code + "] " + errorResponse.message);
         this.errorResponse = errorResponse;
     }
 
     public ErrorResponse getErrorResponse() {
         return this.errorResponse;
+    }
+
+    // 400
+    public static class BadRequest extends ProtocolError {
+        public static final long serialVersionUID = 1L;
+
+        public BadRequest(String message) {
+            super(message);
+        }
+
+        public BadRequest(ErrorResponse errorResponse) {
+            super(errorResponse);
+        }
+    }
+
+    // 401
+    public static class InvalidToken extends BMYException {
+        public static final long serialVersionUID = 1L;
+
+        public InvalidToken(String message) {
+            super(message);
+        }
+
+        public InvalidToken(ErrorResponse errorResponse) {
+            super(errorResponse);
+        }
     }
 
     // 403
@@ -37,7 +63,7 @@ public class BMYException extends Exception {
         }
 
         public AccessDenied(ErrorResponse errorResponse) {
-            super(errorResponse.message);
+            super(errorResponse);
         }
     }
 
@@ -50,7 +76,7 @@ public class BMYException extends Exception {
         }
 
         public NotFound(ErrorResponse errorResponse) {
-            super(errorResponse.message);
+            super(errorResponse);
         }
     }
 
@@ -63,7 +89,7 @@ public class BMYException extends Exception {
         }
 
         public AlreadyExists(ErrorResponse errorResponse) {
-            super(errorResponse.message);
+            super(errorResponse);
         }
     }
 
@@ -76,7 +102,7 @@ public class BMYException extends Exception {
         }
 
         public UnacceptableRequest(ErrorResponse errorResponse) {
-            super(errorResponse.message);
+            super(errorResponse);
         }
     }
 
@@ -89,7 +115,7 @@ public class BMYException extends Exception {
         }
 
         public OperationNotAllowed(ErrorResponse errorResponse) {
-            super(errorResponse.message);
+            super(errorResponse);
         }
     }
 
@@ -102,7 +128,7 @@ public class BMYException extends Exception {
         }
 
         public ServerError(ErrorResponse errorResponse) {
-            super(errorResponse.message);
+            super(errorResponse);
         }
     }
 
@@ -115,7 +141,7 @@ public class BMYException extends Exception {
         }
 
         public RetryLater(ErrorResponse errorResponse) {
-            super(errorResponse.message);
+            super(errorResponse);
         }
     }
 
@@ -128,7 +154,7 @@ public class BMYException extends Exception {
         }
 
         public QuotaOutage(ErrorResponse errorResponse) {
-            super(errorResponse.message);
+            super(errorResponse);
         }
     }
 
@@ -142,18 +168,9 @@ public class BMYException extends Exception {
         public ProtocolError(String message, Throwable cause) {
             super(message, cause);
         }
-    }
 
-    // 400
-    public static class BadRequest extends ProtocolError {
-        public static final long serialVersionUID = 1L;
-
-        public BadRequest(String message) {
-            super(message);
-        }
-
-        public BadRequest(ErrorResponse errorResponse) {
-            super(errorResponse.message);
+        public ProtocolError(ErrorResponse errorResponse) {
+            super(errorResponse);
         }
     }
 
@@ -202,19 +219,6 @@ public class BMYException extends Exception {
         @Override
         public IOException getCause() {
             return this.underlying;
-        }
-    }
-
-    // 401
-    public static class InvalidToken extends BMYException {
-        public static final long serialVersionUID = 1L;
-
-        public InvalidToken(String message) {
-            super(message);
-        }
-
-        public InvalidToken(ErrorResponse errorResponse) {
-            super(errorResponse.message);
         }
     }
 }
