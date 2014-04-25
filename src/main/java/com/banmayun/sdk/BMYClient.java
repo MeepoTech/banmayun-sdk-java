@@ -113,11 +113,11 @@ public class BMYClient {
         return this.requestConfig;
     }
 
-    public void setToken(Link link) {
+    public void setLink(Link link) {
         this.link = link;
     }
 
-    public Link getToken() {
+    public Link getLink() {
         return this.link;
     }
 
