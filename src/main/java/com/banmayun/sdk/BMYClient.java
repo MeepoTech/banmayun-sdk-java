@@ -42,7 +42,7 @@ public class BMYClient {
     private static final int CHUNKED_UPLOAD_CHUNK_SIZE = 4 * 1024 * 1024;
 
     private BMYRequestConfig requestConfig = null;
-    private String token = null;
+    private Link link = null;
     private BMYHost host = null;
 
     public enum ThumbnailFormat {
@@ -92,11 +92,11 @@ public class BMYClient {
         this(requestConfig, null);
     }
 
-    public BMYClient(BMYRequestConfig requestConfig, String token) {
-        this(requestConfig, token, BMYHost.DEFAULT);
+    public BMYClient(BMYRequestConfig requestConfig, Link link) {
+        this(requestConfig, link, BMYHost.DEFAULT);
     }
 
-    public BMYClient(BMYRequestConfig requestConfig, String token, BMYHost host) {
+    public BMYClient(BMYRequestConfig requestConfig, Link link, BMYHost host) {
         if (requestConfig == null) {
             throw new IllegalArgumentException("'requestConfig' is null");
         }
@@ -105,7 +105,7 @@ public class BMYClient {
         }
 
         this.requestConfig = requestConfig;
-        this.token = token;
+        this.link = link;
         this.host = host;
     }
 
@@ -113,12 +113,12 @@ public class BMYClient {
         return this.requestConfig;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setToken(Link link) {
+        this.link = link;
     }
 
-    public String getToken() {
-        return this.token;
+    public Link getToken() {
+        return this.link;
     }
 
     public Link signInUser(String userName, String password, String linkName, String linkDevice, String ldapName)
@@ -2089,26 +2089,28 @@ public class BMYClient {
 
     private <T> T doDelete(String path, String[] params, List<HttpRequestor.Header> headers,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
-        return BMYRequestUtil.doDelete(this.requestConfig, this.host.api, path, this.token, params, headers, handler);
+        return BMYRequestUtil.doDelete(this.requestConfig, this.host.api, path, this.link.token, params, headers,
+                handler);
     }
 
     private <T> T doGet(String path, String[] params, List<HttpRequestor.Header> headers,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
-        return BMYRequestUtil.doGet(this.requestConfig, this.host.api, path, this.token, params, headers, handler);
+        return BMYRequestUtil.doGet(this.requestConfig, this.host.api, path, this.link.token, params, headers, handler);
     }
 
     private Response startGet(String path, String[] params, List<HttpRequestor.Header> headers) throws BMYException {
-        return BMYRequestUtil.startGet(this.requestConfig, this.host.api, path, this.token, params, headers);
+        return BMYRequestUtil.startGet(this.requestConfig, this.host.api, path, this.link.token, params, headers);
     }
 
     private <T> T doPost(String path, String[] params, List<HttpRequestor.Header> headers, String body,
             BMYRequestUtil.ResponseHandler<T> handler) throws BMYException {
-        return BMYRequestUtil.doPost(this.requestConfig, this.host.api, path, this.token, params, body, headers,
+        return BMYRequestUtil.doPost(this.requestConfig, this.host.api, path, this.link.token, params, body, headers,
                 handler);
     }
 
     private HttpRequestor.Uploader getUploaderWithPost(String path, String[] params, List<HttpRequestor.Header> headers)
             throws BMYException {
-        return BMYRequestUtil.getUploaderWithPost(this.requestConfig, this.host.api, path, this.token, params, headers);
+        return BMYRequestUtil.getUploaderWithPost(this.requestConfig, this.host.api, path, this.link.token, params,
+                headers);
     }
 }
