@@ -8,6 +8,8 @@ public class BMYException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
+    private ErrorResponse errorResponse = null;
+
     public BMYException(String message) {
         super(message);
     }
@@ -16,19 +18,13 @@ public class BMYException extends Exception {
         super(message, cause);
     }
 
-    public static class BMYServerResponseException extends BMYException {
-        private static final long serialVersionUID = 1L;
+    public BMYException(ErrorResponse errorResponse) {
+        super(errorResponse.message);
+        this.errorResponse = errorResponse;
+    }
 
-        private ErrorResponse response = null;
-
-        public BMYServerResponseException(ErrorResponse response) {
-            super("Server Error Response");
-            this.response = response;
-        }
-
-        public ErrorResponse getErrorResponse() {
-            return this.response;
-        }
+    public ErrorResponse getErrorResponse() {
+        return this.errorResponse;
     }
 
     // 403
@@ -39,6 +35,10 @@ public class BMYException extends Exception {
         public AccessDenied(String message) {
             super(message);
         }
+
+        public AccessDenied(ErrorResponse errorResponse) {
+            super(errorResponse.message);
+        }
     }
 
     // 404
@@ -47,6 +47,10 @@ public class BMYException extends Exception {
 
         public NotFound(String message) {
             super(message);
+        }
+
+        public NotFound(ErrorResponse errorResponse) {
+            super(errorResponse.message);
         }
     }
 
@@ -57,6 +61,10 @@ public class BMYException extends Exception {
         public AlreadyExists(String message) {
             super(message);
         }
+
+        public AlreadyExists(ErrorResponse errorResponse) {
+            super(errorResponse.message);
+        }
     }
 
     // 422
@@ -65,6 +73,10 @@ public class BMYException extends Exception {
 
         public UnacceptableRequest(String message) {
             super(message);
+        }
+
+        public UnacceptableRequest(ErrorResponse errorResponse) {
+            super(errorResponse.message);
         }
     }
 
@@ -75,6 +87,10 @@ public class BMYException extends Exception {
         public OperationNotAllowed(String message) {
             super(message);
         }
+
+        public OperationNotAllowed(ErrorResponse errorResponse) {
+            super(errorResponse.message);
+        }
     }
 
     // 500
@@ -83,6 +99,10 @@ public class BMYException extends Exception {
 
         public ServerError(String message) {
             super(message);
+        }
+
+        public ServerError(ErrorResponse errorResponse) {
+            super(errorResponse.message);
         }
     }
 
@@ -93,6 +113,10 @@ public class BMYException extends Exception {
         public RetryLater(String message) {
             super(message);
         }
+
+        public RetryLater(ErrorResponse errorResponse) {
+            super(errorResponse.message);
+        }
     }
 
     // 507
@@ -101,6 +125,10 @@ public class BMYException extends Exception {
 
         public QuotaOutage(String message) {
             super(message);
+        }
+
+        public QuotaOutage(ErrorResponse errorResponse) {
+            super(errorResponse.message);
         }
     }
 
@@ -122,6 +150,10 @@ public class BMYException extends Exception {
 
         public BadRequest(String message) {
             super(message);
+        }
+
+        public BadRequest(ErrorResponse errorResponse) {
+            super(errorResponse.message);
         }
     }
 
@@ -174,11 +206,15 @@ public class BMYException extends Exception {
     }
 
     // 401
-    public static class InvalidAccessToken extends BMYException {
+    public static class InvalidToken extends BMYException {
         public static final long serialVersionUID = 1L;
 
-        public InvalidAccessToken(String message) {
+        public InvalidToken(String message) {
             super(message);
+        }
+
+        public InvalidToken(ErrorResponse errorResponse) {
+            super(errorResponse.message);
         }
     }
 }
