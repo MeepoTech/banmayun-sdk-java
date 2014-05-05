@@ -2100,8 +2100,13 @@ public class BMYClient {
     }
 
     private Response startGet(String path, String[] params, List<HttpRequestor.Header> headers) throws BMYException {
-        return BMYRequestUtil.startGet(this.requestConfig, this.host.api, path, this.link == null ? null
+        Response response = BMYRequestUtil.startGet(this.requestConfig, this.host.api, path, this.link == null ? null
                 : this.link.token, params, headers);
+        if (response.statusCode != 200) {
+            throw BMYRequestUtil.unexpectedStatus(response);
+        } else {
+            return response;
+        }
     }
 
     private <T> T doPost(String path, String[] params, List<HttpRequestor.Header> headers, String body,

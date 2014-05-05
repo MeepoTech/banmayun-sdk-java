@@ -2,7 +2,7 @@ package com.banmayun.sdk;
 
 public class BMYHost {
 
-    public static final BMYHost DEFAULT = new BMYHost("192.168.200.195:5000", "www.banmayun.com");
+    public static final BMYHost DEFAULT = new BMYHost("192.168.200.206:5000", "www.banmayun.com");
 
     public final String api;
     public final String web;
