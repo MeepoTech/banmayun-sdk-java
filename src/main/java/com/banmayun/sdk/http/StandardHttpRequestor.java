@@ -36,7 +36,6 @@ public class StandardHttpRequestor extends HttpRequestor {
             bodyStream = conn.getErrorStream();
         } else {
             bodyStream = conn.getInputStream();
-
         }
         return new Response(conn.getResponseCode(), bodyStream, conn.getHeaderFields());
     }

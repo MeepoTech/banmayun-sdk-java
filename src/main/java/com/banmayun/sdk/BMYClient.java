@@ -1978,21 +1978,19 @@ public class BMYClient {
                 this.uploadOffset = this.chunkPos;
             } else {
                 int arrayOffset = 0;
-                while (true) {
-                    final int arrayOffsetFinal = arrayOffset;
-                    BMYRequestUtil.runAndRetry(3, new BMYRequestUtil.RequestMaker<Object, RuntimeException>() {
-                        @Override
-                        public Object run() throws BMYException, RuntimeException {
-                            BMYClient.this.chunkedUploadAppend(ChunkedUploadOutputStream.this.rootId,
-                                    ChunkedUploadOutputStream.this.uploadId,
-                                    ChunkedUploadOutputStream.this.uploadOffset, ChunkedUploadOutputStream.this.chunk,
-                                    arrayOffsetFinal, ChunkedUploadOutputStream.this.chunkPos - arrayOffsetFinal);
-                            return null;
-                        }
-                    });
-                    long expectedOffset = this.uploadOffset + this.chunkPos;
-                    this.uploadOffset = expectedOffset;
-                }
+                final int arrayOffsetFinal = arrayOffset;
+                BMYRequestUtil.runAndRetry(3, new BMYRequestUtil.RequestMaker<Object, RuntimeException>() {
+                    @Override
+                    public Object run() throws BMYException, RuntimeException {
+                        BMYClient.this.chunkedUploadAppend(ChunkedUploadOutputStream.this.rootId,
+                                ChunkedUploadOutputStream.this.uploadId, ChunkedUploadOutputStream.this.uploadOffset,
+                                ChunkedUploadOutputStream.this.chunk, arrayOffsetFinal,
+                                ChunkedUploadOutputStream.this.chunkPos - arrayOffsetFinal);
+                        return null;
+                    }
+                });
+                long expectedOffset = this.uploadOffset + this.chunkPos;
+                this.uploadOffset = expectedOffset;
             }
             this.chunkPos = 0;
         }
