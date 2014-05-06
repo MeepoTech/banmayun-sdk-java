@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.CharacterCodingException;
 import java.util.ArrayList;
@@ -69,7 +70,18 @@ public class BMYRequestUtil {
     }
 
     public static String buildUri(String host, String path) {
-        return "http://" + host + "/" + path;
+        try {
+            URI uri = null;
+            if (host.contains(":")) {
+                String[] hostAndPort = host.split(":");
+                uri = new URI("http", null, hostAndPort[0], Integer.parseInt(hostAndPort[1]), "/" + path, null, null);
+            } else {
+                uri = new URI("http", host, "/" + path, null);
+            }
+            return uri.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String buildUrlWithParams(String host, String path, String token, String userLocale, String[] params) {
