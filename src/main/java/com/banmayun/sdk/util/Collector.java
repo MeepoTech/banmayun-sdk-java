@@ -9,6 +9,7 @@ public abstract class Collector<E, L> {
     public abstract L finish();
 
     public static final class ArrayListCollector<E> extends Collector<E, ArrayList<E>> {
+
         private ArrayList<E> list = new ArrayList<E>();
 
         @Override
@@ -25,6 +26,7 @@ public abstract class Collector<E, L> {
     }
 
     public static final class NullSkipper<E, L> extends Collector<E, L> {
+
         private Collector<E, L> underlying = null;
 
         public NullSkipper(Collector<E, L> underlying) {

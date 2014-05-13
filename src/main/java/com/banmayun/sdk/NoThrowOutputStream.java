@@ -57,6 +57,7 @@ public final class NoThrowOutputStream extends OutputStream {
     }
 
     public static final class HiddenException extends RuntimeException {
+
         public final IOException underlying;
 
         public HiddenException(IOException underlying) {

@@ -45,6 +45,7 @@ public class IOUtil {
     }
 
     private static ThreadLocal<byte[]> slurpBuffer = new ThreadLocal<byte[]>() {
+
         @Override
         protected byte[] initialValue() {
             return new byte[4096];
@@ -118,6 +119,7 @@ public class IOUtil {
     }
 
     public static abstract class WrappedException extends IOException {
+
         private static final long serialVersionUID = 1L;
 
         private IOException underlying = null;
@@ -149,6 +151,7 @@ public class IOUtil {
     }
 
     public static final class ReadException extends WrappedException {
+
         private static final long serialVersionUID = 1L;
 
         public ReadException(String message, IOException underlying) {
@@ -161,6 +164,7 @@ public class IOUtil {
     }
 
     public static final class WriteException extends WrappedException {
+
         private static final long serialVersionUID = 1L;
 
         public WriteException(String message, IOException underlying) {
@@ -173,6 +177,7 @@ public class IOUtil {
     }
 
     public static final InputStream EMPTY_INPUT_STREAM = new InputStream() {
+
         @Override
         public int read() {
             return -1;
@@ -190,6 +195,7 @@ public class IOUtil {
     };
 
     public static final OutputStream BLACK_HOLE_OUTPUT_STREAM = new OutputStream() {
+
         @Override
         public void write(int b) {
         }

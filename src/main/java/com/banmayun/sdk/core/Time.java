@@ -30,6 +30,7 @@ public class Time extends Dumpable {
     }
 
     public static JsonReader<Time> reader = new JsonReader<Time>() {
+
         @Override
         public Time read(JsonParser parser) throws IOException, JsonReadException {
             Long millis = null;

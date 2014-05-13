@@ -96,6 +96,7 @@ public class Meta extends Dumpable {
     }
 
     public static JsonReader<Meta> reader = new JsonReader<Meta>() {
+
         @Override
         public Meta read(JsonParser parser) throws IOException, JsonReadException {
             String id = null;

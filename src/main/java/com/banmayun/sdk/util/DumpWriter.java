@@ -20,6 +20,7 @@ public abstract class DumpWriter {
     public abstract DumpWriter verbatim(String s);
 
     public static final class Multiline extends DumpWriter {
+
         private StringBuilder buf = null;
         private int indentAmount = 4;
         private int currentIndent = 0;
@@ -131,6 +132,7 @@ public abstract class DumpWriter {
     }
 
     public static final class Plain extends DumpWriter {
+
         private StringBuilder buf = null;
         private boolean needSep = false;
 

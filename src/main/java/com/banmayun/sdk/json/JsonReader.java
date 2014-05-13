@@ -102,6 +102,7 @@ public abstract class JsonReader<T> {
     }
 
     public static final JsonReader<String> STRING_READER = new JsonReader<String>() {
+
         @Override
         public String read(JsonParser parser) throws IOException, JsonReadException {
             try {
@@ -115,6 +116,7 @@ public abstract class JsonReader<T> {
     };
 
     public static final JsonReader<Boolean> BOOLEAN_READER = new JsonReader<Boolean>() {
+
         @Override
         public Boolean read(JsonParser parser) throws IOException, JsonReadException {
             return readBoolean(parser);
@@ -132,6 +134,7 @@ public abstract class JsonReader<T> {
     }
 
     public static class FieldMapping {
+
         private Map<String, Integer> fields = null;
 
         private FieldMapping(Map<String, Integer> fields) {
@@ -148,6 +151,7 @@ public abstract class JsonReader<T> {
         }
 
         public static class Builder {
+
             private Map<String, Integer> fields = new HashMap<String, Integer>();
 
             public void add(String fieldName, int expectedIndex) {
@@ -240,6 +244,7 @@ public abstract class JsonReader<T> {
     }
 
     public static abstract class FileLoadException extends Exception {
+
         private static final long serialVersionUID = 1L;
 
         protected FileLoadException(String message) {
@@ -247,6 +252,7 @@ public abstract class JsonReader<T> {
         }
 
         public static final class IOError extends FileLoadException {
+
             private static final long serialVersionUID = 1L;
 
             private IOException reason = null;
@@ -262,6 +268,7 @@ public abstract class JsonReader<T> {
         }
 
         public static final class JsonError extends FileLoadException {
+
             private static final long serialVersionUID = 1L;
 
             private JsonReadException reason = null;

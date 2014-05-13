@@ -29,6 +29,7 @@ public class BMYException extends Exception {
 
     // 400
     public static class BadRequest extends ProtocolError {
+
         public static final long serialVersionUID = 1L;
 
         public BadRequest(String message) {
@@ -42,6 +43,7 @@ public class BMYException extends Exception {
 
     // 401
     public static class InvalidToken extends BMYException {
+
         public static final long serialVersionUID = 1L;
 
         public InvalidToken(String message) {
@@ -69,6 +71,7 @@ public class BMYException extends Exception {
 
     // 404
     public static class NotFound extends BMYException {
+
         private static final long serialVersionUID = 1L;
 
         public NotFound(String message) {
@@ -82,6 +85,7 @@ public class BMYException extends Exception {
 
     // 409
     public static class AlreadyExists extends BMYException {
+
         private static final long serialVersionUID = 1L;
 
         public AlreadyExists(String message) {
@@ -95,6 +99,7 @@ public class BMYException extends Exception {
 
     // 422
     public static class UnacceptableRequest extends BMYException {
+
         private static final long serialVersionUID = 1L;
 
         public UnacceptableRequest(String message) {
@@ -108,6 +113,7 @@ public class BMYException extends Exception {
 
     // 424
     public static class OperationNotAllowed extends BMYException {
+
         private static final long serialVersionUID = 1L;
 
         public OperationNotAllowed(String message) {
@@ -121,6 +127,7 @@ public class BMYException extends Exception {
 
     // 500
     public static class ServerError extends BMYException {
+
         public static final long serialVersionUID = 1L;
 
         public ServerError(String message) {
@@ -134,6 +141,7 @@ public class BMYException extends Exception {
 
     // 503
     public static class RetryLater extends BMYException {
+
         public static final long serialVersionUID = 1L;
 
         public RetryLater(String message) {
@@ -147,6 +155,7 @@ public class BMYException extends Exception {
 
     // 507
     public static class QuotaOutage extends BMYException {
+
         public static final long serialVersionUID = 1L;
 
         public QuotaOutage(String message) {
@@ -159,6 +168,7 @@ public class BMYException extends Exception {
     }
 
     public static abstract class ProtocolError extends BMYException {
+
         public static final long serialVersionUID = 1L;
 
         public ProtocolError(String message) {
@@ -175,6 +185,7 @@ public class BMYException extends Exception {
     }
 
     public static class BadResponse extends ProtocolError {
+
         public static final long serialVersionUID = 1L;
 
         public BadResponse(String message) {
@@ -187,6 +198,7 @@ public class BMYException extends Exception {
     }
 
     public static class BadResponseCode extends BadResponse {
+
         public static final long serialVersionUID = 1L;
 
         private int statusCode;
@@ -207,6 +219,7 @@ public class BMYException extends Exception {
     }
 
     public static class NetworkIO extends BMYException {
+
         public static final long serialVersionUID = 1L;
 
         private IOException underlying;

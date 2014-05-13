@@ -33,6 +33,7 @@ public class ResultList<T extends Dumpable> extends Dumpable {
     }
 
     public static class reader<T extends Dumpable> extends JsonReader<ResultList<T>> {
+
         private JsonReader<T> metadataReader = null;
 
         public reader(JsonReader<T> metadataReader) {

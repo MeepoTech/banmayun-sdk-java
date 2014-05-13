@@ -30,6 +30,7 @@ public class EnumElement extends Dumpable {
     }
 
     public static JsonReader<EnumElement> reader = new JsonReader<EnumElement>() {
+
         @Override
         public EnumElement read(JsonParser parser) throws IOException, JsonReadException {
             String name = null;

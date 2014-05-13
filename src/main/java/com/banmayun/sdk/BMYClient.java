@@ -140,6 +140,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Link>() {
+
             @Override
             public Link handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -154,6 +155,7 @@ public class BMYClient {
         String apiPath = "1/auth/sign_out";
 
         return this.doPost(apiPath, null, null, null, new BMYRequestUtil.ResponseHandler<Link>() {
+
             @Override
             public Link handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -169,6 +171,7 @@ public class BMYClient {
         String[] params = { "email", email };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -184,6 +187,7 @@ public class BMYClient {
         String[] params = { "username", userName, "password", oldPassword, "new_password", newPassword };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -202,6 +206,7 @@ public class BMYClient {
         String body = user.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -218,6 +223,7 @@ public class BMYClient {
         String body = user.toJsonString();
 
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -232,6 +238,7 @@ public class BMYClient {
         String apiPath = "1/users/" + targetUserId;
 
         return this.doGet(apiPath, null, null, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -261,6 +268,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
+
             @Override
             public ResultList<User> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -276,6 +284,7 @@ public class BMYClient {
         String body = update.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -291,6 +300,7 @@ public class BMYClient {
         String[] params = { "new_password", newPassword };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -336,6 +346,7 @@ public class BMYClient {
         String body = relation.toJsonString();
 
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
+
             @Override
             public Group handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -350,6 +361,7 @@ public class BMYClient {
         String apiPath = "1/users/" + targetUserId + "/groups/" + groupId;
 
         return this.doGet(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Group>() {
+
             @Override
             public Group handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -379,6 +391,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
+
             @Override
             public ResultList<Group> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -394,6 +407,7 @@ public class BMYClient {
         String body = update.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
+
             @Override
             public Group handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -408,6 +422,7 @@ public class BMYClient {
         String apiPath = "1/users/" + targetUserId + "/groups/" + groupId;
 
         return this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Group>() {
+
             @Override
             public Group handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -423,6 +438,7 @@ public class BMYClient {
         String body = group.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
+
             @Override
             public Group handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -442,6 +458,7 @@ public class BMYClient {
         String body = group.toJsonString();
 
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
+
             @Override
             public Group handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -456,6 +473,7 @@ public class BMYClient {
         String apiPath = "1/groups/" + groupId;
 
         return this.doGet(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Group>() {
+
             @Override
             public Group handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -485,6 +503,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
+
             @Override
             public ResultList<Group> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -500,6 +519,7 @@ public class BMYClient {
         String body = update.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Group>() {
+
             @Override
             public Group handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -514,6 +534,7 @@ public class BMYClient {
         String apiPath = "1/groups/" + groupId;
 
         return this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Group>() {
+
             @Override
             public Group handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -557,6 +578,7 @@ public class BMYClient {
         String[] params = { "user_id", targetUserId };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -571,6 +593,7 @@ public class BMYClient {
         String apiPath = "1/groups/" + groupId + "/users/" + targetUserId;
 
         return this.doGet(apiPath, null, null, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -600,6 +623,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
+
             @Override
             public ResultList<User> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -615,6 +639,7 @@ public class BMYClient {
         String body = update.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -629,6 +654,7 @@ public class BMYClient {
         String apiPath = "1/groups/" + groupId + "/users/" + targetUserId;
 
         return this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<User>() {
+
             @Override
             public User handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -643,6 +669,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId;
 
         return this.doGet(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Root>() {
+
             @Override
             public Root handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -658,6 +685,7 @@ public class BMYClient {
         String body = defaultPermission.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Root>() {
+
             @Override
             public Root handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -673,6 +701,7 @@ public class BMYClient {
         String[] params = { "quota", quota };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Root>() {
+
             @Override
             public Root handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -782,6 +811,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/p/" + path;
 
         return this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -796,6 +826,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId;
 
         return this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -810,6 +841,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/meta";
 
         return this.doGet(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -845,6 +877,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Revision>>() {
+
             @Override
             public ResultList<Revision> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -861,6 +894,7 @@ public class BMYClient {
         String body = comment.toJsonString();
 
         return this.doPost(apiPath, null, null, body, new BMYRequestUtil.ResponseHandler<Comment>() {
+
             @Override
             public Comment handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -875,6 +909,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/comments/" + commentId;
 
         return this.doGet(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Comment>() {
+
             @Override
             public Comment handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -891,6 +926,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Comment>>() {
+
             @Override
             public ResultList<Comment> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -908,6 +944,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Comment>>() {
+
             @Override
             public ResultList<Comment> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -926,6 +963,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Comment>>() {
+
             @Override
             public ResultList<Comment> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -941,6 +979,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/comments/" + commentId;
 
         return this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Comment>() {
+
             @Override
             public Comment handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -955,6 +994,7 @@ public class BMYClient {
         String apiPath = "1/roots/all/files/all/comments";
 
         this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Object>() {
+
             @Override
             public Comment handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -969,6 +1009,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/all/comments";
 
         this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Object>() {
+
             @Override
             public Comment handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -983,6 +1024,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/comments";
 
         this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Object>() {
+
             @Override
             public Comment handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1007,6 +1049,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Share>() {
+
             @Override
             public Share handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1021,6 +1064,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/shares/" + shareId;
 
         return this.doGet(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Share>() {
+
             @Override
             public Share handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1037,6 +1081,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Share>>() {
+
             @Override
             public ResultList<Share> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1053,6 +1098,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Share>>() {
+
             @Override
             public ResultList<Share> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1070,6 +1116,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Share>>() {
+
             @Override
             public ResultList<Share> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1084,6 +1131,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/shares/" + shareId;
 
         return this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Share>() {
+
             @Override
             public Share handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1098,6 +1146,7 @@ public class BMYClient {
         String apiPath = "1/roots/all/files/all/shares";
 
         this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Object>() {
+
             @Override
             public Share handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1112,6 +1161,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/all/shares";
 
         this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Object>() {
+
             @Override
             public Share handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1126,6 +1176,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/files/" + metaId + "/shares";
 
         this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Object>() {
+
             @Override
             public Share handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1143,6 +1194,7 @@ public class BMYClient {
                 String.valueOf(modifiedAtMillis) };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1158,6 +1210,7 @@ public class BMYClient {
         String[] params = { "root_id", rootId, "path", path, "to_path", toPath };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1182,6 +1235,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1197,6 +1251,7 @@ public class BMYClient {
         String[] params = { "root_id", rootId, "path", path, "list", "" + list };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1212,6 +1267,7 @@ public class BMYClient {
         String[] params = { "root_id", rootId, "path", path };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<List<Meta>>() {
+
             @Override
             public List<Meta> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1246,6 +1302,7 @@ public class BMYClient {
         String[] params = { "root_id", rootId, "path", path, "to_path", toPath };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1261,6 +1318,7 @@ public class BMYClient {
         String[] params = { "root_id", rootId, "path", path, "to_version", Long.toString(toVersion) };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1279,6 +1337,7 @@ public class BMYClient {
                 "modified_at_millis", String.valueOf(modifiedAtMillis) };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1294,6 +1353,7 @@ public class BMYClient {
         String[] params = { "root_id", rootId, "path", path, "modified_at_millis", String.valueOf(modifiedAtMillis) };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1310,6 +1370,7 @@ public class BMYClient {
         String body = permission.toJsonString();
 
         return this.doPost(apiPath, params, null, body, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1325,6 +1386,7 @@ public class BMYClient {
         String[] params = { "root_id", rootId };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Meta>() {
+
             @Override
             public Meta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1341,6 +1403,7 @@ public class BMYClient {
         String[] params = { "root_id", rootId };
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Delta>() {
+
             @Override
             public Delta handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1355,6 +1418,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/trashes/" + trashId;
 
         return this.doGet(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Trash>() {
+
             @Override
             public Trash handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1371,6 +1435,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Trash>>() {
+
             @Override
             public ResultList<Trash> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1385,6 +1450,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/trashes/" + trashId;
 
         return this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Trash>() {
+
             @Override
             public Trash handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1399,6 +1465,7 @@ public class BMYClient {
         String apiPath = "1/roots/" + rootId + "/trashes/";
 
         this.doDelete(apiPath, null, null, new BMYRequestUtil.ResponseHandler<Object>() {
+
             @Override
             public Trash handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1417,6 +1484,7 @@ public class BMYClient {
         }
 
         return this.doPost(apiPath, params, null, null, new BMYRequestUtil.ResponseHandler<Trash>() {
+
             @Override
             public Trash handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1435,6 +1503,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
+
             @Override
             public ResultList<User> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1456,6 +1525,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
+
             @Override
             public ResultList<User> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1474,6 +1544,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
+
             @Override
             public ResultList<Group> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1495,6 +1566,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
+
             @Override
             public ResultList<Group> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1513,6 +1585,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
+
             @Override
             public ResultList<Meta> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1534,6 +1607,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
+
             @Override
             public ResultList<Meta> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1557,6 +1631,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
+
             @Override
             public ResultList<Meta> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1575,6 +1650,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<User>>() {
+
             @Override
             public ResultList<User> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1593,6 +1669,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Group>>() {
+
             @Override
             public ResultList<Group> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1611,6 +1688,7 @@ public class BMYClient {
         String[] params = paramList.toArray(new String[0]);
 
         return this.doGet(apiPath, params, null, new BMYRequestUtil.ResponseHandler<ResultList<Meta>>() {
+
             @Override
             public ResultList<Meta> handle(Response response) throws BMYException {
                 if (response.statusCode != 200) {
@@ -1669,6 +1747,7 @@ public class BMYClient {
     }
 
     public static class SingleUploader extends Uploader {
+
         private HttpRequestor.Uploader httpUploader;
         private long claimedBytes;
         private CountingOutputStream body;
@@ -1734,6 +1813,7 @@ public class BMYClient {
             }
 
             return BMYRequestUtil.finishResponse(response, new BMYRequestUtil.ResponseHandler<Meta>() {
+
                 @Override
                 public Meta handle(HttpRequestor.Response response) throws BMYException {
                     if (response.statusCode != 200) {
@@ -1871,6 +1951,7 @@ public class BMYClient {
     }
 
     public class ChunkedUploader extends Uploader {
+
         private String rootId;
         private String path;
         private long numBytes;
@@ -1916,6 +1997,7 @@ public class BMYClient {
                 }
 
                 return BMYRequestUtil.runAndRetry(3, new BMYRequestUtil.RequestMaker<Meta, RuntimeException>() {
+
                     public Meta run() throws BMYException {
                         return BMYClient.this.commitChunkedUploadByPath(ChunkedUploader.this.rootId,
                                 ChunkedUploader.this.path, ChunkedUploader.this.body.uploadId,
@@ -1932,6 +2014,7 @@ public class BMYClient {
     }
 
     private class ChunkedUploadOutputStream extends OutputStream {
+
         private String rootId;
         private byte[] chunk;
         private int chunkPos = 0;
@@ -1968,6 +2051,7 @@ public class BMYClient {
             if (this.uploadId == null) {
                 this.uploadId = BMYRequestUtil.runAndRetry(3,
                         new BMYRequestUtil.RequestMaker<String, RuntimeException>() {
+
                             @Override
                             public String run() throws BMYException, RuntimeException {
                                 return BMYClient.this.chunkedUploadFirst(ChunkedUploadOutputStream.this.rootId,
@@ -1980,6 +2064,7 @@ public class BMYClient {
                 int arrayOffset = 0;
                 final int arrayOffsetFinal = arrayOffset;
                 BMYRequestUtil.runAndRetry(3, new BMYRequestUtil.RequestMaker<Object, RuntimeException>() {
+
                     @Override
                     public Object run() throws BMYException, RuntimeException {
                         BMYClient.this.chunkedUploadAppend(ChunkedUploadOutputStream.this.rootId,
@@ -2020,6 +2105,7 @@ public class BMYClient {
     }
 
     public static class IOBMYException extends IOException {
+
         private static final long serialVersionUID = 1L;
 
         private BMYException underlying = null;
@@ -2036,6 +2122,7 @@ public class BMYClient {
     }
 
     public static abstract class Uploader {
+
         public abstract OutputStream getBody();
 
         public abstract void abort();
@@ -2046,6 +2133,7 @@ public class BMYClient {
     }
 
     public static class Downloader {
+
         public final Meta meta;
         public final InputStream body;
 

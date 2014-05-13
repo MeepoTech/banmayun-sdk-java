@@ -74,6 +74,7 @@ public class Group extends Dumpable {
     }
 
     public static JsonReader<Group> reader = new JsonReader<Group>() {
+
         @Override
         public Group read(JsonParser parser) throws IOException, JsonReadException {
             String id = null;

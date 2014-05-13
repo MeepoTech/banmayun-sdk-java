@@ -41,6 +41,7 @@ public class Revision extends Dumpable {
     }
 
     public static JsonReader<Revision> reader = new JsonReader<Revision>() {
+
         @Override
         public Revision read(JsonParser parser) throws IOException, JsonReadException {
             Long version = null;

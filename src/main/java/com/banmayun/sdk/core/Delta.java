@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonToken;
 public class Delta extends Dumpable {
 
     public static class Entry extends Dumpable {
+
         public String path = null;
         public Meta meta = null;
 
@@ -32,6 +33,7 @@ public class Delta extends Dumpable {
         }
 
         public static JsonReader<Entry> reader = new JsonReader<Entry>() {
+
             @Override
             public Entry read(JsonParser parser) throws IOException, JsonReadException {
                 String path = null;
@@ -100,6 +102,7 @@ public class Delta extends Dumpable {
     }
 
     public static JsonReader<Delta> reader = new JsonReader<Delta>() {
+
         @Override
         public Delta read(JsonParser parser) throws IOException, JsonReadException {
             String cursorId = null;

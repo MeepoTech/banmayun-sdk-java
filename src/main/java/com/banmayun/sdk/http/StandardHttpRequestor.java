@@ -74,6 +74,7 @@ public class StandardHttpRequestor extends HttpRequestor {
     }
 
     private static class Uploader extends HttpRequestor.Uploader {
+
         private HttpURLConnection conn;
 
         public Uploader(HttpURLConnection conn) throws IOException {

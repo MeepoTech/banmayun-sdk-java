@@ -32,6 +32,7 @@ public class ErrorResponse extends Dumpable {
     }
 
     public static JsonReader<ErrorResponse> reader = new JsonReader<ErrorResponse>() {
+
         @Override
         public ErrorResponse read(JsonParser parser) throws IOException, JsonReadException {
             Integer status = null;

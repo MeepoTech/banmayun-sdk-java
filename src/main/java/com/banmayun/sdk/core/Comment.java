@@ -42,6 +42,7 @@ public class Comment extends Dumpable {
     }
 
     public static JsonReader<Comment> reader = new JsonReader<Comment>() {
+
         @Override
         public Comment read(JsonParser parser) throws IOException, JsonReadException {
             String id = null;

@@ -63,6 +63,7 @@ public final class JsonReadException extends java.lang.Exception {
     }
 
     public static class PathPart {
+
         private String description = null;
         private PathPart next = null;
 

@@ -50,6 +50,7 @@ public class Permission extends Dumpable {
     }
 
     public static JsonReader<Permission> reader = new JsonReader<Permission>() {
+
         @Override
         public Permission read(JsonParser parser) throws IOException, JsonReadException {
             Boolean insertableToOwner = true;

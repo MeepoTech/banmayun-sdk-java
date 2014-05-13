@@ -30,6 +30,7 @@ public class Size extends Dumpable {
     }
 
     public static JsonReader<Size> reader = new JsonReader<Size>() {
+
         @Override
         public Size read(JsonParser parser) throws IOException, JsonReadException {
             Long bytes = null;

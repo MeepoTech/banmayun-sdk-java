@@ -68,6 +68,7 @@ public class User extends Dumpable {
     }
 
     public static JsonReader<User> reader = new JsonReader<User>() {
+
         @Override
         public User read(JsonParser parser) throws IOException, JsonReadException {
             String id = null;

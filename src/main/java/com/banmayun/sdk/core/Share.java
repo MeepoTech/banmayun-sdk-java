@@ -43,6 +43,7 @@ public class Share extends Dumpable {
     }
 
     public static JsonReader<Share> reader = new JsonReader<Share>() {
+
         @Override
         public Share read(JsonParser parser) throws IOException, JsonReadException {
             String id = null;

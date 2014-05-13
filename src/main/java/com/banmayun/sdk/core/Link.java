@@ -48,6 +48,7 @@ public class Link extends Dumpable {
     }
 
     public static JsonReader<Link> reader = new JsonReader<Link>() {
+
         @Override
         public Link read(JsonParser parser) throws IOException, JsonReadException {
             String id = null;

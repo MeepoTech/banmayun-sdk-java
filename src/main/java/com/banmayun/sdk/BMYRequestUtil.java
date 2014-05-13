@@ -233,6 +233,7 @@ public class BMYRequestUtil {
     }
 
     public static abstract class ResponseHandler<T> {
+
         public abstract T handle(HttpRequestor.Response response) throws BMYException;
     }
 
@@ -350,6 +351,7 @@ public class BMYRequestUtil {
     }
 
     public static abstract class RequestMaker<T, E extends Throwable> {
+
         public abstract T run() throws BMYException, E;
     }
 

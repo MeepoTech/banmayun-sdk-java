@@ -39,6 +39,7 @@ public class Relation extends Dumpable {
     }
 
     public static JsonReader<Relation> reader = new JsonReader<Relation>() {
+
         @Override
         public Relation read(JsonParser parser) throws IOException, JsonReadException {
             EnumElement role = null;

@@ -38,6 +38,7 @@ public class ChunkedUpload extends Dumpable {
     }
 
     public static JsonReader<ChunkedUpload> reader = new JsonReader<ChunkedUpload>() {
+
         @Override
         public ChunkedUpload read(JsonParser parser) throws IOException, JsonReadException {
             String id = null;

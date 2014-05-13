@@ -9,6 +9,7 @@ public abstract class BMYStreamWriter<E extends Throwable> {
     public abstract void write(NoThrowOutputStream out) throws E;
 
     public static final class InputStreamCopier extends BMYStreamWriter<IOException> {
+
         private InputStream source = null;
 
         public InputStreamCopier(InputStream source) {
@@ -22,6 +23,7 @@ public abstract class BMYStreamWriter<E extends Throwable> {
     }
 
     public static final class ByteArrayCopier extends BMYStreamWriter<RuntimeException> {
+
         private byte[] data = null;
         private int offset = 0;
         private int length = -1;
